@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>ZendExt</groupId>
+	<artifactId>ZendExt</artifactId>
+	<packaging>php</packaging>
+	<name>ZendExt</name>
+	<version>1.0-SNAPSHOT</version>
+	<properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.phpmaven</groupId>
+				<artifactId>maven-php-plugin</artifactId>
+				<extensions>true</extensions>
+				<version>1.0</version>
+			</plugin>
+			<plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                        <id>reports-dir</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>mkdir</executable>
+                            <arguments>
+                                <argument>-p</argument>
+                                <argument>${project.build.directory}/reports/coverage</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>codesniffer</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>phpcs</executable>
+                            <arguments>
+                                <argument>--standard=Zend</argument>
+                                <argument>--report=checkstyle</argument>
+                                <!-- Hudson's plugin needs it to be in the target folder... -->
+                                <argument>--report-file=${project.build.directory}/checkstyle-result.xml</argument>
+                                <argument>src/main/</argument>
+                            </arguments>
+                            <successCodes>
+                                <!-- Prevent the build from failing due a coding style error -->
+                                <successCode>0</successCode>
+                                <successCode>1</successCode>
+                            </successCodes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>phpunit</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>phpunit</executable>
+                            <arguments>
+                                <!-- Since phpunit uses spaces as separators, we need to set these key-value pairs as different arguments -->
+                                <argument>--log-xml</argument>
+                                <argument>${project.build.directory}/reports/phpunit.xml</argument>
+                                
+                                <!-- Hudson's plugin needs it to be in the target folder... -->
+                                <argument>--log-pmd</argument>
+                                <argument>${project.build.directory}/pmd.xml</argument>
+                                
+                                <argument>--coverage-clover</argument>
+                                <argument>${project.build.directory}/reports/clover.xml</argument>
+                                
+                                <argument>--coverage-html</argument>
+                                <argument>${project.build.directory}/reports/coverage/</argument>
+                                
+                                <argument>src/test/php/AllTests.php</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>org.phpunit</groupId>
+			<artifactId>phpunit5</artifactId>
+			<version>3.3.9</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+            <groupId>com.zend</groupId>
+            <artifactId>zend-framework</artifactId>
+            <version>1.10.2</version>
+        </dependency>
+	</dependencies>
+
+	<reporting>
+		<plugins>
+		    <plugin>
+                <groupId>org.phpmaven</groupId>
+                <artifactId>maven-php-plugin</artifactId>
+                <version>1.0</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>doxygen</report>
+                            <!-- The plugin fails to find this on Debian-based machines -->
+<!--                            <report>phpdocumentor</report>-->
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+			<plugin>
+				<groupId>org.phpmaven</groupId>
+				<artifactId>maven-php-plugin</artifactId>
+				<version>1.0</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>2.4</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>report-only</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
+	</reporting>
+</project>
