@@ -16,6 +16,10 @@
 				<artifactId>maven-php-plugin</artifactId>
 				<extensions>true</extensions>
 				<version>1.0</version>
+				<configuration>
+                    <compileArgs> -d auto_prepend_file=maven-autoloader.php</compileArgs>
+                    <ignoreValidate>false</ignoreValidate>
+                </configuration>
 			</plugin>
 			<plugin>
                 <groupId>org.codehaus.mojo</groupId>
