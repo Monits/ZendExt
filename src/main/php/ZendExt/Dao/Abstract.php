@@ -77,11 +77,7 @@ abstract class ZendExt_Dao_Abstract
         // If the sharding arg is not present, retrieve a connection from the default
         if (null === $shardingArg) {
             if (!isset(self::$_tables[$this->_tableClass]['default'])) {
-                $defaultDbs = self::$_config->getDefaultShardDbs($this->_tableClass);
-
-                if (!is_array($defaultDbs)) {
-                    $defaultDbs = array($defaultDbs);
-                }
+                $defaultDbs = (array) self::$_config->getDefaultShardDbs($this->_tableClass);
 
                 // Pick anyone at random
                 self::$_tables[$this->_tableClass]['default'] = $defaultDbs[array_rand($defaultDbs)];
@@ -105,12 +101,7 @@ abstract class ZendExt_Dao_Abstract
 
         if (!isset(self::$_tables[$this->_tableClass][$operation][$shardId])) {
             // Retrieve the adapter to be used for the instance
-            $dbNames = self::$_config->getShardDbs($this->_tableClass, $shardId, $operation);
-
-            // Make sure it's an array
-            if (!is_array($dbNames)) {
-                $dbNames = array($dbNames);
-            }
+            $dbNames = (array) self::$_config->getShardDbs($this->_tableClass, $shardId, $operation);
 
             $dbNameToUse = $dbNames[array_rand($dbNames)];
 
