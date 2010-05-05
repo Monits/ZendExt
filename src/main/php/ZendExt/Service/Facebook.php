@@ -11,6 +11,8 @@
  * @since     1.0.0
  */
 
+//*WARNING*: Do *NOT* under pain of slow death, remove the next line!!!
+//This wont autoload, so if you remove it, everything blows up. And I mean *everything*!!
 require_once('facebook/facebook.php');
 
 /**
@@ -35,7 +37,7 @@ class ZendExt_Service_Facebook
     /**
      * Instance of FB lib.
      *
-     * @var facebook
+     * @var Facebook
      */
     private $_fb;
 
