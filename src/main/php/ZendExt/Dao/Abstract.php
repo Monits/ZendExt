@@ -130,6 +130,6 @@ abstract class ZendExt_Dao_Abstract
      */
     public static function setConfiguration(ZendExt_Application_Resource_Multidb $config)
     {
-        $this->_config = $config;
+        self::$_config = $config;
     }
 }
