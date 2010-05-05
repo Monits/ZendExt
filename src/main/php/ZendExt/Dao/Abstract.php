@@ -80,20 +80,15 @@ abstract class ZendExt_Dao_Abstract
                 $defaultDbs = (array) self::$_config->getDefaultShardDbs($this->_tableClass);
 
                 // Pick anyone at random
-                self::$_tables[$this->_tableClass]['default'] = $defaultDbs[array_rand($defaultDbs)];
+                $table = $this->_createTableWithAnyAdapter($defaultDbs);
+                self::$_tables[$this->_tableClass]['default'] = $table;
             }
 
             return self::$_tables[$this->_tableClass]['default'];
         }
 
         // Apply sharding
-        $shardingClass = self::$_config->getShardingStrategy($this->_tableClass);
-        if (!isset(self::$_shardingStrategies[$shardingClass])) {
-            self::$_shardingStrategies[$shardingClass] = new $shardingClass();
-        }
-
-        $shardId = self::$_shardingStrategies[$shardingClass]->getShard($shardingArg);
-
+        $shardId = $this->_getShardId();
 
         if (!isset(self::$_tables[$this->_tableClass][$operation])) {
             self::$_tables[$this->_tableClass][$operation] = array();
@@ -103,13 +98,44 @@ abstract class ZendExt_Dao_Abstract
             // Retrieve the adapter to be used for the instance
             $dbNames = (array) self::$_config->getShardDbs($this->_tableClass, $shardId, $operation);
 
-            $dbNameToUse = $dbNames[array_rand($dbNames)];
-
-            $db = self::$_config->getDb($dbNameToUse);
-            self::$_tables[$this->_tableClass][$operation][$shardId] = new $this->_tableClass($db);
+            // Pick anyone at random
+            $table = $this->_createTableWithAnyAdapter($dbNames);
+            self::$_tables[$this->_tableClass][$operation][$shardId] = $table;
         }
 
         return self::$_tables[$this->_tableClass][$operation][$shardId];
+    }
+
+    /**
+     * Computes the shard id for the current table given the value by which to shard.
+     *
+     * @param any $shardingArg The value on which to perform sharding.
+     *
+     * @return int The shard id for the current table and value by which to shard.
+     */
+    private function _getShardId($shardingArg)
+    {
+        // If not already instantiated, create a new sharding strategy
+        $shardingClass = self::$_config->getShardingStrategy($this->_tableClass);
+        if (!isset(self::$_shardingStrategies[$shardingClass])) {
+            self::$_shardingStrategies[$shardingClass] = new $shardingClass();
+        }
+
+        return self::$_shardingStrategies[$shardingClass]->getShard($shardingArg);
+    }
+
+    /**
+     * Creates a new table using a random adapter from the given list.
+     *
+     * @param array $dbs The list of possible adapters to be used for the table.
+     *
+     * @return Zend_Db_Table_Abstract The newly created table.
+     */
+    private function _createTableWithAnyAdapter(array $dbs)
+    {
+        $dbName = $dbs[array_rand($dbs)];
+        $db = self::$_config->getDb($dbName);
+        return new $this->_tableClass($db);
     }
 
     /**
