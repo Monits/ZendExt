@@ -95,7 +95,14 @@
                                 <argument>--coverage-html</argument>
                                 <argument>${project.build.directory}/reports/coverage/</argument>
                                 
-                                <argument>src/test/php/AllTests.php</argument>
+                                <argument>-dmemory_limit=100M</argument>
+                                
+                                <!-- Properly set include path and autoloader to allow everything to work -->
+                                <argument>--bootstrap</argument>
+                                <argument>maven-autoloader.php</argument>
+                                <argument>-dinclude_path=src/main/php:src/test/php:/usr/share/php:target/phpinc</argument>
+                                
+                                <argument>src/test/php/</argument>
                             </arguments>
                         </configuration>
                     </execution>

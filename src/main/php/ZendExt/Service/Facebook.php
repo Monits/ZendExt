@@ -4,7 +4,7 @@
  *
  * @category  ZendExt
  * @package   ZendExt_Service
- * @copyright 2010 company
+ * @copyright 2010 Monits
  * @license   Copyright (C) 2010. All rights reserved.
  * @version   Release: 1.0.0
  * @link      http://www.zendext.com/
@@ -19,9 +19,9 @@ require_once('facebook/facebook.php');
  * Wrapper for Facebook API library.
  *
  * @category  ZendExt
- * @package   ZendExt_service
+ * @package   ZendExt_Service
  * @author    jpcivile <jpcivile@monits.com>
- * @copyright 2010 company
+ * @copyright 2010 Monits
  * @license   Copyright 2010. All rights reserved.
  * @version   Release: 1.0.0
  * @link      http://www.zendext.com/
