@@ -182,6 +182,12 @@ class MultidbTest extends PHPUnit_Framework_TestCase
      */
     public function testGetDefaultShardDbs()
     {
+        $this->assertNull(
+            $this->_multidb->getDefaultShardDbs(
+                'non-existing-table', 0
+            )
+        );
+
         $this->assertEquals(
             $this->_config['shards']['realshard']['default'],
             $this->_multidb->getDefaultShardDbs(
@@ -201,6 +207,57 @@ class MultidbTest extends PHPUnit_Framework_TestCase
             $this->_multidb->getDefaultShardDbs(
                 'Random_Master_Table', 0
             )
+        );
+    }
+
+    /**
+     * Test the getDb method.
+     *
+     * @return void
+     */
+    public function testGetDb()
+    {
+        try {
+            $this->_multidb->getDb('non-existing-adapter');
+
+            $this->fail('could retrieve an adapter for a non-existing adapter name.');
+        } catch (Zend_Application_Resource_Exception $e) {
+            // This is expected
+        }
+
+        $adapter = $this->_multidb->getDb('test_adapter_r');
+        $adapterConfig = $adapter->getConfig();
+
+        $this->assertEquals(
+            $this->_config['adapters']['test_adapter_r']['username'],
+            $adapterConfig['username']
+        );
+
+
+        $adapter = $this->_multidb->getDb('test_adapter_w');
+        $adapterConfig = $adapter->getConfig();
+
+        $this->assertEquals(
+            $this->_config['adapters']['test_adapter_w']['username'],
+            $adapterConfig['username']
+        );
+
+
+        $adapter = $this->_multidb->getDb('test_adapter_default');
+        $adapterConfig = $adapter->getConfig();
+
+        $this->assertEquals(
+            $this->_config['adapters']['test_adapter_default']['username'],
+            $adapterConfig['username']
+        );
+
+
+        $adapter = $this->_multidb->getDb('test_adapter_rw');
+        $adapterConfig = $adapter->getConfig();
+
+        $this->assertEquals(
+            $this->_config['adapters']['test_adapter_rw']['username'],
+            $adapterConfig['username']
         );
     }
 }
