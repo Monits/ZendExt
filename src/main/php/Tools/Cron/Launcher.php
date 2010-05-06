@@ -2,8 +2,8 @@
 /**
  * Launcher script for offline processes.
  *
- * @category  ZendExt
- * @package   ZendExt_Cron
+ * @category  Tools
+ * @package   Tools_Cron
  * @copyright 2010 Monits
  * @license   Copyright (C) 2010. All rights reserved.
  * @version   Release: 1.0.0
@@ -12,16 +12,8 @@
  */
 
 error_reporting(E_ALL);
-
-if (!file_exists('log/')) {
-
-    mkdir('log/');
-}
-
-if (!file_exists('data/')) {
-
-    mkdir('data/');
-}
+define('CONFIG_FILE', 'config/process.xml');
+define('STRATEGY_PATH', 'strategy/');
 
 require_once 'Zend/Loader/Autoloader.php';
 $loader = Zend_Loader_Autoloader::getInstance();
@@ -30,7 +22,7 @@ $loader->registerNamespace('ZendExt_');
 try {
 
     $opts = new Zend_Console_Getopt(array(
-        'config|c=s' => 'Path to config file. Optional.'
+        'config|c=s' => 'Path to process config file. Optional'
     ));
 
     $opts->parse();
@@ -39,7 +31,17 @@ try {
     die($e->getUsageMessage());
 }
 
-instanceLogger('log/Launcher.log');
+
+$config = loadConfig($opts->config);
+$strategyDir = $config->launcher->strategyDir? $config->launcher->strategyDir : STRATEGY_PATH;
+
+if (!file_exists($config->launcher->logDir)) {
+
+    mkdir($config->launcher->logDir, 0744, true);
+}
+
+instanceLogger($config->launcher->logDir.'/'.$config->launcher->logFile);
+ZendExt_Cron_Persistance::setDataDirectory($config->data->dir? $config->data->dir.'/' : 'data/');
 
 $strategyList = $opts->getRemainingArgs();
 if ( empty($strategyList) ) {
@@ -47,7 +49,7 @@ if ( empty($strategyList) ) {
     logger('info', 'You must specify at least one strategy.');
 } else if ( count($strategyList) == 1 ) {
 
-    spawnProcess($strategyList[0], $opts->config);
+    spawnProcess($strategyList[0], $strategyDir, $config->process);
 } else {
 
     $forked = 0;
@@ -58,7 +60,7 @@ if ( empty($strategyList) ) {
         $pid = pcntl_fork();
         if ( $pid == 0 ) {
 
-            spawnProcess($strategyName, $opts->config);
+            spawnProcess($strategyName, $strategyDir, $config->process);
             exit();
         } else if ( $pid == -1 ) {
 
@@ -105,15 +107,16 @@ function waitForChildren($forked)
 /**
  * Spawn a new process.
  *
- * @param string $strategyName The name of the strategy to pass on to the process.
- * @param string $configFile   Optional. The name of the config file to use.
+ * @param string      $strategyName The name of the strategy to pass on to the process.
+ * @param string      $strategyDir  The directory to load strategies from.
+ * @param Zend_Config $config       The config to use
  *
  * @return void
  */
-function spawnProcess($strategyName, $configFile = null)
+function spawnProcess($strategyName, $strategyDir, Zend_Config $config)
 {
 
-    $strategyPath = 'strategy/'.$strategyName.'.php';
+    $strategyPath = $strategyDir.$strategyName.'.php';
 
     if ( !file_exists($strategyPath) ) {
 
@@ -129,7 +132,7 @@ function spawnProcess($strategyName, $configFile = null)
 
         try {
 
-            $process = new ZendExt_Cron_Process(new $strategyName, $configFile);
+            $process = new ZendExt_Cron_Process(new $strategyName, $config);
             $process->execute();
         } catch ( ZendExt_Cron_LockException $e ) {
 
@@ -139,8 +142,11 @@ function spawnProcess($strategyName, $configFile = null)
             logger('crit', $e->getMessage());
         } catch ( Exception $e ) {
 
-            $process->forceCleanup();
             logger('crit', $e->__toString());
+            if ( isset($process) ) {
+
+                $process->forceCleanup();
+            }
         }
     }
 }
@@ -180,6 +186,37 @@ function logger($level, $message)
     } else {
 
         echo $message.PHP_EOL;
+    }
+}
+
+/**
+ * Load the config file.
+ *
+ * @param string $configFile The path to the config file.
+ *
+ * @return void
+ */
+function loadConfig($configFile)
+{
+    if ( !$configFile ) {
+
+        $configFile = CONFIG_FILE;
+    }
+
+    if (!file_exists($configFile)) {
+        error_log('Cant find the config file!! Crashing hard.');
+        die();
+    }
+
+    try {
+
+        return new Zend_Config_Xml($configFile);
+    } catch ( Zend_Config_Exception $e ) {
+
+        error_log('Config file parsing failed, crashing hard.');
+        error_log($e->__toString());
+
+        die();
     }
 }
 
@@ -249,6 +286,6 @@ function shutdownHandler()
     if ( $isError ) {
 
         //TODO: Somehow clean up the .pid file
-        logger('crit', $error['message']);
+        error_log($error['message']);
     }
 }

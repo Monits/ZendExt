@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zend-config>
+	<launcher>
+		<logDir>log/</logDir>
+		<logFile>launcher.log</logFile>
+		<strategyDir>../../../resources/strategy/</strategyDir>
+	</launcher>
+	<data>
+		<dir>data/</dir>
+	</data>
+	<process>
+		<configDir>../../../resources/config/strategies</configDir>
+		<logDir>log/</logDir>
+		<logFile>process.log</logFile>
+		<pidFile>process.pid</pidFile>
+		<log>
+			<recipients>
+				<mail>jmsotuyo@monits.com</mail>
+			</recipients>
+			<from>Cron Logger</from>
+			<subject>Process Critical</subject>
+		</log>
+		<outputFile>php://stdout</outputFile>
+	</process>
+</zend-config>

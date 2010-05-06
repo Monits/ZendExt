@@ -25,10 +25,11 @@
  */
 final class ZendExt_Cron_Process
 {
-
-    const CONFIG_FILE = 'config/process.xml';
-
-    const STRATEGY_CONFIG_DIR = 'config/strategies/';
+    private static $_defaultOptions = array(
+                                          'configDir' => 'config/strategies',
+                                          'outputFile' => 'php://stdout',
+                                          'logDir' => 'log/'
+                                      );
 
     /**
      * The strategy being used.
@@ -54,34 +55,35 @@ final class ZendExt_Cron_Process
     /**
      * Creates a new offline process.
      *
-     * @param ZendExt_Cron_Strategy_Interface $strategy   The strategy to apply during execution.
-     * @param string                          $configFile Optional. The name of the config file to be used.
+     * @param ZendExt_Cron_Strategy_Interface $strategy The strategy to apply during execution.
+     * @param Zend_Config                     $config   The config data to use.
      */
-    public function __construct(ZendExt_Cron_Strategy_Interface $strategy, $configFile = null)
+    public function __construct(ZendExt_Cron_Strategy_Interface $strategy, Zend_Config $config)
     {
 
         $this->_strategy = $strategy;
 
-        $this->_loadConfig($configFile);
+        $this->_loadConfig($config);
         $this->_setupLogger();
     }
 
     /**
      * Load and set the config for the process.
      *
-     * @param string $configFile Optional. Path to config file.
+     * @param Zend_Config $config The config data to use.
      *
      * @return void
      */
-    private function _loadConfig($configFile = null)
+    private function _loadConfig($config)
     {
+        $this->_config = new Zend_Config(self::$_defaultOptions, true);
+        $this->_config->merge($config);
 
         $strategyReflector = new ReflectionClass($this->_strategy);
         $strategyName = $strategyReflector->getName();
 
-        $configFile = ( $configFile === null ) ? self::STRATEGY_CONFIG_DIR.$strategyName.'.xml' : $configFile;
+        $configFile = $this->_config->configDir.'/'.$strategyName.'.xml';
 
-        $this->_config = new Zend_Config_Xml(self::CONFIG_FILE, 'process', true);
         $this->_config->merge(new Zend_Config_Xml($configFile, 'process'));
     }
 
@@ -110,9 +112,13 @@ final class ZendExt_Cron_Process
     {
 
         $logConfig = $this->_config->log;
+        if (!file_exists($this->_config->logDir)) {
+
+            mkdir($this->_config->logDir, 0744, true);
+        }
 
         $this->_logger = new Zend_Log();
-        $writer = new Zend_Log_Writer_Stream($this->_config->logDir.$this->_config->logFile);
+        $writer = new Zend_Log_Writer_Stream($this->_config->logDir.'/'.$this->_config->logFile);
 
         $mail = new Zend_Mail();
 
@@ -244,4 +250,5 @@ final class ZendExt_Cron_Process
 
         file_put_contents($this->_config->outputFile, $stats);
     }
+
 }

@@ -26,7 +26,7 @@
 final class ZendExt_Cron_Persistance
 {
 
-    const DATA_DIR = 'data/';
+    private static $_dataDir = 'data/';
 
     /**
      * The name of the process running.
@@ -46,7 +46,7 @@ final class ZendExt_Cron_Persistance
     public static function persist($name, $data)
     {
 
-        $filePath = self::DATA_DIR.self::$_process.'/';
+        $filePath = self::$_dataDir.self::$_process.'/';
         $fileName = $name.'.dat';
 
         if ( !is_dir($filePath) ) {
@@ -69,7 +69,7 @@ final class ZendExt_Cron_Persistance
     public static function retrieve($name)
     {
 
-        $fileName = self::DATA_DIR.self::$_process.'/'.$name.'.dat';
+        $fileName = self::$_dataDir.self::$_process.'/'.$name.'.dat';
 
         if ( !self::isPersisted($name) ) {
 
@@ -89,7 +89,7 @@ final class ZendExt_Cron_Persistance
     public static function isPersisted($name)
     {
 
-        return file_exists(self::DATA_DIR.self::$_process.'/'.$name.'.dat');
+        return file_exists(self::$_dataDir.self::$_process.'/'.$name.'.dat');
     }
 
     /**
@@ -106,5 +106,17 @@ final class ZendExt_Cron_Persistance
 
             self::$_process = $process;
         }
+    }
+
+    /**
+     * Set the data directory.
+     *
+     * @param string $dir The directory path.
+     *
+     * @return void
+     */
+    public static function setDataDirectory($dir)
+    {
+        self::$_dataDir = $dir;
     }
 }
