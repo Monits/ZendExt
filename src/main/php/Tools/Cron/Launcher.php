@@ -12,7 +12,7 @@
  */
 
 error_reporting(E_ALL);
-define('CONFIG_FILE', 'config/process.xml');
+define('CONFIG_FILE', 'src/main/resources/config/process.xml');
 define('STRATEGY_PATH', 'strategy/');
 
 require_once 'Zend/Loader/Autoloader.php';
