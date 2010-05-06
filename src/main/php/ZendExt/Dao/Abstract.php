@@ -50,6 +50,42 @@ abstract class ZendExt_Dao_Abstract
     protected $_tableClass = null;
 
     /**
+     * Retrieves the table for the requested shard id.
+     *
+     * @param int    $shard     The id of shard to be used.
+     * @param string $operation The operation to be performed on the table.
+     *                          See {@link #OPERATION_READ} and {@link #OPERATION_WRITE}
+     *
+     * @return Zend_Db_Table_Abstract The table to be used by this DAO.
+     */
+    protected function _getTableForShard($shard, $operation = self::OPERATION_READ)
+    {
+        if (null === self::$_config) {
+            return $this->_getTableForDefaultAdapter();
+        }
+
+        // Assure an entry for the table exists
+        if (!isset(self::$_tables[$this->_tableClass])) {
+            self::$_tables[$this->_tableClass] = array();
+        }
+
+        if (!isset(self::$_tables[$this->_tableClass][$operation])) {
+            self::$_tables[$this->_tableClass][$operation] = array();
+        }
+
+        if (!isset(self::$_tables[$this->_tableClass][$operation][$shardId])) {
+            // Retrieve the adapter to be used for the instance
+            $dbNames = (array) self::$_config->getShardDbs($this->_tableClass, $shardId, $operation);
+
+            // Pick anyone at random
+            $table = $this->_createTableWithAnyAdapter($dbNames);
+            self::$_tables[$this->_tableClass][$operation][$shardId] = $table;
+        }
+
+        return self::$_tables[$this->_tableClass][$operation][$shardId];
+    }
+
+    /**
      * Retrieves the table instance to be used.
      *
      * @param string $operation   The operation to be performed on the table.
@@ -61,12 +97,7 @@ abstract class ZendExt_Dao_Abstract
     protected function _getTable($operation = self::OPERATION_READ, $shardingArg = null)
     {
         if (null === self::$_config) {
-            // No sharding configuration, assume a default adapter.
-            if (!isset(self::$_tables[$this->_tableClass])) {
-                self::$_tables[$this->_tableClass] = new $this->_tableClass();
-            }
-
-            return self::$_tables[$this->_tableClass];
+            return $this->_getTableForDefaultAdapter();
         }
 
         // Assure an entry for the table exists
@@ -90,20 +121,7 @@ abstract class ZendExt_Dao_Abstract
         // Apply sharding
         $shardId = $this->_getShardId();
 
-        if (!isset(self::$_tables[$this->_tableClass][$operation])) {
-            self::$_tables[$this->_tableClass][$operation] = array();
-        }
-
-        if (!isset(self::$_tables[$this->_tableClass][$operation][$shardId])) {
-            // Retrieve the adapter to be used for the instance
-            $dbNames = (array) self::$_config->getShardDbs($this->_tableClass, $shardId, $operation);
-
-            // Pick anyone at random
-            $table = $this->_createTableWithAnyAdapter($dbNames);
-            self::$_tables[$this->_tableClass][$operation][$shardId] = $table;
-        }
-
-        return self::$_tables[$this->_tableClass][$operation][$shardId];
+        return $this->_getTableForShard($shardId, $operation);
     }
 
     /**
@@ -136,6 +154,21 @@ abstract class ZendExt_Dao_Abstract
         $dbName = $dbs[array_rand($dbs)];
         $db = self::$_config->getDb($dbName);
         return new $this->_tableClass($db);
+    }
+
+    /**
+     * Retrieves the table assuming a default table adapter.
+     *
+     * @return Zend_Db_Table_abstract
+     */
+    private function _getTableForDefaultAdapter()
+    {
+        // No sharding configuration, assume a default adapter.
+        if (!isset(self::$_tables[$this->_tableClass])) {
+            self::$_tables[$this->_tableClass] = new $this->_tableClass();
+        }
+
+        return self::$_tables[$this->_tableClass];
     }
 
     /**
