@@ -95,7 +95,7 @@
                                 <argument>--coverage-html</argument>
                                 <argument>${project.build.directory}/reports/coverage/</argument>
                                 
-                                <argument>-dmemory_limit=100M</argument>
+                                <argument>-dmemory_limit=256M</argument>
                                 
                                 <!-- Properly set include path and autoloader to allow everything to work -->
                                 <argument>--bootstrap</argument>
