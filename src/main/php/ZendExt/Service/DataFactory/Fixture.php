@@ -30,6 +30,8 @@ class ZendExt_Service_DataFactory_Fixture
 
     const VISITOR = 'visitante';
 
+    const CHANNEL_NAME = 'deportes.futbol.mundial.fixture';
+
     private $_matches;
 
     /**

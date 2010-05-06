@@ -28,4 +28,102 @@ class ZendExt_Service_DataFactory
     const DATE_FORMAT = 'YYYYMMdd';
 
     const TIME_FORMAT = 'HH:mm:ss';
+
+    const BASE_URL = 'http://www.datafactory.ws/clientes/xml/';
+
+    private $_baseUrl = self::BASE_URL;
+
+    private $_channels;
+
+    private $_parsers = array();
+
+    /**
+     * Check for updates.
+     *
+     * @param timestamp $lastUpdate The timestamp of the last update.
+     * @param string    $baseUrl    Optional. The base url to make requests on.
+     */
+    public function __construct($lastUpdate, $baseUrl=null)
+    {
+        $this->_checkChannels($lastUpdate);
+
+        if ( $baseUrl ) {
+
+            $this->_baseUrl = $baseUrl;
+        }
+    }
+
+    /**
+     * Check for updates.
+     *
+     * @param timestamp $lastUpdate The timestamp of the last update.
+     *
+     * @return void
+     */
+    private function _checkChannels($lastUpdate)
+    {
+        $xml = $this->_requestXML(
+            $this->_baseUrl.'index.php'.ZendExt_Service_DataFactory_Channel::buildUrl($lastUpdate)
+        );
+
+        $parser = new ZendExt_Service_DataFactory_Channel($xml);
+
+        $this->_channels = $parser->getChannels();
+    }
+
+    /**
+     * Check whether a given channel can be updated.
+     *
+     * @param string $channel
+     *
+     * @return boolean
+     */
+    public function canUpdate($channel)
+    {
+        return array_search($channel, $this->_channels) !== false;
+    }
+
+    /**
+     * Get parsed channel data.
+     *
+     * @param string  $channel The name of the channel.
+     * @param string  $parser  The name of the parser class.
+     *
+     * @return object
+     */
+    public function getChannel($channel, $parser)
+    {
+        if ( isset($this->_parsers[$channel]) ) {
+
+            return $this->_parsers[$channel];
+        }
+
+        if (!$this->canUpdate($channel)) {
+
+            return false;
+        }
+
+        $xml = $this->_requestXML($this->_baseUrl.'index.php?canal='.$channel);
+        $this->_parsers[$channel] = new $parser($xml);
+
+        return $this->_parsers[$channel];
+    }
+
+    /**
+     * Request an XML document.
+     *
+     * @param string $url the url to fetch from.
+     *
+     * @return string
+     */
+    private function _requestXML($url)
+    {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        return $response;
+    }
 }
