@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zend-config>
+	<process>
+		<logFile>test.log</logFile>
+		<pidFile>test.pid</pidFile>
+		<strategy>
+			<total>120</total>
+		</strategy>
+		<sleepTime>2</sleepTime>
+	</process>
+</zend-config>
