@@ -78,8 +78,8 @@ class ZendExt_Service_DataFactory_Channel
     public static function buildUrl($date)
     {
         $date = new Zend_Date($date);
-        $day = $date->toString('YYYYMMdd');
-        $time = $date->toString('HH:mm:ss');
+        $day = $date->toString(ZendExt_Service_DataFactory::DATE_FORMAT);
+        $time = $date->toString(ZendExt_Service_DataFactory::TIME_FORMAT);
 
         return '?desde='.$day.'&hora='.$time;
     }
