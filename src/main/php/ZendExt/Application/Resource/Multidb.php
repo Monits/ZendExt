@@ -146,6 +146,11 @@ class ZendExt_Application_Resource_Multidb extends Zend_Application_Resource_Res
      */
     public function getDb($name)
     {
+        // Prevent the db from picking a default if there is none.
+        if (null === $name) {
+            $name = '';
+        }
+
         return $this->_dbs->getDb($name);
     }
 
