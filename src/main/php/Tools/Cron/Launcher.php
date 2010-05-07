@@ -33,7 +33,13 @@ try {
 
 
 $config = loadConfig($opts->config);
-$strategyDir = $config->launcher->strategyDir? $config->launcher->strategyDir : STRATEGY_PATH;
+$strategyDir = $config->launcher->strategyDir ?
+    $config->launcher->strategyDir : STRATEGY_PATH;
+
+if ( $config->launcher->strategyNamespace ) {
+
+    $loader->registerNamespace($config->launcher->strategyNamespace);
+}
 
 if (!file_exists($config->launcher->logDir)) {
 
@@ -116,37 +122,49 @@ function waitForChildren($forked)
 function spawnProcess($strategyName, $strategyDir, Zend_Config $config)
 {
 
-    $strategyPath = $strategyDir.$strategyName.'.php';
+    $loaded = Zend_Loader_Autoloader::autoload($strategyName);
 
-    if ( !file_exists($strategyPath) ) {
+    if ( !$loaded ) {
 
-        logger('crit', 'The specified strategy was not found.');
-    } else {
+        $strategyPath = $strategyDir.'/'.$strategyName.'.php';
+        if ( !file_exists($strategyPath) ) {
 
-        require_once($strategyPath);
+            logger('crit', 'The specified strategy was not found.');
+            return;
+        } else {
 
-        register_shutdown_function('shutdownHandler');
-        set_error_handler('errorHandler');
+            require_once($strategyPath);
+            if (!class_exists($strategyName)) {
 
-        ZendExt_Cron_Persistance::setCurrentProcess($strategyName);
-
-        try {
-
-            $process = new ZendExt_Cron_Process(new $strategyName, $config);
-            $process->execute();
-        } catch ( ZendExt_Cron_LockException $e ) {
-
-            logger('crit', $e->getMessage());
-        } catch ( ZendExt_Cron_ErrorException $e ) {
-
-            logger('crit', $e->getMessage());
-        } catch ( Exception $e ) {
-
-            logger('crit', $e->__toString());
-            if ( isset($process) ) {
-
-                $process->forceCleanup();
+                logger('crit', 'The specified strategy was not found.');
+                return;
             }
+
+        }
+    }
+
+    register_shutdown_function('shutdownHandler');
+    set_error_handler('errorHandler');
+
+    ZendExt_Cron_Persistance::setCurrentProcess($strategyName);
+
+
+    try {
+
+        $process = new ZendExt_Cron_Process(new $strategyName, $config);
+        $process->execute();
+    } catch ( ZendExt_Cron_LockException $e ) {
+
+        logger('crit', $e->getMessage());
+    } catch ( ZendExt_Cron_ErrorException $e ) {
+
+        logger('crit', $e->getMessage());
+    } catch ( Exception $e ) {
+
+        logger('crit', $e->__toString());
+        if ( isset($process) ) {
+
+            $process->forceCleanup();
         }
     }
 }

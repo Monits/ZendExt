@@ -80,10 +80,9 @@ final class ZendExt_Cron_Process
         $this->_config->merge($config);
 
         $strategyReflector = new ReflectionClass($this->_strategy);
-        $strategyName = $strategyReflector->getName();
+        $fileName = $strategyReflector->getConstant('CONFIG_FILE');
 
-        $configFile = $this->_config->configDir.'/'.$strategyName.'.xml';
-
+        $configFile = $this->_config->configDir.'/'.$fileName.'.xml';
         $this->_config->merge(new Zend_Config_Xml($configFile, 'process'));
     }
 
@@ -127,11 +126,11 @@ final class ZendExt_Cron_Process
         $mail->setSubject($logConfig->subject);
         $mail->setFrom($logConfig->from);
 
-        $writer2 = new Zend_Log_Writer_Mail($mail);
-        $writer2->addFilter(new Zend_Log_Filter_Priority(Zend_Log::CRIT));
+    //    $writer2 = new Zend_Log_Writer_Mail($mail);
+      //  $writer2->addFilter(new Zend_Log_Filter_Priority(Zend_Log::CRIT));
 
         $this->_logger->addWriter($writer);
-        $this->_logger->addWriter($writer2);
+        //$this->_logger->addWriter($writer2);
 
         ZendExt_Cron_Log::setProcessLog($this->_logger);
     }

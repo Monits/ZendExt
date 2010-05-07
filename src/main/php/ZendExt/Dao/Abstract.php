@@ -73,16 +73,16 @@ abstract class ZendExt_Dao_Abstract
             self::$_tables[$this->_tableClass][$operation] = array();
         }
 
-        if (!isset(self::$_tables[$this->_tableClass][$operation][$shardId])) {
+        if (!isset(self::$_tables[$this->_tableClass][$operation][$shard])) {
             // Retrieve the adapter to be used for the instance
-            $dbNames = (array) self::$_config->getShardDbs($this->_tableClass, $shardId, $operation);
+            $dbNames = (array) self::$_config->getShardDbs($this->_tableClass, $shard, $operation);
 
             // Pick anyone at random
             $table = $this->_createTableWithAnyAdapter($dbNames);
-            self::$_tables[$this->_tableClass][$operation][$shardId] = $table;
+            self::$_tables[$this->_tableClass][$operation][$shard] = $table;
         }
 
-        return self::$_tables[$this->_tableClass][$operation][$shardId];
+        return self::$_tables[$this->_tableClass][$operation][$shard];
     }
 
     /**
@@ -119,7 +119,7 @@ abstract class ZendExt_Dao_Abstract
         }
 
         // Apply sharding
-        $shardId = $this->_getShardId();
+        $shardId = $this->_getShardId($shardingArg);
 
         return $this->_getTableForShard($shardId, $operation);
     }
