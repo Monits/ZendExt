@@ -6,7 +6,7 @@
  * @package   ZendExt_Sharding_Strategy
  * @copyright 2010 Monits
  * @license   Copyright (C) 2010. All rights reserved.
- * @version   1.0.0
+ * @version   Release: 1.0.0
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
