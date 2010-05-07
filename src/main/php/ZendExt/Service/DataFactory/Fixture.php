@@ -63,7 +63,7 @@ class ZendExt_Service_DataFactory_Fixture
 
         foreach ($dates as $date) {
 
-            $group = $date->getAttribute('nombre');
+            $group = substr($date->getAttribute('nombre'), -1);
             $roundNumber = $date->getAttribute('nivel');
 
             $matches = $date->getElementsByTagName('partido');
