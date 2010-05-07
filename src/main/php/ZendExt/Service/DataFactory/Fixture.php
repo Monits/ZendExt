@@ -36,6 +36,8 @@ class ZendExt_Service_DataFactory_Fixture
 
     const ARGELIA_CODE = 'DZA';
 
+    const STATE_FINISHED = 'Finalizado';
+
     private $_matches;
 
     /**
@@ -75,7 +77,8 @@ class ZendExt_Service_DataFactory_Fixture
                 $timestamp = new Zend_Date($matchDate, ZendExt_Service_DataFactory::DATE_FORMAT);
                 $timestamp->setTime($matchTime, ZendExt_Service_DataFactory::TIME_FORMAT);
 
-                $state = $match->getElementsByTagName('estado')->item(0)->getAttribute('id');
+                $isFinished = $match->getElementsByTagName('estado')->item(0)->nodeValue == self::STATE_FINISHED;
+                $number = $match->getAttribute('nro');
 
                 $stadium = $match->getAttribute('nombreEstadio');
 
@@ -85,10 +88,11 @@ class ZendExt_Service_DataFactory_Fixture
                             'group' => $group,
                             'roundNumber' => $roundNumber,
                             'timestamp' => $timestamp->getTimestamp(),
-                            'state' => $state,
+                            'isFinished' => $isFinished,
                             'local' => $local,
                             'visitor' => $visitor,
-                            'stadium' => $stadium
+                            'stadium' => $stadium,
+                            'number' => $number
                         );
 
                 $result[] = new ZendExt_Service_DataFactory_Match($data);

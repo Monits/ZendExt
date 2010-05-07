@@ -31,13 +31,15 @@ class ZendExt_Service_DataFactory_Match
 
     private $_timestamp;
 
-    private $_state = 0;
+    private $_isFinished;
 
     private $_stadium;
 
     private $_group = null;
 
     private $_roundNumber;
+
+    private $_number;
 
     /**
      * Create a new instance.
@@ -50,10 +52,11 @@ class ZendExt_Service_DataFactory_Match
                     'local',
                     'visitor',
                     'timestamp',
-                    'state',
+                    'isFinished',
                     'stadium',
                     'group',
-                    'roundNumber'
+                    'roundNumber',
+                    'number'
                 );
 
         foreach ($keys as $key) {
@@ -110,13 +113,13 @@ class ZendExt_Service_DataFactory_Match
     }
 
     /**
-     * Get the matches state.
+     * Whether the match has finished or not.
      *
-     * @return integer
+     * @return boolean
      */
-    public function getState()
+    public function isFinished()
     {
-        return $this->_state;
+        return $this->_isFinished;
     }
 
     /**
@@ -147,5 +150,15 @@ class ZendExt_Service_DataFactory_Match
     public function getRoundNumber()
     {
         return $this->_roundNumber;
+    }
+
+    /**
+     * Get the match number.
+     *
+     * @return integer
+     */
+    public function getNumber()
+    {
+        return $this->_number;
     }
 }
