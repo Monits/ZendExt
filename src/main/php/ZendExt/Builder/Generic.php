@@ -36,7 +36,7 @@ class ZendExt_Builder_Generic
     protected $_class;
 
     /**
-     * Default handler for method calls. No validation is performed to such values.
+     * Default handler for method calls.
      *
      * @param string $methodName The name of the method called.
      * @param array  $args       The arguments passed to the method.
@@ -48,7 +48,8 @@ class ZendExt_Builder_Generic
     public function __call($methodName, $args)
     {
         if ('with' === substr($methodName, 0, 4)) {
-            $var = strtolower(substr($methodName, 4, 1)) . substr($methodName, 5);
+            $var = strtolower(substr($methodName, 4, 1))
+                    . substr($methodName, 5);
             $val = $args[0];
 
             if (!isset($this->_fields[$var])) {
@@ -57,13 +58,17 @@ class ZendExt_Builder_Generic
 
             if (is_array($this->_fields[$var])) {
                 if (isset($this->_fields[$var]['validators'])) {
-                    $this->_validateField($this->_fields[$var]['validators'], $var, $val);
+                    $this->_validateField(
+                        $this->_fields[$var]['validators'], $var, $val
+                    );
                 }
             }
 
             $this->_data[$var] = $val;
         } else {
-            throw new ZendExt_Builder_Exception('Unknown method: ' . $methodName);
+            throw new ZendExt_Builder_Exception(
+                'Unknown method: ' . $methodName
+            );
         }
 
         return $this;
@@ -72,9 +77,12 @@ class ZendExt_Builder_Generic
     /**
      * Validates the given field with the requested validators.
      *
-     * @param array|Zend_Validate $validators The validators to be applied.
-     * @param string              $var        The name of the var being validated.
-     * @param any                 $val        The value to be validated.
+     * @param array|Zend_Validate_Interface $validators The validators
+     *                                                  to be applied.
+     * @param string                        $var        The name of the var
+     *                                                  being validated.
+     * @param any                           $val        The value to be
+     *                                                  validated.
      *
      * @return void
      *
@@ -89,11 +97,15 @@ class ZendExt_Builder_Generic
 
         foreach ($validators as $validator) {
             if (!$validator instanceof Zend_Validate_Interface) {
-                throw new ZendExt_Builder_Exception('Validators must be instances of Zend_Validate_Interface');
+                throw new ZendExt_Builder_Exception(
+                    'Validators must be instances of Zend_Validate_Interface'
+                );
             }
 
             if (!$validator->isValid($val)) {
-                throw new ZendExt_Builder_ValidationException($var, $validator->getMessages());
+                throw new ZendExt_Builder_ValidationException(
+                    $var, $validator->getMessages()
+                );
             }
         }
     }
@@ -101,7 +113,8 @@ class ZendExt_Builder_Generic
     /**
      * Creates a builder given it's configuration.
      *
-     * @param array|Zend_Config $config The configuration with which to create a builder.
+     * @param array|Zend_Config $config The configuration with which
+     *                                     to create a builder.
      *
      * @return ZendExt_Builder_Generic
      *
@@ -112,11 +125,15 @@ class ZendExt_Builder_Generic
         $builder = new ZendExt_Builder_Generic();
 
         if (!isset($config->class)) {
-            throw new ZendExt_Builder_Exception('Invalid config, no class to be builded specyfied.');
+            throw new ZendExt_Builder_Exception(
+                'Invalid config, no class to be builded specyfied.'
+            );
         }
 
         if (!isset($config->fields)) {
-            throw new ZendExt_Builder_Exception('Invalid config, no fields specyfied.');
+            throw new ZendExt_Builder_Exception(
+                'Invalid config, no fields specyfied.'
+            );
         }
 
         $builder->_class = $config->class;
@@ -136,12 +153,16 @@ class ZendExt_Builder_Generic
     {
         foreach ($this->_fields as $field => $config) {
 
-            if (isset($config['default']) && !isset($this->_data[$field])) {
+            if (array_key_exists('default', $config)
+                    && !isset($this->_data[$field])) {
                 $this->_data[$field] = $config['default'];
             }
 
-            if (isset($config['required']) && true === $config['required'] && !isset($this->_data[$field])) {
-                throw new ZendExt_Builder_Exception("The field '$field' is required but missing.");
+            if (isset($config['required']) && true === $config['required']
+                    && !array_key_exists($field, $this->_data)) {
+                throw new ZendExt_Builder_Exception(
+                    "The field '$field' is required but missing."
+                );
             }
         }
 
