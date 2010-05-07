@@ -225,6 +225,14 @@ class MultidbTest extends PHPUnit_Framework_TestCase
             // This is expected
         }
 
+        try {
+            $this->_multidb->getDb(null);
+
+            $this->fail('could retrieve an adapter for a non-existing adapter name.');
+        } catch (Zend_Application_Resource_Exception $e) {
+            // This is expected
+        }
+
         $adapter = $this->_multidb->getDb('test_adapter_r');
         $adapterConfig = $adapter->getConfig();
 
