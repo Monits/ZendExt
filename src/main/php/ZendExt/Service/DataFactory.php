@@ -31,6 +31,8 @@ class ZendExt_Service_DataFactory
 
     const BASE_URL = 'http://www.datafactory.ws/clientes/xml/';
 
+    const FIXTURE = 'ZendExt_Service_DataFactory_Fixture';
+
     private $_baseUrl = self::BASE_URL;
 
     private $_channels;
@@ -74,7 +76,7 @@ class ZendExt_Service_DataFactory
     /**
      * Check whether a given channel can be updated.
      *
-     * @param string $channel
+     * @param string $channel The name of the channel to check for.
      *
      * @return boolean
      */
@@ -86,27 +88,27 @@ class ZendExt_Service_DataFactory
     /**
      * Get parsed channel data.
      *
-     * @param string  $channel The name of the channel.
-     * @param string  $parser  The name of the parser class.
+     * @param string $parser The name of the parser class.
      *
      * @return object
      */
-    public function getChannel($channel, $parser)
+    public function getChannel($parser)
     {
-        if ( isset($this->_parsers[$channel]) ) {
+        if ( isset($this->_parsers[$parser]) ) {
 
-            return $this->_parsers[$channel];
+            return $this->_parsers[$parser];
         }
 
+        $channel = constant($parser.'::CHANNEL_NAME');
         if (!$this->canUpdate($channel)) {
 
             return false;
         }
 
         $xml = $this->_requestXML($this->_baseUrl.'index.php?canal='.$channel);
-        $this->_parsers[$channel] = new $parser($xml);
+        $this->_parsers[$parser] = new $parser($xml);
 
-        return $this->_parsers[$channel];
+        return $this->_parsers[$parser];
     }
 
     /**
