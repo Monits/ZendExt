@@ -32,6 +32,10 @@ class ZendExt_Service_DataFactory_Fixture
 
     const CHANNEL_NAME = 'deportes.futbol.mundial.fixture';
 
+    const ARGELIA = 'Argelia';
+
+    const ARGELIA_CODE = 'DZA';
+
     private $_matches;
 
     /**
@@ -104,15 +108,39 @@ class ZendExt_Service_DataFactory_Fixture
      */
     private function _getTeamData(DOMElement $match, $team)
     {
-        $name = $match->getElementsByTagName($team)->item(0)->getAttribute('pais');
+        $teamNode = $match->getElementsByTagName($team)->item(0);
+        $name = $teamNode->getAttribute('pais');
         $goals = $match->getElementsByTagName('goles'.$team)->item(0)->nodeValue;
         $penaltyGoals = $match->getElementsByTagName('golesDefPenales'.$team)->item(0)->nodeValue;
+        $shortName = $teamNode->getAttribute('paisSigla');
+        $code = $this->_getCodeFromName($name, $shortName);
 
         return array(
                    'name' => $name,
                    'goals' => $goals,
-                   'penaltyGoals' => $penaltyGoals
+                   'penaltyGoals' => $penaltyGoals,
+                   'code' => $code,
+                   'shortName' => $shortName
                );
+    }
+
+    /**
+     * Hackish method to transform short names into ISO country codes.
+     *
+     * @param string $name      The countrys name.
+     * @param string $shortName The countrys short name.
+     *
+     * @return string The country code.
+     */
+    private function _getCodeFromName($name, $shortName)
+    {
+        if ( $name == self::ARGELIA ) {
+
+            return self::ARGELIA_CODE;
+        } else {
+
+            return $shortName;
+        }
     }
 
     /**

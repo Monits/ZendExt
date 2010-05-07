@@ -31,6 +31,10 @@ class ZendExt_Service_DataFactory_Team
 
     private $_penaltyGoals;
 
+    private $_code;
+
+    private $_shortName;
+
     /**
      * Instance a new team.
      *
@@ -41,7 +45,9 @@ class ZendExt_Service_DataFactory_Team
         $keys = array(
                     'name',
                     'goals',
-                    'penaltyGoals'
+                    'penaltyGoals',
+                    'shortName',
+                    'code'
                 );
 
         foreach ($keys as $key) {
@@ -88,5 +94,27 @@ class ZendExt_Service_DataFactory_Team
     {
 
         return $this->_penaltyGoals;
+    }
+
+    /**
+     * Get the team's short name.
+     *
+     * @return string
+     */
+    public function getShortName()
+    {
+
+        return $this->_shortName;
+    }
+
+    /**
+     * Get the team's code.
+     *
+     * @return string
+     */
+    public function getCode()
+    {
+
+        return $this->_code;
     }
 }
