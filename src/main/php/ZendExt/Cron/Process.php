@@ -55,10 +55,12 @@ final class ZendExt_Cron_Process
     /**
      * Creates a new offline process.
      *
-     * @param ZendExt_Cron_Strategy_Interface $strategy The strategy to apply during execution.
+     * @param ZendExt_Cron_Strategy_Interface $strategy The strategy to apply
+     *                                                  during execution.
      * @param Zend_Config                     $config   The config data to use.
      */
-    public function __construct(ZendExt_Cron_Strategy_Interface $strategy, Zend_Config $config)
+    public function __construct(ZendExt_Cron_Strategy_Interface $strategy,
+        Zend_Config $config)
     {
 
         $this->_strategy = $strategy;
@@ -99,7 +101,8 @@ final class ZendExt_Cron_Process
         file_put_contents($this->_config->pidFile, getmypid());
         $this->_strategy->init($this->_config->strategy);
 
-        $this->_allowsProgress = $this->_strategy instanceOf ZendExt_Cron_Strategy_MeasurableInterface;
+        $this->_allowsProgress = $this->_strategy
+            instanceOf ZendExt_Cron_Strategy_MeasurableInterface;
     }
 
     /**
@@ -117,7 +120,9 @@ final class ZendExt_Cron_Process
         }
 
         $this->_logger = new Zend_Log();
-        $writer = new Zend_Log_Writer_Stream($this->_config->logDir.'/'.$this->_config->logFile);
+        $writer = new Zend_Log_Writer_Stream(
+            $this->_config->logDir.'/'.$this->_config->logFile
+        );
 
         $mail = new Zend_Mail();
 
@@ -126,11 +131,11 @@ final class ZendExt_Cron_Process
         $mail->setSubject($logConfig->subject);
         $mail->setFrom($logConfig->from);
 
-        $writer2 = new Zend_Log_Writer_Mail($mail);
-        $writer2->addFilter(new Zend_Log_Filter_Priority(Zend_Log::CRIT));
+        $mailWriter = new Zend_Log_Writer_Mail($mail);
+        $mailWriter->addFilter(new Zend_Log_Filter_Priority(Zend_Log::CRIT));
 
         $this->_logger->addWriter($writer);
-        $this->_logger->addWriter($writer2);
+        $this->_logger->addWriter($mailWriter);
 
         ZendExt_Cron_Log::setProcessLog($this->_logger);
     }
@@ -155,14 +160,16 @@ final class ZendExt_Cron_Process
      * @return void
      *
      * @throws ZendExt_Cron_LockException  Another process is locking execution.
-     * @throws ZendExt_Cron_ErrorException The proces has failed due to an internal error.
+     * @throws ZendExt_Cron_ErrorException The proces has failed due to an
+     *                                     internal error.
      */
     public function execute()
     {
 
         if ( file_exists($this->_config->pidFile) ) {
 
-            $msg = 'A lock file was found when trying to execute a process with pid '.getmypid().'.';
+            $msg = 'A lock file was found when trying to execute a'
+                .' process with pid '.getmypid().'.';
 
             $this->_logger->info($msg);
             throw new ZendExt_Cron_LockException($msg);
@@ -194,12 +201,18 @@ final class ZendExt_Cron_Process
             $this->_logger->crit($e->__toString());
             $this->forceCleanup();
 
-            throw new ZendExt_Cron_ErrorException('An unexpected error caused the process to stop running.');
+            throw new ZendExt_Cron_ErrorException(
+                'An unexpected error caused the process to stop running.'
+            );
         }
 
-        $info = 'Total execution time:'.($end - $start).' with '.($x * $this->_config->sleepTime).'s spent sleeping';
+        $info = 'Total execution time:'.($end - $start).' with '
+            .($x * $this->_config->sleepTime).'s spent sleeping';
         $this->_logger->info($info);
-        $this->_logger->info('Peak memory usage during execution: '.memory_get_peak_usage().' bytes');
+
+        $info = 'Peak memory usage during execution: '
+            .memory_get_peak_usage().' bytes';
+        $this->_logger->info($info);
 
         $this->_cleanup();
     }
@@ -237,7 +250,8 @@ final class ZendExt_Cron_Process
             $eta = ( $total * ( $delta / $processed ) ) - $delta;
             $progress = ($processed / $total) * 100;
 
-            $stats .= 'Progress: '.round($progress, 2).'% ETA '.round($eta, 2).PHP_EOL;
+            $stats .= 'Progress: '.round($progress, 2).'% ETA '
+                .round($eta, 2).PHP_EOL;
         }
 
         $memoryUse = memory_get_usage();

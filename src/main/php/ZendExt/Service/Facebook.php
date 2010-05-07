@@ -12,7 +12,8 @@
  */
 
 //*WARNING*: Do *NOT* under pain of slow death, remove the next line!!!
-//This wont autoload, so if you remove it, everything blows up. And I mean *everything*!!
+//This wont autoload, so if you remove it, everything blows up.
+//And I mean *everything*!!
 require_once('facebook/facebook.php');
 
 /**
@@ -53,7 +54,8 @@ class ZendExt_Service_Facebook
      *
      * @param string  $apiKey         The API key given by FB.
      * @param string  $apiSecret      The API secret given by FB.
-     * @param boolean $generateSecret Whether session API calls should generate a new secret.
+     * @param boolean $generateSecret Whether session API calls should
+     * 								  generate a new secret.
      */
     public function __construct($apiKey, $apiSecret, $generateSecret=false)
     {

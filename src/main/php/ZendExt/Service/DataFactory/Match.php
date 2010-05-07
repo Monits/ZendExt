@@ -73,12 +73,14 @@ class ZendExt_Service_DataFactory_Match
 
         if ( $this->_local ) {
 
-            $this->_local = new ZendExt_Service_DataFactory_Team($this->_local);
+            $this->_local =
+                new ZendExt_Service_DataFactory_Team($this->_local);
         }
 
         if ( $this->_visitor ) {
 
-            $this->_visitor = new ZendExt_Service_DataFactory_Team($this->_visitor);
+            $this->_visitor =
+                new ZendExt_Service_DataFactory_Team($this->_visitor);
         }
     }
 

@@ -73,7 +73,9 @@ final class ZendExt_Cron_Persistance
 
         if ( !self::isPersisted($name) ) {
 
-            throw new Exception('Data persistance file '.$fileName.' not found.');
+            throw new Exception(
+                'Data persistance file '.$fileName.' not found.'
+            );
         }
 
         return unserialize(file_get_contents($fileName));

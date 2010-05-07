@@ -74,10 +74,19 @@ class ZendExt_Service_DataFactory_Fixture
                 $matchDate = $match->getAttribute('fecha');
                 $matchTime = $match->getAttribute('hora');
 
-                $timestamp = new Zend_Date($matchDate, ZendExt_Service_DataFactory::DATE_FORMAT);
-                $timestamp->setTime($matchTime, ZendExt_Service_DataFactory::TIME_FORMAT);
+                $timestamp = new Zend_Date(
+                    $matchDate,
+                    ZendExt_Service_DataFactory::DATE_FORMAT
+                );
+                $timestamp->setTime(
+                    $matchTime,
+                    ZendExt_Service_DataFactory::TIME_FORMAT
+                );
 
-                $isFinished = $match->getElementsByTagName('estado')->item(0)->nodeValue == self::STATE_FINISHED;
+                $state = $match->getElementsByTagName('estado')
+                    ->item(0)->nodeValue;
+                $isFinished = $state == self::STATE_FINISHED;
+
                 $number = $match->getAttribute('nro');
 
                 $stadium = $match->getAttribute('nombreEstadio');
@@ -103,7 +112,7 @@ class ZendExt_Service_DataFactory_Fixture
     }
 
     /**
-     * Retrieve team name, goals and penalty goals, for either local or visitor team.
+     * Retrieve team name, goals and penalty goals, for either team.
      *
      * @param DOMElement $match The node that has the data.
      * @param string     $team  Either 'local' or 'visitante'
@@ -114,8 +123,10 @@ class ZendExt_Service_DataFactory_Fixture
     {
         $teamNode = $match->getElementsByTagName($team)->item(0);
         $name = $teamNode->getAttribute('pais');
-        $goals = $match->getElementsByTagName('goles'.$team)->item(0)->nodeValue;
-        $penaltyGoals = $match->getElementsByTagName('golesDefPenales'.$team)->item(0)->nodeValue;
+        $goals = $match->getElementsByTagName('goles'.$team)
+            ->item(0)->nodeValue;
+        $penaltyGoals = $match->getElementsByTagName('golesDefPenales'.$team)
+            ->item(0)->nodeValue;
         $shortName = $teamNode->getAttribute('paisSigla');
         $code = $this->_getCodeFromName($name, $shortName);
 

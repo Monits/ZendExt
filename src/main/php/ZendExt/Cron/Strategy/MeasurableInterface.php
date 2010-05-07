@@ -23,7 +23,8 @@
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
-interface ZendExt_Cron_Strategy_MeasurableInterface extends ZendExt_Cron_Strategy_Interface
+interface ZendExt_Cron_Strategy_MeasurableInterface
+    extends ZendExt_Cron_Strategy_Interface
 {
 
     /**

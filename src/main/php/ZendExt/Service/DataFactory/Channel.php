@@ -35,7 +35,9 @@ class ZendExt_Service_DataFactory_Channel
     public function __construct($xml)
     {
         $document = DOMDocument::loadXML($xml);
-        $this->_channels = $this->_parseChannels($document->getElementsByTagName('canal'));
+        $this->_channels = $this->_parseChannels(
+            $document->getElementsByTagName('canal')
+        );
     }
 
     /**
@@ -71,7 +73,8 @@ class ZendExt_Service_DataFactory_Channel
     /**
      * Build the url for getting channels using a certain date.
      *
-     * @param string|integer $date Either a timestamp or a Zend_Date parsable date.
+     * @param string|integer $date Either a timestamp
+     * 							   or a Zend_Date parsable date.
      *
      * @return string
      */
