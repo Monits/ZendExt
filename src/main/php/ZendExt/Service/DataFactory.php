@@ -64,8 +64,9 @@ class ZendExt_Service_DataFactory
      */
     private function _checkChannels($lastUpdate)
     {
+        $params = ZendExt_Service_DataFactory_Channel::buildUrl($lastUpdate);
         $xml = $this->_requestXML(
-            $this->_baseUrl.'index.php'.ZendExt_Service_DataFactory_Channel::buildUrl($lastUpdate)
+            $this->_baseUrl.'index.php'.$params
         );
 
         $parser = new ZendExt_Service_DataFactory_Channel($xml);
@@ -126,6 +127,6 @@ class ZendExt_Service_DataFactory
         $response = curl_exec($ch);
         curl_close($ch);
 
-        return utf8_encode($response);
+        return $response;
     }
 }
