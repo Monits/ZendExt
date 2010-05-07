@@ -126,6 +126,6 @@ class ZendExt_Service_DataFactory
         $response = curl_exec($ch);
         curl_close($ch);
 
-        return $response;
+        return utf8_encode($response);
     }
 }
