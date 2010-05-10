@@ -115,7 +115,7 @@ class ZendExt_Service_Facebook
      */
     public function getUserLocale()
     {
-        return $this->request->getParam(self::$_params['locale']);
+        return $this->_request->getParam(self::$_params['locale']);
     }
 
     /**
@@ -125,6 +125,6 @@ class ZendExt_Service_Facebook
      */
     public function isAjax()
     {
-        return $this->request->getParam(self::$_params['ajax']) == 1;
+        return $this->_request->getParam(self::$_params['ajax']) == 1;
     }
 }
