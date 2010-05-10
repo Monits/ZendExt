@@ -31,8 +31,9 @@ require_once('facebook/facebook.php');
 class ZendExt_Service_Facebook
 {
     private static $_params = array(
-                                  'locale' => 'fb_sig_locale',
-                                  'friends' => 'fb_sig_friends'
+                                  'locale'  => 'fb_sig_locale',
+                                  'friends' => 'fb_sig_friends',
+                                  'ajax'    => 'fb_sig_is_ajax'
                               );
 
     /**
@@ -115,5 +116,15 @@ class ZendExt_Service_Facebook
     public function getUserLocale()
     {
         return $this->request->getParam(self::$_params['locale']);
+    }
+
+    /**
+     * Check whether the request is AJAX.
+     *
+     * @return boolean
+     */
+    public function isAjax()
+    {
+        return $this->request->getParam(self::$_params['ajax']) == 1;
     }
 }
