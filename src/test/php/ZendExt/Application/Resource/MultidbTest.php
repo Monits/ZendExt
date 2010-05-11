@@ -151,7 +151,7 @@ class MultidbTest extends PHPUnit_Framework_TestCase
         }
 
         $this->assertEquals(
-            $this->_config['shards']['master']['r'],
+            $this->_config['shards']['master']['r'][0],
             $this->_multidb->getShardDbs(
                 'Random_Master_Table', 0,
                 ZendExt_Application_Resource_Multidb::OPERATION_READ
@@ -159,7 +159,7 @@ class MultidbTest extends PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals(
-            $this->_config['shards']['realshard']['r'],
+            $this->_config['shards']['realshard']['r'][0],
             $this->_multidb->getShardDbs(
                 'Random_Table_2', 0,
                 ZendExt_Application_Resource_Multidb::OPERATION_READ
@@ -167,7 +167,7 @@ class MultidbTest extends PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals(
-            $this->_config['shards']['realshard']['w'],
+            $this->_config['shards']['realshard']['w'][0],
             $this->_multidb->getShardDbs(
                 'Random_Table_1', 0,
                 ZendExt_Application_Resource_Multidb::OPERATION_WRITE

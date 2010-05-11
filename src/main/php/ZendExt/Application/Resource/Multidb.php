@@ -110,7 +110,9 @@ class ZendExt_Application_Resource_Multidb extends Zend_Application_Resource_Res
 
         if (isset($this->_shards[$shard])) {
             if (isset($this->_shards[$shard][$operation])) {
-                return $this->_shards[$shard][$operation];
+                if (isset($this->_shards[$shard][$operation][$shardId])) {
+                    return $this->_shards[$shard][$operation][$shardId];
+                }
             }
         }
 
