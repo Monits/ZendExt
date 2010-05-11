@@ -33,7 +33,8 @@ class ZendExt_Service_Facebook
     private static $_params = array(
                                   'locale'  => 'fb_sig_locale',
                                   'friends' => 'fb_sig_friends',
-                                  'ajax'    => 'fb_sig_is_ajax'
+                                  'ajax'    => 'fb_sig_is_ajax',
+                                  'invited' => 'ids'
                               );
 
     /**
@@ -126,5 +127,15 @@ class ZendExt_Service_Facebook
     public function isAjax()
     {
         return $this->_request->getParam(self::$_params['ajax']) == 1;
+    }
+
+    /**
+     * Get an array of uids that user invited on the last request.
+     *
+     * @return array
+     */
+    public function getInvitedIds()
+    {
+        return $this->_request->getParam(self::$_params['invited']);
     }
 }
