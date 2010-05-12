@@ -24,7 +24,8 @@
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
-class ZendExt_Application_Resource_Multidb extends Zend_Application_Resource_ResourceAbstract
+class ZendExt_Application_Resource_Multidb
+    extends Zend_Application_Resource_ResourceAbstract
 {
     /**
      * Defines the read operation.
@@ -48,7 +49,7 @@ class ZendExt_Application_Resource_Multidb extends Zend_Application_Resource_Res
     protected $_tables = array();
 
     /**
-     * Initialize the Database Connections (instances of Zend_Db_Table_Abstract) and sharding configuration.
+     * Initialize the Database Connections and sharding configuration.
      *
      * @return ZendExt_Application_Resource_Multidb
      */
@@ -57,7 +58,9 @@ class ZendExt_Application_Resource_Multidb extends Zend_Application_Resource_Res
         $options = $this->getOptions();
 
         // Initialize multidb resource with configured adapters
-        $this->_dbs = new Zend_Application_Resource_Multidb($options['adapters']);
+        $this->_dbs = new Zend_Application_Resource_Multidb(
+            $options['adapters']
+        );
         $this->_dbs->init();
 
         // Get shards and tables configuration
@@ -69,11 +72,13 @@ class ZendExt_Application_Resource_Multidb extends Zend_Application_Resource_Res
     }
 
     /**
-     * Retrieves the name of the sharding strategy to be used for a given table.
+     * Retrieves the name of the sharding strategy to be used for a table.
      *
-     * @param string $table The name of the table whose sharding strategy is requested.
+     * @param string $table The name of the table whose sharding strategy
+     *                      is requested.
      *
-     * @return string The name of the strategy to beused for sharding, null if none configured.
+     * @return string The name of the strategy to beused for sharding,
+     *                null if none configured.
      */
     public function getShardingStrategy($table)
     {
@@ -91,19 +96,26 @@ class ZendExt_Application_Resource_Multidb extends Zend_Application_Resource_Res
     /**
      * Retrieves the configuration for a requested shard for a given operation.
      *
-     * @param string $table     The name of the table for which to request a shard.
-     * @param int    $shardId   The id of the shard to retrieve (as obtained from the sharding strategy).
+     * @param string $table     The name of the table for which to request
+     *                          a shard.
+     * @param int    $shardId   The id of the shard to retrieve (as obtained
+     *                          from the sharding strategy).
      * @param string $operation The operation to perform on the table.
-     *                          See {@link #OPERATION_READ} and {@link #OPERATION_WRITE}
+     *                          See {@link #OPERATION_READ} and
+     *                          {@link #OPERATION_WRITE}
      *
-     * @return string|array The name of the adapters that can be used for the requested operation on the given table.
+     * @return string|array The name of the adapters that can be used for the
+     *                      requested operation on the given table.
      *
      * @throws Zend_Application_Resource_Exception
      */
     public function getShardDbs($table, $shardId, $operation)
     {
-        if ($operation != self::OPERATION_READ && $operation != self::OPERATION_WRITE) {
-            throw new Zend_Application_Resource_Exception('Unrecognized operation requested.');
+        if ($operation != self::OPERATION_READ
+                && $operation != self::OPERATION_WRITE) {
+            throw new Zend_Application_Resource_Exception(
+                'Unrecognized operation requested.'
+            );
         }
 
         $shard = $this->_getShardForTable($table);
@@ -122,9 +134,11 @@ class ZendExt_Application_Resource_Multidb extends Zend_Application_Resource_Res
     /**
      * Retrieves the default dbs for the shard to which a given table belongs.
      *
-     * @param string $table The name of the table whose default dbs to retrieve.
+     * @param string $table The name of the table whose default dbs
+     *                      to retrieve.
      *
-     * @return string|array The default dbs for the shard to which a given table belongs.
+     * @return string|array The default dbs for the shard to which a given
+     *                      table belongs.
      */
     public function getDefaultShardDbs($table)
     {
