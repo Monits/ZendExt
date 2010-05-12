@@ -54,11 +54,13 @@ abstract class ZendExt_Dao_Abstract
      *
      * @param int    $shard     The id of shard to be used.
      * @param string $operation The operation to be performed on the table.
-     *                          See {@link #OPERATION_READ} and {@link #OPERATION_WRITE}
+     *                          See {@link #OPERATION_READ}
+     *                          and {@link #OPERATION_WRITE}
      *
      * @return Zend_Db_Table_Abstract The table to be used by this DAO.
      */
-    protected function _getTableForShard($shard, $operation = self::OPERATION_READ)
+    protected function _getTableForShard($shard,
+        $operation = self::OPERATION_READ)
     {
         if (null === self::$_config) {
             return $this->_getTableForDefaultAdapter();
@@ -75,7 +77,11 @@ abstract class ZendExt_Dao_Abstract
 
         if (!isset(self::$_tables[$this->_tableClass][$operation][$shard])) {
             // Retrieve the adapter to be used for the instance
-            $dbNames = (array) self::$_config->getShardDbs($this->_tableClass, $shard, $operation);
+            $dbNames = (array) self::$_config->getShardDbs(
+                $this->_tableClass,
+                $shard,
+                $operation
+            );
 
             // Pick anyone at random
             $table = $this->_createTableWithAnyAdapter($dbNames);
@@ -89,12 +95,14 @@ abstract class ZendExt_Dao_Abstract
      * Retrieves the table instance to be used.
      *
      * @param string $operation   The operation to be performed on the table.
-     *                            See {@link #OPERATION_READ} and {@link #OPERATION_WRITE}
+     *                            See {@link #OPERATION_READ}
+     *                            and {@link #OPERATION_WRITE}
      * @param any    $shardingArg The value on which to perform sharding.
      *
      * @return Zend_Db_Table_Abstract The table to be used by this DAO.
      */
-    protected function _getTable($operation = self::OPERATION_READ, $shardingArg = null)
+    protected function _getTable($operation = self::OPERATION_READ,
+        $shardingArg = null)
     {
         if (null === self::$_config) {
             return $this->_getTableForDefaultAdapter();
@@ -105,10 +113,13 @@ abstract class ZendExt_Dao_Abstract
             self::$_tables[$this->_tableClass] = array();
         }
 
-        // If the sharding arg is not present, retrieve a connection from the default
+        // If the sharding arg is not present,
+        // retrieve a connection from the default
         if (null === $shardingArg) {
             if (!isset(self::$_tables[$this->_tableClass]['default'])) {
-                $defaultDbs = (array) self::$_config->getDefaultShardDbs($this->_tableClass);
+                $defaultDbs = (array) self::$_config->getDefaultShardDbs(
+                    $this->_tableClass
+                );
 
                 // Pick anyone at random
                 $table = $this->_createTableWithAnyAdapter($defaultDbs);
@@ -125,21 +136,25 @@ abstract class ZendExt_Dao_Abstract
     }
 
     /**
-     * Computes the shard id for the current table given the value by which to shard.
+     * Computes the shard id for the current table given a sharding value.
      *
      * @param any $shardingArg The value on which to perform sharding.
      *
-     * @return int The shard id for the current table and value by which to shard.
+     * @return int The shard id for the current table and the sharding value.
      */
     private function _getShardId($shardingArg)
     {
         // If not already instantiated, create a new sharding strategy
-        $shardingClass = self::$_config->getShardingStrategy($this->_tableClass);
+        $shardingClass = self::$_config->getShardingStrategy(
+            $this->_tableClass
+        );
         if (!isset(self::$_shardingStrategies[$shardingClass])) {
             self::$_shardingStrategies[$shardingClass] = new $shardingClass();
         }
 
-        return self::$_shardingStrategies[$shardingClass]->getShard($shardingArg);
+        return self::$_shardingStrategies[$shardingClass]->getShard(
+            $shardingArg
+        );
     }
 
     /**
@@ -174,11 +189,13 @@ abstract class ZendExt_Dao_Abstract
     /**
      * Configures the DAO to know which adapter to use for each request.
      *
-     * @param ZendExt_Application_Resource_Multidb $config The configuration to be used.
+     * @param ZendExt_Application_Resource_Multidb $config The configuration
+     *                                                     to be used.
      *
      * @return void
      */
-    public static function setConfiguration(ZendExt_Application_Resource_Multidb $config)
+    public static function setConfiguration(
+        ZendExt_Application_Resource_Multidb $config)
     {
         self::$_config = $config;
     }

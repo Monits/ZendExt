@@ -6,7 +6,7 @@
  * @package   ZendExt_Service
  * @copyright 2010 Monits
  * @license   Copyright (C) 2010. All rights reserved.
- * @version   Version: 1.0.0
+ * @version   Release: 1.0.0
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
@@ -65,7 +65,7 @@ class ZendExt_Service_DataFactory
     private function _checkChannels($lastUpdate)
     {
         $params = ZendExt_Service_DataFactory_Channel::buildUrl($lastUpdate);
-        $xml = $this->_requestXML(
+        $xml = $this->_requestXml(
             $this->_baseUrl.'index.php'.$params
         );
 
@@ -106,7 +106,7 @@ class ZendExt_Service_DataFactory
             return false;
         }
 
-        $xml = $this->_requestXML($this->_baseUrl.'index.php?canal='.$channel);
+        $xml = $this->_requestXml($this->_baseUrl.'index.php?canal='.$channel);
         $this->_parsers[$parser] = new $parser($xml);
 
         return $this->_parsers[$parser];
@@ -119,7 +119,7 @@ class ZendExt_Service_DataFactory
      *
      * @return string
      */
-    private function _requestXML($url)
+    private function _requestXml($url)
     {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

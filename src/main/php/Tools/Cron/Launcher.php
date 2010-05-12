@@ -72,9 +72,12 @@ if ( empty($strategyList) ) {
             exit();
         } else if ( $pid == -1 ) {
 
+            $log = 'An error ocurred while trying to start '
+                .$strategyName.' strategy.';
+
             logger(
-            	'info',
-            	'An error ocurred while trying to start '.$strategyName.' strategy.'
+                'info',
+                $log
             );
 
             logger('info', 'Waiting for other process to end...');
@@ -108,8 +111,8 @@ function waitForChildren($forked)
         if ( $ret == -1 ) {
 
             logger(
-            	'crit',
-            	'An error ocurred while waiting for the processes to end'
+                'crit',
+                'An error ocurred while waiting for the processes to end'
             );
         } else if ( $ret != 0 ) {
 
@@ -122,7 +125,7 @@ function waitForChildren($forked)
 /**
  * Spawn a new process.
  *
- * @param string      $strategyName The name of the strategy to pass on to the process.
+ * @param string      $strategyName The name of the strategy for the process.
  * @param string      $strategyDir  The directory to load strategies from.
  * @param Zend_Config $config       The config to use
  *
@@ -257,7 +260,8 @@ function loadConfig($configFile)
  * @param integer $errline    The line at which the error was found.
  * @param array   $errcontext The active symbol table when the error occurred.
  *
- * @return boolean True if the error was handled, false if the default error handler should process it.
+ * @return boolean True if the error was handled, false if the default
+ *                      error handler should process it.
  */
 function errorHandler($errno, $errstr, $errfile, $errline, array $errcontext)
 {
@@ -268,7 +272,7 @@ function errorHandler($errno, $errstr, $errfile, $errline, array $errcontext)
     }
 
     $output =
-    	'An error ocurred:'.PHP_EOL.
+        'An error ocurred:'.PHP_EOL.
         $errstr.PHP_EOL.
         'Error on line '.$errline.' in file '.$errfile;
 
@@ -289,7 +293,8 @@ function errorHandler($errno, $errstr, $errfile, $errline, array $errcontext)
 /**
  * Custom shutdown handler.
  *
- * This is called by PHP when the script is being shutdown, it checks for errors and logs accordingly.
+ * This is called by PHP when the script is being shutdown,
+ * it checks for errors and logs accordingly.
  *
  * @return void
  */
