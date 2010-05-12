@@ -23,6 +23,6 @@
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
-class ZendExt_Builder_Exception extends Exception
+class ZendExt_Builder_Exception extends ZendExt_Exception
 {
 }

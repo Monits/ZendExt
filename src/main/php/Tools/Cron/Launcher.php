@@ -47,7 +47,9 @@ if (!file_exists($config->launcher->logDir)) {
 }
 
 instanceLogger($config->launcher->logDir.'/'.$config->launcher->logFile);
-ZendExt_Cron_Persistance::setDataDirectory($config->data->dir? $config->data->dir.'/' : 'data/');
+ZendExt_Cron_Persistance::setDataDirectory(
+    $config->data->dir ? $config->data->dir.'/' : 'data/'
+);
 
 $strategyList = $opts->getRemainingArgs();
 if ( empty($strategyList) ) {
@@ -70,7 +72,11 @@ if ( empty($strategyList) ) {
             exit();
         } else if ( $pid == -1 ) {
 
-            logger('info', 'An error ocurred while trying to start '.$strategyName.' strategy.');
+            logger(
+            	'info',
+            	'An error ocurred while trying to start '.$strategyName.' strategy.'
+            );
+
             logger('info', 'Waiting for other process to end...');
 
             waitForChildren($forked);
@@ -101,7 +107,10 @@ function waitForChildren($forked)
 
         if ( $ret == -1 ) {
 
-            logger('crit', 'An error ocurred while waiting for the processes to end');
+            logger(
+            	'crit',
+            	'An error ocurred while waiting for the processes to end'
+            );
         } else if ( $ret != 0 ) {
 
             --$forked;
@@ -197,7 +206,8 @@ function instanceLogger($file)
 function logger($level, $message)
 {
 
-    if ( class_exists('ZendExt_Cron_Log') && ($logger = ZendExt_Cron_Log::getLauncherLog()) !== null ) {
+    if (class_exists('ZendExt_Cron_Log') &&
+        ($logger = ZendExt_Cron_Log::getLauncherLog()) !== null ) {
 
         $logger->$level($message);
 
@@ -257,7 +267,10 @@ function errorHandler($errno, $errstr, $errfile, $errline, array $errcontext)
         return false;
     }
 
-    $output = 'An error ocurred:'.PHP_EOL.$errstr.PHP_EOL.'Error on line '.$errline.' in file '.$errfile;
+    $output =
+    	'An error ocurred:'.PHP_EOL.
+        $errstr.PHP_EOL.
+        'Error on line '.$errline.' in file '.$errfile;
 
     if ( $errno == E_USER_ERROR ) {
 
@@ -296,7 +309,10 @@ function shutdownHandler()
                 break;
 
             default:
-                //Any other error state is handled by errorHandler so there's no need for this function to do it too.
+                /*
+                 * Any other error state is handled by errorHandler
+                 * so there's no need for this function to do it too.
+                 */
                 break;
         }
     }

@@ -23,6 +23,6 @@
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
-class ZendExt_Cron_ErrorException extends Exception
+class ZendExt_Cron_ErrorException extends ZendExt_Exception
 {
 }

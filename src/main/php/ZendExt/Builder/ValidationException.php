@@ -23,7 +23,7 @@
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
-class ZendExt_Builder_ValidationException extends Exception
+class ZendExt_Builder_ValidationException extends ZendExt_Exception
 {
     protected $_field;
     protected $_errors = null;

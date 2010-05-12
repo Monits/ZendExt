@@ -23,7 +23,8 @@
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
-class ZendExt_Sharding_Strategy_Null implements ZendExt_Sharding_Strategy_Interface
+class ZendExt_Sharding_Strategy_Null implements
+    ZendExt_Sharding_Strategy_Interface
 {
     /**
      * Retrieves the shard to which a given value belongs.

@@ -64,7 +64,7 @@ final class ZendExt_Cron_Persistance
      *
      * @return object The persisted data object
      *
-     * @throws Exception
+     * @throws ZendExt_Exception
      */
     public static function retrieve($name)
     {
@@ -73,7 +73,7 @@ final class ZendExt_Cron_Persistance
 
         if ( !self::isPersisted($name) ) {
 
-            throw new Exception(
+            throw new ZendExt_Exception(
                 'Data persistance file '.$fileName.' not found.'
             );
         }
