@@ -57,7 +57,7 @@ class ZendExt_Service_Facebook
      * @param string  $apiKey         The API key given by FB.
      * @param string  $apiSecret      The API secret given by FB.
      * @param boolean $generateSecret Whether session API calls should
-     * 								  generate a new secret.
+     *                                   generate a new secret.
      */
     public function __construct($apiKey, $apiSecret, $generateSecret=false)
     {
@@ -137,5 +137,20 @@ class ZendExt_Service_Facebook
     public function getInvitedIds()
     {
         return $this->_request->getParam(self::$_params['invited']);
+    }
+
+    /**
+     * Get the uids of the friends of the current user that installed the app.
+     *
+     * @return array
+     */
+    public function getAuthorizedFriends()
+    {
+        $friends = $this->_fb->api_client->friends_getAppUsers();
+        if (is_array($friends)) {
+            return $friends;
+        }
+
+        return array();
     }
 }
