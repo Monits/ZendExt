@@ -34,6 +34,7 @@ class ZendExt_Service_Facebook
                                   'locale'  => 'fb_sig_locale',
                                   'friends' => 'fb_sig_friends',
                                   'ajax'    => 'fb_sig_is_ajax',
+                                  'userId'  => 'fb_sig_user',
                                   'invited' => 'ids'
                               );
 
@@ -106,7 +107,7 @@ class ZendExt_Service_Facebook
      */
     public function getUserId()
     {
-        return $this->_fb->get_loggedin_user();
+        return $this->_request->getParam(self::$_params['userId']);
     }
 
     /**
