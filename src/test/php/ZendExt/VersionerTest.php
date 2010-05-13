@@ -11,6 +11,18 @@
  * @since     1.0.0
  */
 
+/**
+ * Unit Test for ZendExt_Versioner.
+ *
+ * @category  ZendExt
+ * @package   ZendExt
+ * @author    jpcivile <jpcivile@monits.com>
+ * @copyright 2010 Monits
+ * @license   Copyright 2010. All rights reserved.
+ * @version   Release: 1.0.0
+ * @link      http://www.monits.com/
+ * @since     1.0.0
+ */
 class VersionerTest extends PHPUnit_Framework_TestCase
 {
     private $_cache;
@@ -127,4 +139,51 @@ class VersionerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $this->_versioner->getFileVersion($this->_file));
     }
 
+    /**
+     * Test get/set for key prefix.
+     *
+     * @return void
+     */
+    public function testKeyPrefix()
+    {
+        $value = 'asd';
+        $this->_versioner->setKeyPrefix($value);
+        $this->assertEquals($value, $this->_versioner->getKeyPrefix());
+    }
+
+    /**
+     * Test get/set for check interval.
+     *
+     * @return void
+     */
+    public function testCheckInterval()
+    {
+        $value = 100;
+        $this->_versioner->setCheckInterval($value);
+        $this->assertEquals($value, $this->_versioner->getKeyPrefix());
+    }
+
+    /**
+     * Test get/set for update delay time.
+     *
+     * @return void
+     */
+    public function testUpdateDelay()
+    {
+        $value = 100;
+        $this->_versioner->setUpdateDelayTime($value);
+        $this->assertEquals($value, $this->_versioner->getUpdateDelayTime());
+    }
+
+    /**
+     * Test get/set for cache.
+     *
+     * @return void
+     */
+    public function testCache()
+    {
+        $this->assertEquals($this->_cache, $this->_versioner->getCache());
+        $this->_versioner->setCache($this->_cache);
+        $this->assertEquals($this->_cache, $this->_versioner->getCache());
+    }
 }
