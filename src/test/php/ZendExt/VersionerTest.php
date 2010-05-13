@@ -160,7 +160,7 @@ class VersionerTest extends PHPUnit_Framework_TestCase
     {
         $value = 100;
         $this->_versioner->setCheckInterval($value);
-        $this->assertEquals($value, $this->_versioner->getKeyPrefix());
+        $this->assertEquals($value, $this->_versioner->getCheckInterval());
     }
 
     /**
