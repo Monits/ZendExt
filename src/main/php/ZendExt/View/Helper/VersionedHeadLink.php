@@ -50,7 +50,7 @@ class ZendExt_View_Helper_VersionedHeadLink extends Zend_View_Helper_HeadLink
             $config = $config['item'];
         }
 
-        foreach ( $items as $style ) {
+        foreach ( $config as $style ) {
 
             $styles[$style['name']] = $this->_createStylesheet(
                 $style['name'],
