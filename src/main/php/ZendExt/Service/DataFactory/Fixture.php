@@ -32,9 +32,10 @@ class ZendExt_Service_DataFactory_Fixture
 
     const CHANNEL_NAME = 'deportes.futbol.mundial.fixture';
 
-    const ARGELIA = 'Argelia';
-
-    const ARGELIA_CODE = 'DZA';
+    private static $_shortCode = array(
+        'Argelia'    => 'DZA',
+        'Eslovaquia' => 'SVK'
+    );
 
     const STATE_FINISHED = 'Finalizado';
 
@@ -149,9 +150,9 @@ class ZendExt_Service_DataFactory_Fixture
      */
     private function _getCodeFromName($name, $shortName)
     {
-        if ( $name == self::ARGELIA ) {
+        if ( isset(self::$_shortCode[$name]) ) {
 
-            return self::ARGELIA_CODE;
+            return self::$_shortCode[$name];
         } else {
 
             return $shortName;
