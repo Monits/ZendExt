@@ -258,15 +258,23 @@ class ZendExt_View_Helper_VersionedHeadLink extends Zend_View_Helper_HeadLink
     public function toString($indent = null)
     {
         $container = $this->getContainer();
+
         $styles = $container['styles'];
-        $versioner = $container['versioner'];
         $container->offsetUnset('styles');
-        $container->offsetUnset('versioner');
+
+        $versioner = null;
+        if ( isset($container['versioner'])  ) {
+            $versioner = $container['versioner'];
+            $container->offsetUnset('versioner');
+        }
+
 
         $result = parent::toString($indent);
 
         $container['styles'] = $styles;
-        $container['versioner'] = $versioner;
+        if ( $versioner !== null ) {
+            $container['versioner'] = $versioner;
+        }
         return $result;
     }
 }
