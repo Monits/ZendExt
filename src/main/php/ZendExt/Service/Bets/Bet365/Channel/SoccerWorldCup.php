@@ -115,7 +115,7 @@ class ZendExt_Service_Bets_Bet365_Channel_SoccerWorldCup
      *
      * @return void
      */
-    public function setParser(ZendExt_Service_Bet365_Channel_Parser $parser)
+    public function setParser(ZendExt_Service_Bets_Bet365_Channel_Parser $parser)
     {
         $this->_parser = $parser;
     }
