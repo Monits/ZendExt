@@ -3,7 +3,7 @@
  * Bets site Bet365.com service implementation.
  *
  * @category  ZendExt
- * @package   ZendExt_Service
+ * @package   ZendExt_Service_Bets
  * @copyright 2010 Monits
  * @license   Copyright (C) 2010. All rights reserved.
  * @version   Release: 1.0.0
@@ -15,7 +15,7 @@
  * Bets site Bet365.com service implementation.
  *
  * @category  ZendExt
- * @package   ZendExt_Service
+ * @package   ZendExt_Service_Bets
  * @author    Franco Zeoli <fzeoli@monits.com>
  * @copyright 2010 Monits
  * @license   Copyright 2010. All rights reserved.
@@ -23,21 +23,21 @@
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
-class ZendExt_Service_Bet365 extends ZendExt_Service_Bets_Abstract
+class ZendExt_Service_Bets_Bet365 extends ZendExt_Service_Bets_Abstract
 {
 
     const CHANNEL_SOCCER_WORLD_CUP =
-        'ZendExt_Service_Bet365_Channel_SoccerWorldCup';
+        'ZendExt_Service_Bets_Bet365_Channel_SoccerWorldCup';
 
     protected $_availableChannels = array(self::CHANNEL_SOCCER_WORLD_CUP);
 
     /**
-     * @var FBFCoach_Service_Bet365_Channel_Interface
+     * @var FBFCoach_Service_Bets_Bet365_Channel_Interface
      */
     private $_channel;
 
     /**
-     * @var ZendExt_Service_Bet365_Channel_Parser_Interface
+     * @var ZendExt_Service_Bets_Bet365_Channel_Parser_Interface
      */
     private $_parser;
 
@@ -53,8 +53,17 @@ class ZendExt_Service_Bet365 extends ZendExt_Service_Bets_Abstract
         parent::__construct($channel);
 
         $this->_parser = new ZendExt_Service_Bet365_Channel_Parser();
-
         $this->_channel = new $this->_channelClass();
+
+        $this->_parser->setInputText(
+            $this->_getOutput(
+                $this->_getUrl(),
+                $this->_getRawCookies(),
+                $this->_getMethod(),
+                $this->_getRawPostData()
+            )
+        );
+
         $this->_channel->setParser($this->_parser);
     }
 
@@ -70,15 +79,6 @@ class ZendExt_Service_Bet365 extends ZendExt_Service_Bets_Abstract
      */
     public function getMatchPayback($local, $visitor)
     {
-        $this->_parser->setInputText(
-            $this->_getOutput(
-                $this->_getUrl($local, $visitor),
-                $this->_getRawCookies(),
-                $this->_getMethod(),
-                $this->_getRawPostData()
-            )
-        );
-
         return $this->_channel->getMatchPayback($local, $visitor);
     }
 

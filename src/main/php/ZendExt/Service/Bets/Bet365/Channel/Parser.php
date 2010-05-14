@@ -3,7 +3,7 @@
  * Bets service channels' parser.
  *
  * @category  ZendExt
- * @package   ZendExt_Service_Bet365
+ * @package   ZendExt_Service_Bets_Bet365
  * @copyright 2010 Monits
  * @license   Copyright (C) 2010. All rights reserved.
  * @version   Release: 1.0.0
@@ -15,7 +15,7 @@
  * Bets service channels' parser.
  *
  * @category  ZendExt
- * @package   ZendExt_Service_Bet365
+ * @package   ZendExt_Service_Bets_Bet365
  * @author    Franco Zeoli <fzeoli@monits.com>
  * @copyright 2010 Monits
  * @license   Copyright 2010. All rights reserved.
@@ -23,8 +23,8 @@
  * @link      http://www.zendext.com
  * @since     1.0.0
  */
-class ZendExt_Service_Bet365_Channel_Parser
-    implements ZendExt_Service_Bet365_Channel_Parser_Interface
+class ZendExt_Service_Bets_Bet365_Channel_Parser
+    implements ZendExt_Service_Bets_Bet365_Channel_Parser_Interface
 {
     private $_text;
     private $_parsedResult;
