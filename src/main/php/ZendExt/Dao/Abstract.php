@@ -142,7 +142,7 @@ abstract class ZendExt_Dao_Abstract
      *
      * @return int The shard id for the current table and the sharding value.
      */
-    private function _getShardId($shardingArg)
+    protected function _getShardId($shardingArg)
     {
         // If not already instantiated, create a new sharding strategy
         $shardingClass = self::$_config->getShardingStrategy(
