@@ -52,7 +52,7 @@ class ZendExt_Service_Bets_Bet365 extends ZendExt_Service_Bets_Abstract
     {
         parent::__construct($channel);
 
-        $this->_parser = new ZendExt_Service_Bet365_Channel_Parser();
+        $this->_parser = new ZendExt_Service_Bets_Bet365_Channel_Parser();
         $this->_channel = new $this->_channelClass();
 
         $this->_parser->setInputText(
