@@ -32,6 +32,21 @@ class ZendExt_Service_Bets_Bet365_Channel_SoccerWorldCup
     private $_parser;
 
     /**
+     * @var ZendExt_Service_Bets_Alias_Interface
+     */
+    private $_aliases;
+
+    /**
+     * Creates a new SoccerWorldCup for Bet365.
+     *
+     * @return ZendExt_Service_Bets_Bet365_Channel_SoccerWorldCup
+     */
+    public function __construct()
+    {
+        $this->_aliases = new ZendExt_Service_Bets_Alias_SoccerWorldCup();
+    }
+
+    /**
      * Retrieves the cookies needed in the request.
      *
      * @return string
@@ -75,7 +90,22 @@ class ZendExt_Service_Bets_Bet365_Channel_SoccerWorldCup
      */
     public function getMatchPayback($local, $visitor)
     {
-        return $this->_parser->getMatchPayback($local, $visitor);
+        /*
+         * We don't really know which aliases may be in use,
+         * so we brute-force them. Not nice, but should be less than
+         * 10 combinations.
+         */
+        foreach ($this->_aliases->getAliasesFor($visitor) as $v) {
+            foreach ($this->_aliases->getAliasesFor($local) as $l) {
+               $ret = $this->_parser->getMatchPayback($l, $v);
+
+               if (null !== $ret) {
+                   return $ret;
+               }
+            }
+        }
+
+        return null;
     }
 
     /**
