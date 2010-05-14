@@ -97,11 +97,11 @@ class ZendExt_Service_Bets_Bet365_Channel_SoccerWorldCup
          */
         foreach ($this->_aliases->getAliasesFor($visitor) as $v) {
             foreach ($this->_aliases->getAliasesFor($local) as $l) {
-               $ret = $this->_parser->getMatchPayback($l, $v);
+                $ret = $this->_parser->getMatchPayback($l, $v);
 
-               if (null !== $ret) {
-                   return $ret;
-               }
+                if (null !== $ret) {
+                    return $ret;
+                }
             }
         }
 
