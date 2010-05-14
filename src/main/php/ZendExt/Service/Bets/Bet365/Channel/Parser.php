@@ -56,7 +56,13 @@ class ZendExt_Service_Bets_Bet365_Channel_Parser
             $this->_parsedResult = $this->_parse();
         }
 
-        return $this->_parsedResult[$local . ' v ' . $visitor];
+        $key = $local . ' v ' . $visitor;
+
+        if (isset($this->_parsedResult[$key])) {
+            return $this->_parsedResult[$key];
+        }
+
+        return null;
     }
 
     /**
