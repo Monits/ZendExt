@@ -101,6 +101,13 @@ class ZendExt_Service_Bets_Bet365_Channel_SoccerWorldCup
 
                 if (null !== $ret) {
                     return $ret;
+                } else {
+                    // If it's null maybe the teams are swapped on bet365.com
+                    $ret = $this->_parser->getMatchPayback($v, $l);
+
+                    if (null !== $ret) {
+                        return $ret;
+                    }
                 }
             }
         }
