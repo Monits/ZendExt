@@ -41,8 +41,11 @@ class ZendExt_Builder_ValidationException extends ZendExt_Exception
         $this->_field = $field;
         $this->_errors = $errors;
 
-        $this->message = 'Error validating field ' . $field
-            . '. First error is: "' . $errors[0] . '"';
+        $this->message = 'Error validating field ' . $field;
+
+        if (!empty($errors)) {
+            $this->message .= '. First error is: "' . $errors[0] . '"';
+        }
     }
 
     /**
