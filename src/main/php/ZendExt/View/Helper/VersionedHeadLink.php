@@ -195,7 +195,7 @@ class ZendExt_View_Helper_VersionedHeadLink extends Zend_View_Helper_HeadLink
             }
         }
 
-        $uri .= 'version='.$version;
+        $uri .= 'v='.$version;
 
         return $uri;
     }
