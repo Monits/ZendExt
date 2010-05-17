@@ -106,6 +106,10 @@ class ZendExt_Service_Bets_Bet365_Channel_SoccerWorldCup
                     $ret = $this->_parser->getMatchPayback($v, $l);
 
                     if (null !== $ret) {
+                        $local = $ret['1'];
+                        $ret['1'] = $ret['2'];
+                        $ret['2'] = $local;
+
                         return $ret;
                     }
                 }
