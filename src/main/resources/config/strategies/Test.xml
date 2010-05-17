@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zend-config>
 	<process>
-		<logFile>test.log</logFile>
+	   <log>
+	       <file>test.log</file>
+	   </log>
 		<pidFile>test.pid</pidFile>
 		<strategy>
 			<total>120</total>

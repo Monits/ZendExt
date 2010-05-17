@@ -55,4 +55,13 @@ interface ZendExt_Cron_Strategy_Interface
      * @return void
      */
     public function shutdown();
+
+    /**
+     * Set the manager.
+     *
+     * @param ZendExt_Cron_Manager $manager A manager instance.
+     *
+     * @return void
+     */
+    public function setManager(ZendExt_Cron_Manager $manager);
 }

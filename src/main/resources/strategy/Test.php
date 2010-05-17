@@ -25,6 +25,7 @@
  */
 class Test implements ZendExt_Cron_Strategy_MeasurableInterface
 {
+    const CONFIG_FILE = 'Test';
 
     /**
      * The config object.
@@ -53,6 +54,8 @@ class Test implements ZendExt_Cron_Strategy_MeasurableInterface
      * @var string
      */
     private $_bigString = '';
+
+    private $_manager;
 
     /**
      * Init the strategy.
@@ -84,7 +87,6 @@ class Test implements ZendExt_Cron_Strategy_MeasurableInterface
      */
     public function processBulk()
     {
-
         sleep(rand(2, 5));
         $this->_bigString .= str_repeat('test', rand(10, 20));
 
@@ -133,5 +135,17 @@ class Test implements ZendExt_Cron_Strategy_MeasurableInterface
     public function isDone()
     {
         return $this->_processed >= $this->_total;
+    }
+
+    /**
+     * Set the manager.
+     *
+     * @param ZendExt_Cron_Manager $manager A manager instance.
+     *
+     * @return void
+     */
+    public function setManager(ZendExt_Cron_Manager $manager)
+    {
+        $this->_manager = $manager;
     }
 }

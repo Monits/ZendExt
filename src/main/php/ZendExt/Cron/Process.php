@@ -58,14 +58,15 @@ final class ZendExt_Cron_Process
      * @param ZendExt_Cron_Strategy_Interface $strategy The strategy to apply
      *                                                  during execution.
      * @param Zend_Config                     $config   The config data to use.
+     * @param array                           $extra    Override config.
      */
     public function __construct(ZendExt_Cron_Strategy_Interface $strategy,
-        Zend_Config $config)
+        Zend_Config $config, array $extra = array())
     {
 
         $this->_strategy = $strategy;
 
-        $this->_loadConfig($config);
+        $this->_loadConfig($config, $extra);
         $this->_setupLogger();
     }
 
@@ -73,10 +74,11 @@ final class ZendExt_Cron_Process
      * Load and set the config for the process.
      *
      * @param Zend_Config $config The config data to use.
+     * @param array       $extra  Extra config to override defaults.
      *
      * @return void
      */
-    private function _loadConfig($config)
+    private function _loadConfig($config, array $extra = array())
     {
         $this->_config = new Zend_Config(self::$_defaultOptions, true);
         $this->_config->merge($config);
@@ -86,6 +88,8 @@ final class ZendExt_Cron_Process
 
         $configFile = $this->_config->configDir.'/'.$fileName.'.xml';
         $this->_config->merge(new Zend_Config_Xml($configFile, 'process'));
+
+        $this->_config->merge(new Zend_Config($extra));
     }
 
     /**
@@ -114,28 +118,50 @@ final class ZendExt_Cron_Process
     {
 
         $logConfig = $this->_config->log;
-        if (!file_exists($this->_config->logDir)) {
+        if (!file_exists($logConfig->path)) {
 
-            mkdir($this->_config->logDir, 0744, true);
+            mkdir($logConfig->path, 0744, true);
         }
 
         $this->_logger = new Zend_Log();
         $writer = new Zend_Log_Writer_Stream(
-            $this->_config->logDir.'/'.$this->_config->logFile
+            $logConfig->path.'/'.$logConfig->file
         );
 
-        $mail = new Zend_Mail();
+        if ($logConfig->mail) {
 
-        $to = $logConfig->recipients->toArray();
-        $mail->addTo($to['mail']);
-        $mail->setSubject($logConfig->subject);
-        $mail->setFrom($logConfig->from);
+            if ($logConfig->mail->transport == 'smtp') {
 
-        $mailWriter = new Zend_Log_Writer_Mail($mail);
-        $mailWriter->addFilter(new Zend_Log_Filter_Priority(Zend_Log::CRIT));
+                $transport = new Zend_Mail_Transport_Smtp(
+                    $logConfig->mail->host,
+                    $logConfig->mail->config->toArray()
+                );
+            } else {
+
+                $transport = new Zend_Mail_Transport_Sendmail();
+            }
+
+            Zend_Mail::setDefaultTransport($transport);
+
+            $mail = new Zend_Mail('UTF-8');
+            if (is_string($logConfig->mail->to)) {
+                $to = $logConfig->mail->to;
+            } else {
+                $to = $logConfig->mail->to->toArray();
+            }
+            $mail->addTo($to);
+            $mail->setFrom($logConfig->mail->from);
+            $mail->setSubject($logConfig->mail->subject);
+
+            $filter = new Zend_Log_Filter_Priority(Zend_Log::CRIT);
+
+            $mailWriter = new Zend_Log_Writer_Mail($mail);
+            $mailWriter->addFilter($filter);
+
+            $this->_logger->addWriter($mailWriter);
+        }
 
         $this->_logger->addWriter($writer);
-        $this->_logger->addWriter($mailWriter);
 
         ZendExt_Cron_Log::setProcessLog($this->_logger);
     }
@@ -168,8 +194,9 @@ final class ZendExt_Cron_Process
 
         if ( file_exists($this->_config->pidFile) ) {
 
-            $msg = 'A lock file was found when trying to execute a'
-                .' process with pid '.getmypid().'.';
+            $strategyReflector = new ReflectionClass($this->_strategy);
+            $msg = 'A lock file was found when trying to execute '
+                .$strategyReflector->getName();
 
             $this->_logger->info($msg);
             throw new ZendExt_Cron_LockException($msg);
