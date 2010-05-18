@@ -45,7 +45,7 @@ class ZendExt_Builder_ValidationException extends ZendExt_Exception
 
         if (!empty($errors)) {
             $this->message .=
-                    '. First error is: "' . array_shift($errors) . '"';
+                '. First error is: "' . array_shift($errors) . '"';
         }
     }
 
