@@ -268,4 +268,35 @@ class MultidbTest extends PHPUnit_Framework_TestCase
             $adapterConfig['username']
         );
     }
+
+    /**
+     * Test the getShardsForTable method.
+     *
+     * @return void
+     */
+    public function testGetShardsForTable()
+    {
+        $this->assertNull(
+            $this->_multidb->getShardsForTable(
+                'Non_Existing_Table',
+                ZendExt_Application_Resource_Multidb::OPERATION_WRITE
+            )
+        );
+
+        $this->assertNull(
+            $this->_multidb->getShardsForTable(
+                'Random_Table_1',
+                'foobar'
+            )
+        );
+
+        $operation = ZendExt_Application_Resource_Multidb::OPERATION_WRITE;
+        $this->assertEquals(
+            $this->_config['shards']['realshard'][$operation],
+            $this->_multidb->getShardsForTable(
+                'Random_Table_1',
+                $operation
+            )
+        );
+    }
 }
