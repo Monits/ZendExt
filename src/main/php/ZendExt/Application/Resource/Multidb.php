@@ -202,6 +202,6 @@ class ZendExt_Application_Resource_Multidb
             }
         }
 
-        return array();
+        return null;
     }
 }
