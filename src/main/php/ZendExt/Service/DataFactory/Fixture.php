@@ -66,7 +66,14 @@ class ZendExt_Service_DataFactory_Fixture
 
         foreach ($dates as $date) {
 
-            $group = substr($date->getAttribute('nombre'), -1);
+            $group = $date->getAttribute('nombre');
+            if (substr($group, 0, -2) == 'Grupo') {
+
+                $group = substr($group, -1);
+            } else {
+
+                $group = null;
+            }
             $roundNumber = $date->getAttribute('nivel');
 
             $matches = $date->getElementsByTagName('partido');
@@ -123,13 +130,22 @@ class ZendExt_Service_DataFactory_Fixture
     private function _getTeamData(DOMElement $match, $team)
     {
         $teamNode = $match->getElementsByTagName($team)->item(0);
-        $name = $teamNode->getAttribute('pais');
+        $name = $teamNode->nodeValue;
         $goals = $match->getElementsByTagName('goles'.$team)
             ->item(0)->nodeValue;
         $penaltyGoals = $match->getElementsByTagName('golesDefPenales'.$team)
             ->item(0)->nodeValue;
         $shortName = $teamNode->getAttribute('paisSigla');
-        $code = $this->_getCodeFromName($name, $shortName);
+        if ($shortName === '') {
+
+            $shortName = null;
+            $code = null;
+        } else {
+
+            $code = $this->_getCodeFromName($name, $shortName);
+        }
+
+
 
         return array(
                    'name' => $name,
