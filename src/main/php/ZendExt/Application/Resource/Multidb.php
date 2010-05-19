@@ -181,4 +181,27 @@ class ZendExt_Application_Resource_Multidb
     {
         return $this->_tables[$table];
     }
+
+    /**
+     * Get all of the available shards for an operation on a given table.
+     *
+     * @param string $table     The table name.
+     * @param string $operation The operation to perform on the table.
+     *                          See {@link #OPERATION_READ} and
+     *                          {@link #OPERATION_WRITE}
+     *
+     * @return array
+     */
+    public function getShardsForTable($table, $operation)
+    {
+        $shard = $this->_getShardForTable($table);
+        if (isset($this->_shards[$shard])) {
+            if (isset($this->_shards[$shard][$operation])) {
+
+                return $this->_shards[$shard][$operation];
+            }
+        }
+
+        return array();
+    }
 }
