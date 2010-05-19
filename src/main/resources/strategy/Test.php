@@ -60,11 +60,15 @@ class Test implements ZendExt_Cron_Strategy_MeasurableInterface
     /**
      * Init the strategy.
      *
-     * @param Zend_Config $config The config object for this strategy.
+     * @param Zend_Config                                  $config    Config for
+     *                                                                this
+     *                                                                strategy.
+     * @param Zend_Application_Bootstrap_BootstrapAbstract $bootstrap Instance.
      *
      * @return void
      */
-    public function init(Zend_Config $config)
+    public function init(Zend_Config $config,
+        Zend_Application_Bootstrap_BootstrapAbstract $bootstrap)
     {
 
         $this->_config = $config;

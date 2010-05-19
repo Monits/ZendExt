@@ -29,11 +29,15 @@ interface ZendExt_Cron_Strategy_Interface
     /**
      * Init the strategy.
      *
-     * @param Zend_Config $config The config object for this strategy.
+     * @param Zend_Config                                  $config    Config for
+     *                                                                this
+     *                                                                strategy.
+     * @param Zend_Application_Bootstrap_BootstrapAbstract $bootstrap Instance.
      *
      * @return void
      */
-    public function init(Zend_Config $config);
+    public function init(Zend_Config $config,
+        Zend_Application_Bootstrap_BootstrapAbstract $bootstrap);
 
     /**
      * Process a bulk of data.

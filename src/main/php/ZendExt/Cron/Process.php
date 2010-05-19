@@ -99,14 +99,56 @@ final class ZendExt_Cron_Process
      */
     private function _init()
     {
-
         $this->_logger->info('Initializing process...');
+        $bootstrap = $this->_bootstrap();
 
         file_put_contents($this->_config->pidFile, getmypid());
-        $this->_strategy->init($this->_config->strategy);
+        $this->_strategy->init($this->_config->strategy, $bootstrap);
 
         $this->_allowsProgress = $this->_strategy
             instanceOf ZendExt_Cron_Strategy_MeasurableInterface;
+    }
+
+    /**
+     * Bootstrap whatever the strategy needs.
+     *
+     * @return Zend_Application_Bootstrap_BootstrapAbstract|NULL
+     *
+     * @throws ZendExt_Cron_ErrorException
+     */
+    private function _bootstrap()
+    {
+        $this->_logger->info('Bootstraping...');
+        $appConfig = $this->_config->strategy->app;
+        if ($appConfig) {
+
+            try {
+                $app = new Zend_Application(
+                    'cron',
+                    $appConfig
+                );
+
+                if ($appConfig->resources) {
+
+                    $resources = $appConfig->resources->toArray();
+                } else {
+
+                    $resources = null;
+                }
+                $app->bootstrap($resources);
+            } catch (Exception $e) {
+
+                $this->_logger->crit($e->__toString());
+                throw new ZendExt_Cron_ErrorException(
+                    'An unexpected error caused the process to stop running.'
+                );
+
+            }
+
+            return $app->getBootstrap();
+        }
+
+        return null;
     }
 
     /**
