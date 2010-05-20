@@ -13,6 +13,11 @@
 
 class LazyStreamTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * Test for when resource is not a stream.
+     *
+     * @return void
+     */
     public function testConstructorThrowsWhenResourceIsNotStream()
     {
         $resource = xml_parser_create();
@@ -27,17 +32,32 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
         xml_parser_free($resource);
     }
 
+    /**
+     * Test valid stream construction.
+     *
+     * @return void
+     */
     public function testConstructorWithValidStream()
     {
         $stream = fopen('php://memory', 'w+');
         new ZendExt_Log_Writer_LazyStream($stream);
     }
 
+    /**
+     * Test for valid url construction.
+     *
+     * @return void
+     */
     public function testConstructorWithValidUrl()
     {
         new ZendExt_Log_Writer_LazyStream('php://memory');
     }
 
+    /**
+     * Test for error on invalid params on construction.
+     *
+     * @return void
+     */
     public function testConstructorThrowsWhenModeSpecifiedForExistingStream()
     {
         $stream = fopen('php://memory', 'w+');
@@ -50,6 +70,11 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * Test for error on unopenable stream.
+     *
+     * @return void
+     */
     public function testConstructorThrowsWhenStreamCannotBeOpened()
     {
         try {
@@ -62,6 +87,11 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * Test write.
+     *
+     * @return void
+     */
     public function testWrite()
     {
         $stream = fopen('php://memory', 'w+');
@@ -77,6 +107,11 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
         $this->assertContains($fields['message'], $contents);
     }
 
+    /**
+     * Test error when the stream is closed.
+     *
+     * @return void
+     */
     public function testWriteThrowsWhenStreamWriteFails()
     {
         $stream = fopen('php://memory', 'w+');
@@ -92,6 +127,11 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * Test that shutdown works correctly.
+     *
+     * @return void
+     */
     public function testShutdownClosesStreamResource()
     {
         $writer = new ZendExt_Log_Writer_LazyStream('php://memory', 'w+');
@@ -107,6 +147,11 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * Test formatter setter.
+     *
+     * @return void
+     */
     public function testSettingNewFormatter()
     {
         $stream = fopen('php://memory', 'w+');
@@ -124,6 +169,11 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
         $this->assertContains($expected, $contents);
     }
 
+    /**
+     * Test the factory method with a stream.
+     *
+     * @return void
+     */
     public function testFactoryStream()
     {
         $cfg = array('log' => array('memory' => array(
@@ -138,6 +188,11 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($logger instanceof Zend_Log);
     }
 
+    /**
+     * Test the factory method with a url.
+     *
+     * @return void
+     */
     public function testFactoryUrl()
     {
         $cfg = array('log' => array('memory' => array(
