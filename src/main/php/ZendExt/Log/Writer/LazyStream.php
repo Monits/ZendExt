@@ -28,10 +28,12 @@ class ZendExt_Log_Writer_LazyStream extends Zend_Log_Writer_Stream
     private $_name;
 
     /**
-     * Class Constructor
+     * Class Constructor.
      *
-     * @param  streamOrUrl     Stream or URL to open as a stream
-     * @param  mode            Mode, only applicable if a URL is given
+     * @param $streamOrUrl Stream or URL to open as a stream.
+     * @param $mode        Mode, only applicable if a URL is given.
+     *
+     * @throws Zend_Log_Exception
      */
     public function __construct($streamOrUrl, $mode = null)
     {
@@ -68,9 +70,11 @@ class ZendExt_Log_Writer_LazyStream extends Zend_Log_Writer_Stream
     }
 
     /**
-     * Open the file stream
+     * Open the file stream.
      *
      * @return void
+     *
+     * @throws Zend_Log_Exception
      */
     private function _openStream()
     {
