@@ -30,8 +30,8 @@ class ZendExt_Log_Writer_LazyStream extends Zend_Log_Writer_Stream
     /**
      * Class Constructor.
      *
-     * @param $streamOrUrl Stream or URL to open as a stream.
-     * @param $mode        Mode, only applicable if a URL is given.
+     * @param string|resource $streamOrUrl Stream or URL to open as a stream.
+     * @param string          $mode        Mode, only if a URL is given.
      *
      * @throws Zend_Log_Exception
      */
