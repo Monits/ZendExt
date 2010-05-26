@@ -179,6 +179,10 @@ class ZendExt_Application_Resource_Multidb
      */
     protected function _getShardForTable($table)
     {
+        if (!isset($this->_tables[$table])) {
+            return null;
+        }
+
         return $this->_tables[$table];
     }
 
