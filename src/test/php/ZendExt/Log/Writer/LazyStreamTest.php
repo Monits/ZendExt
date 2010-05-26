@@ -1,16 +1,28 @@
 <?php
 /**
+ * Test for lazy stream logger.
  *
- *
- * @category
- * @package
- * @copyright 2010 company
+ * @category  ZendExt
+ * @package   ZendExt_Log_Writer
+ * @copyright 2010 Monits
  * @license   Copyright (C) 2010. All rights reserved.
  * @version   1.0.0
- * @link
+ * @link      http://www.zendext.com/
  * @since     1.0.0
  */
 
+/**
+ * Test for lazy stream logger.
+ *
+ * @category  ZendExt
+ * @package   ZendExt_Log_Writer
+ * @author    Juan Pablo Civile <jpcivile@monits.com>
+ * @copyright 2010 Monits
+ * @license   Copyright 2010. All rights reserved.
+ * @version   Release: 1.0.0
+ * @link      http://www.zendext.com/
+ * @since     1.0.0
+ */
 class LazyStreamTest extends PHPUnit_Framework_TestCase
 {
     /**
@@ -24,10 +36,10 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
         try {
             $writer = new ZendExt_Log_Writer_LazyStream($resource);
             $writer->write(array('message' => 'message-to-log'));
-            $this->fail();
+            self::fail();
         } catch (Exception $e) {
-            $this->assertType('Zend_Log_Exception', $e);
-            $this->assertRegExp('/not a stream/i', $e->getMessage());
+            self::assertType('Zend_Log_Exception', $e);
+            self::assertRegExp('/not a stream/i', $e->getMessage());
         }
         xml_parser_free($resource);
     }
@@ -63,10 +75,10 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
         $stream = fopen('php://memory', 'w+');
         try {
             new ZendExt_Log_Writer_LazyStream($stream, 'w+');
-            $this->fail();
+            self::fail();
         } catch (Exception $e) {
-            $this->assertType('Zend_Log_Exception', $e);
-            $this->assertRegExp('/existing stream/i', $e->getMessage());
+            self::assertType('Zend_Log_Exception', $e);
+            self::assertRegExp('/existing stream/i', $e->getMessage());
         }
     }
 
@@ -80,10 +92,10 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
         try {
             $writer = new ZendExt_Log_Writer_LazyStream('');
             $writer->write(array('message' => 'message-to-log'));
-            $this->fail();
+            self::fail();
         } catch (Exception $e) {
-            $this->assertType('Zend_Log_Exception', $e);
-            $this->assertRegExp('/cannot be opened/i', $e->getMessage());
+            self::assertType('Zend_Log_Exception', $e);
+            self::assertRegExp('/cannot be opened/i', $e->getMessage());
         }
     }
 
@@ -104,7 +116,7 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
         $contents = stream_get_contents($stream);
         fclose($stream);
 
-        $this->assertContains($fields['message'], $contents);
+        self::assertContains($fields['message'], $contents);
     }
 
     /**
@@ -121,9 +133,9 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
 
         try {
             $writer->write(array('message' => 'foo'));
-            $this->fail();
+            self::fail();
         } catch (Exception $e) {
-            $this->assertType('Zend_Log_Exception', $e);
+            self::assertType('Zend_Log_Exception', $e);
         }
     }
 
@@ -141,9 +153,9 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
 
         try {
             $writer->write(array('message' => 'this write should fail'));
-            $this->fail();
+            self::fail();
         } catch (Exception $e) {
-            $this->assertType('Zend_Log_Exception', $e);
+            self::assertType('Zend_Log_Exception', $e);
         }
     }
 
@@ -166,7 +178,7 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
         $contents = stream_get_contents($stream);
         fclose($stream);
 
-        $this->assertContains($expected, $contents);
+        self::assertContains($expected, $contents);
     }
 
     /**
@@ -185,7 +197,7 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
         )));
 
         $logger = Zend_Log::factory($cfg['log']);
-        $this->assertTrue($logger instanceof Zend_Log);
+        self::assertTrue($logger instanceof Zend_Log);
     }
 
     /**
@@ -204,6 +216,6 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
         )));
 
         $logger = Zend_Log::factory($cfg['log']);
-        $this->assertTrue($logger instanceof Zend_Log);
+        self::assertTrue($logger instanceof Zend_Log);
     }
 }
