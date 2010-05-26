@@ -30,6 +30,8 @@ require_once('facebook/facebook.php');
  */
 class ZendExt_Service_Facebook
 {
+    const API_URL = 'https://api.facebook.com/restserver.php';
+
     private static $_params = array(
                                   'locale'  => 'fb_sig_locale',
                                   'friends' => 'fb_sig_friends',
@@ -52,6 +54,10 @@ class ZendExt_Service_Facebook
      */
     private $_request;
 
+    private $_apiKey;
+
+    private $_apiSecret;
+
     /**
      * Construct a new FB API service.
      *
@@ -62,6 +68,9 @@ class ZendExt_Service_Facebook
      */
     public function __construct($apiKey, $apiSecret, $generateSecret=false)
     {
+        $this->_apiKey = $apiKey;
+        $this->_apiSecret = $apiSecret;
+
         $this->_fb = new Facebook($apiKey, $apiSecret, $generateSecret);
     }
 
@@ -172,5 +181,90 @@ class ZendExt_Service_Facebook
         $data = $this->_fb->api_client->fql_query($query);
 
         return $data[0]['email'];
+    }
+
+    /**
+     * Increment the users counter.
+     *
+     * @param integer $userId The user id. If null, defaults to current user.
+     *
+     * @return void
+     */
+    public function incrementCounter($userId = null)
+    {
+        if ($userId === null) {
+
+            $userId = $this->getUserId();
+        }
+
+        $params = array(
+            'uid' => $userId
+        );
+
+        $res = $this->_makeApiCall($params);
+    }
+
+    /**
+     * Make a request to rest API.
+     *
+     * @param string $method The api method to use.
+     * @param array  $params Params to pass on.
+     *
+     * @return string The response given by the API
+     */
+    private function _makeApiCall($method, array $params = array())
+    {
+        $get = array(
+            'method' => 'dashboard.incrementCount',
+            'api_key' => $this->_apiKey
+        );
+        $post = $params;
+        $post['v'] = '1.0';
+        $post['call_id'] = microtime(true);
+        $post['sig'] = $this->_makeSig(array_merge($get, $post));
+
+        $getStr = '';
+        foreach($get as $key => $value) {
+
+            $getStr .= $key .'='.$value.'&';
+        }
+        $getStr = substr($getStr, 0, -1);
+
+        $postStr = '';
+        foreach($post as $key => $value) {
+
+            $postStr .= $key .'='.$value.'&';
+        }
+        $postStr = substr($postStr, 0, -1);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, self::API_URL.'?'.$getStr);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postStr);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $res = curl_exec($ch);
+        curl_close($ch);
+
+        return $res;
+    }
+
+    /**
+     * Generate the FB API sig for a given list of params.
+     *
+     * @param array $params An array of key => value params.
+     *
+     * @return string
+     */
+    private function _makeSig($params)
+    {
+        ksort($params);
+
+        $request_str = '';
+        foreach ($params as $key => $value) {
+
+            $request_str .= $key . '=' . $value;
+        }
+        $sig = $request_str . $this->_apiSecret;
+        $sig = md5($sig);
     }
 }
