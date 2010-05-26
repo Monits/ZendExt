@@ -171,6 +171,6 @@ class ZendExt_Service_Facebook
         $query = "SELECT email FROM user WHERE uid=\"$userId\"";
         $data = $this->_fb->api_client->fql_query($query);
 
-        return $data['email'];
+        return $data[0]['email'];
     }
 }
