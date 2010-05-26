@@ -34,7 +34,8 @@ class ZendExt_Service_DataFactory_Channel
      */
     public function __construct($xml)
     {
-        $document = DOMDocument::loadXML($xml);
+        $document = new DOMDocument();
+        $document->loadXML($xml);
         $this->_channels = $this->_parseChannels(
             $document->getElementsByTagName('canal')
         );
