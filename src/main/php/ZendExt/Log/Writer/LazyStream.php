@@ -26,6 +26,7 @@
 class ZendExt_Log_Writer_LazyStream extends Zend_Log_Writer_Stream
 {
     private $_name;
+    private $_mode;
 
     /**
      * Class Constructor.
@@ -44,12 +45,10 @@ class ZendExt_Log_Writer_LazyStream extends Zend_Log_Writer_Stream
 
         if (is_resource($streamOrUrl)) {
             if (get_resource_type($streamOrUrl) != 'stream') {
-                require_once 'Zend/Log/Exception.php';
                 throw new Zend_Log_Exception('Resource is not a stream');
             }
 
             if ($mode != 'a') {
-                require_once 'Zend/Log/Exception.php';
                 throw new Zend_Log_Exception(
                     'Mode cannot be changed on existing streams'
                 );
@@ -67,6 +66,7 @@ class ZendExt_Log_Writer_LazyStream extends Zend_Log_Writer_Stream
         }
 
         $this->_formatter = new Zend_Log_Formatter_Simple();
+        $this->_mode = $mode;
     }
 
     /**
@@ -79,9 +79,9 @@ class ZendExt_Log_Writer_LazyStream extends Zend_Log_Writer_Stream
     private function _openStream()
     {
         if (!is_resource($this->_stream)) {
-            if (! $this->_stream = @fopen($this->_name, $mode, false)) {
-                require_once 'Zend/Log/Exception.php';
-                $msg = "\"$this->_name\" cannot be opened with mode \"$mode\"";
+            if (! $this->_stream = @fopen($this->_name, $this->_mode, false)) {
+                $msg = '"' . $this->_name . '" cannot be opened with mode "'
+                    . $this->_mode . '"';
                 throw new Zend_Log_Exception($msg);
             }
         }
