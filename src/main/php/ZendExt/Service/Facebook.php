@@ -154,4 +154,23 @@ class ZendExt_Service_Facebook
 
         return array();
     }
+
+    /**
+     * Retrieves the mail of the requested user provided he has granted access.
+     *
+     * @param string $userId The id of the user whose mail to request.
+     *
+     * @return string
+     */
+    public function getUserEmail($userId = null)
+    {
+        if (null === $userId) {
+            $userId = $this->getUserId();
+        }
+
+        $query = "SELECT email FROM user WHERE uid=\"$userId\"";
+        $data = $this->_fb->api_client->fql_query($query);
+
+        return $data['email'];
+    }
 }
