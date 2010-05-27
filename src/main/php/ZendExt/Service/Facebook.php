@@ -224,14 +224,14 @@ class ZendExt_Service_Facebook
         $post['sig'] = $this->_makeSig(array_merge($get, $post));
 
         $getStr = '';
-        foreach($get as $key => $value) {
+        foreach ($get as $key => $value) {
 
             $getStr .= $key .'='.$value.'&';
         }
         $getStr = substr($getStr, 0, -1);
 
         $postStr = '';
-        foreach($post as $key => $value) {
+        foreach ($post as $key => $value) {
 
             $postStr .= $key .'='.$value.'&';
         }
@@ -259,12 +259,12 @@ class ZendExt_Service_Facebook
     {
         ksort($params);
 
-        $request_str = '';
+        $requestStr = '';
         foreach ($params as $key => $value) {
 
-            $request_str .= $key . '=' . $value;
+            $requestStr .= $key . '=' . $value;
         }
-        $sig = $request_str . $this->_apiSecret;
-        $sig = md5($sig);
+        $sig = $requestStr . $this->_apiSecret;
+        return md5($sig);
     }
 }
