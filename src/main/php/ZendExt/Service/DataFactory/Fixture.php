@@ -153,8 +153,7 @@ class ZendExt_Service_DataFactory_Fixture
         $penaltyGoals = $match->getElementsByTagName('golesDefPenales'.$team)
             ->item(0)->nodeValue;
 
-        $sigla = $teamNode->getAttribute('paisSigla');
-        $shortName = $this->_transformTeamShortName($name, $sigla);
+        $shortName = $teamNode->getAttribute('paisSigla');
 
         if ($shortName === '') {
 
@@ -163,6 +162,7 @@ class ZendExt_Service_DataFactory_Fixture
         } else {
 
             $code = $this->_getCodeFromName($name, $shortName);
+            $shortName = $this->_transformTeamShortName($name, $shortName);
         }
 
 
