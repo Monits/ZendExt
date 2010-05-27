@@ -200,8 +200,7 @@ class ZendExt_Service_Facebook
         $params = array(
             'uid' => $userId
         );
-
-        $res = $this->_makeApiCall($params);
+        $res = $this->_makeApiCall('dashboard.incrementCount', $params);
     }
 
     /**
@@ -215,9 +214,10 @@ class ZendExt_Service_Facebook
     private function _makeApiCall($method, array $params = array())
     {
         $get = array(
-            'method' => 'dashboard.incrementCount',
+            'method' => $method,
             'api_key' => $this->_apiKey
         );
+
         $post = $params;
         $post['v'] = '1.0';
         $post['call_id'] = microtime(true);
