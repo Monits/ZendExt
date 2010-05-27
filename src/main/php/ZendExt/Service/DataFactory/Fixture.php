@@ -34,14 +34,18 @@ class ZendExt_Service_DataFactory_Fixture
 
     private static $_shortCode = array(
         'Argelia'         => 'DZA',
-        'Eslovaquia'      => 'SVK',
+        'Eslovaquia'      => 'SVK'
+    );
+
+    private static $_shortNames = array(
+        'Argelia'         => 'ALG',
         'Sudáfrica'       => 'RSA',
         'Inglaterra'      => 'ENG',
         'Eslovenia'       => 'SVN',
         'Alemania'        => 'GER',
         'Dinamarca'       => 'DEN',
-        'Holanda'         => 'NED',
         'Eslovaquia'      => 'SVK',
+        'Holanda'         => 'NED',
         'Corea del Norte' => 'PRK',
         'Costa de Marfil' => 'CIV'
     );
@@ -148,7 +152,10 @@ class ZendExt_Service_DataFactory_Fixture
             ->item(0)->nodeValue;
         $penaltyGoals = $match->getElementsByTagName('golesDefPenales'.$team)
             ->item(0)->nodeValue;
-        $shortName = $teamNode->getAttribute('paisSigla');
+
+        $sigla = $teamNode->getAttribute('paisSigla');
+        $shortName = $this->_transformTeamShortName($name, $sigla);
+
         if ($shortName === '') {
 
             $shortName = null;
@@ -170,10 +177,29 @@ class ZendExt_Service_DataFactory_Fixture
     }
 
     /**
+     * Hackish method to transform some short names to English.
+     *
+     * @param string $name      The country's name.
+     * @param string $shortName The country's default short name.
+     *
+     * @return string The short name in English.
+     */
+    private function _transformTeamShortName($name, $shortName)
+    {
+        if (isset(self::$_shortNames[$name])) {
+
+            return self::$_shortNames[$name];
+        } else {
+
+            return $shortName;
+        }
+    }
+
+    /**
      * Hackish method to transform short names into ISO country codes.
      *
-     * @param string $name      The countrys name.
-     * @param string $shortName The countrys short name.
+     * @param string $name      The country's name.
+     * @param string $shortName The country's short name.
      *
      * @return string The country code.
      */
@@ -189,7 +215,7 @@ class ZendExt_Service_DataFactory_Fixture
     }
 
     /**
-     * Return the team name that the app will be using.
+     * Hackish method to transform some names to English.
      *
      * @param string $name The name to transform.
      *
