@@ -33,8 +33,17 @@ class ZendExt_Service_DataFactory_Fixture
     const CHANNEL_NAME = 'deportes.futbol.mundial.fixture';
 
     private static $_shortCode = array(
-        'Argelia'    => 'DZA',
-        'Eslovaquia' => 'SVK'
+        'Argelia'         => 'DZA',
+        'Eslovaquia'      => 'SVK',
+        'Sudáfrica'       => 'RSA',
+        'Inglaterra'      => 'ENG',
+        'Eslovenia'       => 'SVN',
+        'Alemania'        => 'GER',
+        'Dinamarca'       => 'DEN',
+        'Holanda'         => 'NED',
+        'Eslovaquia'      => 'SVK',
+        'Corea del Norte' => 'PRK',
+        'Costa de Marfil' => 'CIV'
     );
 
     private static $_teamNames = array(
