@@ -37,6 +37,10 @@ class ZendExt_Service_DataFactory_Fixture
         'Eslovaquia' => 'SVK'
     );
 
+    private static $_teamNames = array(
+        'Nueva Zelanda' => 'N. Zelanda'
+    );
+
     const STATE_FINISHED = 'Finalizado';
 
     private $_matches;
@@ -130,7 +134,7 @@ class ZendExt_Service_DataFactory_Fixture
     private function _getTeamData(DOMElement $match, $team)
     {
         $teamNode = $match->getElementsByTagName($team)->item(0);
-        $name = $teamNode->nodeValue;
+        $name = $this->_transformTeamName($teamNode->nodeValue);
         $goals = $match->getElementsByTagName('goles'.$team)
             ->item(0)->nodeValue;
         $penaltyGoals = $match->getElementsByTagName('golesDefPenales'.$team)
@@ -172,6 +176,24 @@ class ZendExt_Service_DataFactory_Fixture
         } else {
 
             return $shortName;
+        }
+    }
+
+    /**
+     * Return the team name that the app will be using.
+     *
+     * @param string $name The name to transform.
+     *
+     * @return string
+     */
+    private function _transformTeamName($name)
+    {
+        if (isset(self::$_teamNames[$name])) {
+
+            return self::$_teamNames[$name];
+        } else {
+
+            return $name;
         }
     }
 
