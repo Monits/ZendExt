@@ -77,7 +77,7 @@ abstract class ZendExt_Service_Bets_Abstract
 
         $response = $client->request($method);
 
-        if ($response->isError()) {
+        if (!$response->isSuccessful()) {
             throw new ZendExt_Service_Bets_Exception(
                 'Request failed, returned error code ' . $response->getStatus()
             );
