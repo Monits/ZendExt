@@ -58,7 +58,7 @@ class ZendExt_Service_DataFactory_Fixture
         'Sudáfrica'       => 'South Africa',
         'Grecia'          => 'Greece',
         'Nigeria'         => 'Nigeria',
-        'Corea del Sur'   => 'Korea',
+        'Corea del Sur'   => 'Korea Rep.',
         'Argentina'       => 'Argentina',
         'Estados Unidos'  => 'USA',
         'Eslovenia'       => 'Slovenia',
