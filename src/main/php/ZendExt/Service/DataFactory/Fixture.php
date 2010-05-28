@@ -51,7 +51,38 @@ class ZendExt_Service_DataFactory_Fixture
     );
 
     private static $_teamNames = array(
-        'Nueva Zelanda' => 'N. Zelanda'
+        'Nueva Zelanda'   => 'New Zeland',
+        'México'          => 'Mexico',
+        'Francia'         => 'France',
+        'Uruguay'         => 'Uruguay',
+        'Sudáfrica'       => 'South Africa',
+        'Grecia'          => 'Greece',
+        'Nigeria'         => 'Nigeria',
+        'Corea del Sur'   => 'Korea Republic',
+        'Argentina'       => 'Argentina',
+        'Estados Unidos'  => 'USA',
+        'Eslovenia'       => 'Slovenia',
+        'Argelia'         => 'Algeria',
+        'Inglaterra'      => 'England',
+        'Ghana'           => 'Ghana',
+        'Australia'       => 'Australia',
+        'Serbia'          => 'Serbia',
+        'Alemania'        => 'Germany',
+        'Dinamarca'       => 'Denmark',
+        'Camerún'         => 'Cameroon',
+        'Japón'           => 'Japan',
+        'Holanda'         => 'Netherlands',
+        'Paraguay'        => 'Paraguay',
+        'Eslovaquia'      => 'Slovakia',
+        'Italia'          => 'Italy',
+        'Portugal'        => 'Portugal',
+        'Corea del Norte' => 'Korea DPR',
+        'Costa de Marfil' => 'Côte d\'Ivoire',
+        'Brasil'          => 'Brazil',
+        'Chile'           => 'Chile',
+        'Suiza'           => 'Switzerland',
+        'Honduras'        => 'Honduras',
+        'España'          => 'Spain'
     );
 
     const STATE_FINISHED = 'Finalizado';
@@ -147,7 +178,8 @@ class ZendExt_Service_DataFactory_Fixture
     private function _getTeamData(DOMElement $match, $team)
     {
         $teamNode = $match->getElementsByTagName($team)->item(0);
-        $name = $this->_transformTeamName($teamNode->nodeValue);
+        $name = $teamNode->nodeValue;
+        $officialName = $this->_transformTeamName($name);
         $goals = $match->getElementsByTagName('goles'.$team)
             ->item(0)->nodeValue;
         $penaltyGoals = $match->getElementsByTagName('golesDefPenales'.$team)
@@ -168,7 +200,7 @@ class ZendExt_Service_DataFactory_Fixture
 
 
         return array(
-                   'name' => $name,
+                   'name' => $officialName,
                    'goals' => $goals,
                    'penaltyGoals' => $penaltyGoals,
                    'code' => $code,
