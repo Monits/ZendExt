@@ -5,7 +5,7 @@
 	<artifactId>ZendExt</artifactId>
 	<packaging>php</packaging>
 	<name>ZendExt</name>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -119,7 +119,7 @@
 		</dependency>
 		<dependency>
             <groupId>com.zend</groupId>
-            <artifactId>zend-framework</artifactId>
+            <artifactId>zend-framework-stripped</artifactId>
             <version>1.10.2</version>
         </dependency>
         <dependency>
