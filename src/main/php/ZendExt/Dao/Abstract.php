@@ -199,4 +199,21 @@ abstract class ZendExt_Dao_Abstract
     {
         self::$_config = $config;
     }
+    /**
+     * Wrapper for _getTable, retrieves the table instance to be used.
+     *
+     * @param string $operation   The operation to be performed on the table.
+     *                            See {@link #OPERATION_READ}
+     *                            and {@link #OPERATION_WRITE}
+     * @param any    $shardingArg The value on which to perform sharding.
+     *
+     * @return Zend_Db_Table_Abstract The table to be used by this DAO.
+     */
+    public function getTable($operation = self::OPERATION_READ,
+        $shardingArg = null)
+    {
+        return $this->_getTable($operation, $shardingArg);
+    }
+
+
 }

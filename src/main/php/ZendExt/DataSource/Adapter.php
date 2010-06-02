@@ -42,9 +42,9 @@ interface ZendExt_DataSource_Adapter
     /**
      * Retrieves the table.
      *
-     * @param int $shard The shard id.
+     * @param any $param An extra param for the underlying class.
      *
      * @return Zend_Db_Table_Abstract
      */
-    public function getTable($shard = null);
+    public function getTable($param = null);
 }
