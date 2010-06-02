@@ -41,6 +41,11 @@ abstract class ZendExt_Controller_ScaffoldingAbstract
         $this->_forward('list');
     }
 
+    /**
+     * listAction.
+     *
+     * @return void
+     */
     public function listAction()
     {
 
