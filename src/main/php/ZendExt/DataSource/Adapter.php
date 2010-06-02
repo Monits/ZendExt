@@ -14,7 +14,7 @@
 /**
  * Datasource adapter interface.
  *
- * @category  FBFCoach
+ * @category  ZendExt
  * @package	  ZendExt_DataSource
  * @author    imtirabasso <itirabasso@monits.com>
  * @copyright 2010 Monits
@@ -41,6 +41,7 @@ interface ZendExt_DataSource_Adapter
 
     /**
      * Retrieves the table.
+     *
      * @param int $shard The shard id.
      *
      * @return Zend_Db_Table_Abstract
