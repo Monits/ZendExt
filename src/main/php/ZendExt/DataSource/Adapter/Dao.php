@@ -30,7 +30,7 @@ class ZendExt_DataSource_Adapter_Dao implements ZendExt_DataSource_Adapter
     /**
      * Sets the Dao into the adapter.
      *
-     * @param ZendExt_Dao_Abstract $dao
+     * @param ZendExt_Dao_Abstract $dao An instance of Dao
      *
      * @return void
      */

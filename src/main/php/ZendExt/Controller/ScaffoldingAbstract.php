@@ -31,6 +31,11 @@ abstract class ZendExt_Controller_ScaffoldingAbstract
 
     protected $_dataSource = null;
 
+    /**
+     * indexAction.
+     *
+     * @return void
+     */
     public function indexAction()
     {
         $this->_forward('list');
@@ -41,6 +46,11 @@ abstract class ZendExt_Controller_ScaffoldingAbstract
 
     }
 
+    /**
+     * newAction.
+     *
+     * @return void
+     */
     public function newAction()
     {
         $request = $this->getRequest();
@@ -83,11 +93,21 @@ abstract class ZendExt_Controller_ScaffoldingAbstract
         }
     }
 
+    /**
+     * updateAction.
+     *
+     * @return void
+     */
     public function updateAction()
     {
 
     }
 
+    /**
+     * deleteAction.
+     *
+     * @return void
+     */
     public function deleteAction()
     {
 

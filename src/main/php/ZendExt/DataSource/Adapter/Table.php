@@ -30,7 +30,7 @@ class ZendExt_DataSource_Adapter_Table implements ZendExt_DataSource_Adapter
     /**
      * The adapter's table.
      *
-     * @param $table
+     * @param Zend_Db_Table_Abstract $table The table.
      */
     public function __construct(Zend_Db_Table_Abstract $table)
     {
