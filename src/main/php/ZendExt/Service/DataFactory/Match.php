@@ -29,7 +29,7 @@ class ZendExt_Service_DataFactory_Match
 
     private $_visitor;
 
-    private $_timestamp;
+    private $_datetime;
 
     private $_isFinished;
 
@@ -51,7 +51,7 @@ class ZendExt_Service_DataFactory_Match
         $keys = array(
                     'local',
                     'visitor',
-                    'timestamp',
+                    'datetime',
                     'isFinished',
                     'stadium',
                     'group',
@@ -105,13 +105,13 @@ class ZendExt_Service_DataFactory_Match
     }
 
     /**
-     * Get the match timestamp.
+     * Get the match datetime in MySQL compatible format.
      *
-     * @return integer
+     * @return string
      */
-    public function getTimestamp()
+    public function getDateTime()
     {
-        return $this->_timestamp;
+        return $this->_datetime;
     }
 
     /**

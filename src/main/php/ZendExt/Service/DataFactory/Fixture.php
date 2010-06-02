@@ -110,6 +110,10 @@ class ZendExt_Service_DataFactory_Fixture
     private function _parseFixture(DOMDocument $doc)
     {
         $result = array();
+
+        $tz = $doc->getElementsByTagName('horaActual')
+            ->item(0)->getAttribute('gmt');
+
         $dates = $doc->getElementsByTagName('fecha');
 
         foreach ($dates as $date) {
@@ -130,14 +134,8 @@ class ZendExt_Service_DataFactory_Fixture
                 $matchDate = $match->getAttribute('fecha');
                 $matchTime = $match->getAttribute('hora');
 
-                $timestamp = new Zend_Date(
-                    $matchDate,
-                    ZendExt_Service_DataFactory::DATE_FORMAT
-                );
-                $timestamp->setTime(
-                    $matchTime,
-                    ZendExt_Service_DataFactory::TIME_FORMAT
-                );
+                $datetime = new DateTime($matchDate.' '.$matchTime.' '.$tz);
+                $datetime->setTimezone(new DateTimeZone('UTC'));
 
                 $state = $match->getElementsByTagName('estado')
                     ->item(0)->nodeValue;
@@ -152,7 +150,7 @@ class ZendExt_Service_DataFactory_Fixture
                 $data = array(
                             'group' => $group,
                             'roundNumber' => $roundNumber,
-                            'timestamp' => $timestamp->getTimestamp(),
+                            'datetime' => $datetime->format('Y-m-d H:i:s'),
                             'isFinished' => $isFinished,
                             'local' => $local,
                             'visitor' => $visitor,
