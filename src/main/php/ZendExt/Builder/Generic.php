@@ -47,21 +47,18 @@ class ZendExt_Builder_Generic
      */
     public function __call($methodName, $args)
     {
-        if ('with' === substr($methodName, 0, 4)) {
-            $var = strtolower(substr($methodName, 4, 1))
-                    . substr($methodName, 5);
+        if (isset($methodName[4]) && 'with' === substr($methodName, 0, 4)) {
+            $var = strtolower($methodName[4]) . substr($methodName, 5);
             $val = $args[0];
 
             if (!isset($this->_fields[$var])) {
                 throw new ZendExt_Builder_Exception('Unknown field: ' . $var);
             }
 
-            if (is_array($this->_fields[$var])) {
-                if (isset($this->_fields[$var]['validators'])) {
-                    $this->_validateField(
-                        $this->_fields[$var]['validators'], $var, $val
-                    );
-                }
+            if (isset($this->_fields[$var]['validators'])) {
+                $this->_validateField(
+                    $this->_fields[$var]['validators'], $var, $val
+                );
             }
 
             $this->_data[$var] = $val;
