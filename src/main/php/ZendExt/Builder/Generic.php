@@ -165,4 +165,14 @@ class ZendExt_Builder_Generic
 
         return new $this->_class($this->_data);
     }
+
+    /**
+     * Get the names of the fields.
+     *
+     * @return array
+     */
+    public function getFieldsNames()
+    {
+       return array_keys($this->_fields);
+    }
 }
