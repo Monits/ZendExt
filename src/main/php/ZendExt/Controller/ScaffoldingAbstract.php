@@ -242,14 +242,16 @@ abstract class ZendExt_Controller_ScaffoldingAbstract
              ->setAttrib('class', '')
              ->setAction('')
              ->setMethod('post')
-             ->addDecorator('HtmlTag', 	array('tag' => 'dl','class' => ''));
+             ->addDecorator('HtmlTag', array('tag' => 'dl','class' => ''));
 
         foreach ($fields as $field) {
-            $form->addElement('text', $field , array(
-                'Label'=>$field . ':',
-                //TODO: Verificar en la db o builder si el campo es requerido o no
-                'required'   => true
-            ));
+            $form->addElement('text', $field,
+                array(
+                    'Label'    => $field . ':',
+                    //TODO: Verificar en la db o builder si el campo es requerido o no
+                    'required' => true
+                )
+            );
         }
         $form->addElement('submit', 'send');
 
