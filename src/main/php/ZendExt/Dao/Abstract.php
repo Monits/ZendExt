@@ -231,5 +231,9 @@ abstract class ZendExt_Dao_Abstract
         ZendExt_Application_Resource_Multidb $config)
     {
         self::$_config = $config;
+
+        // Reset all local caches
+        self::$_tables = array();
+        self::$_shardingStrategies = array();
     }
 }
