@@ -128,6 +128,10 @@ class ZendExt_Service_DataFactory_Fixture
         $result = array();
         $dates = $doc->getElementsByTagName('fecha');
 
+        $tz = $doc->getElementsByTagName('horaActual')
+            ->item(0)->getAttribute('gmt');
+
+
         foreach ($dates as $date) {
 
             $group = $date->getAttribute('nombre');
@@ -146,14 +150,8 @@ class ZendExt_Service_DataFactory_Fixture
                 $matchDate = $match->getAttribute('fecha');
                 $matchTime = $match->getAttribute('hora');
 
-                $timestamp = new Zend_Date(
-                    $matchDate,
-                    ZendExt_Service_DataFactory::DATE_FORMAT
-                );
-                $timestamp->setTime(
-                    $matchTime,
-                    ZendExt_Service_DataFactory::TIME_FORMAT
-                );
+                $datetime = new DateTime($matchDate.' '.$matchTime.' '.$tz);
+                $datetime->setTimezone(new DateTimeZone('UTC'));
 
                 $state = $match->getElementsByTagName('estado')
                     ->item(0)->nodeValue;
@@ -168,7 +166,7 @@ class ZendExt_Service_DataFactory_Fixture
                 $data = array(
                             'group' => $group,
                             'roundNumber' => $roundNumber,
-                            'timestamp' => $timestamp->getTimestamp(),
+                            'datetime' => $datetime->format('Y-m-d H:i:s'),
                             'isFinished' => $isFinished,
                             'local' => $local,
                             'visitor' => $visitor,
@@ -194,14 +192,14 @@ class ZendExt_Service_DataFactory_Fixture
     private function _getTeamData(DOMElement $match, $team)
     {
         $teamNode = $match->getElementsByTagName($team)->item(0);
-        $name = $teamNode->nodeValue;
+        $name = trim($teamNode->nodeValue);
         $officialName = $this->_transformTeamName($name);
         $goals = $match->getElementsByTagName('goles'.$team)
             ->item(0)->nodeValue;
         $penaltyGoals = $match->getElementsByTagName('golesDefPenales'.$team)
             ->item(0)->nodeValue;
 
-        $shortName = $teamNode->getAttribute('paisSigla');
+        $shortName = trim($teamNode->getAttribute('paisSigla'));
 
         if ($shortName === '') {
 
