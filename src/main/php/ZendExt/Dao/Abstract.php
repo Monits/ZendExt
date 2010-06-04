@@ -198,7 +198,12 @@ abstract class ZendExt_Dao_Abstract
         ZendExt_Application_Resource_Multidb $config)
     {
         self::$_config = $config;
+
+        // Reset all local caches
+        self::$_tables = array();
+        self::$_shardingStrategies = array();
     }
+
     /**
      * Wrapper for _getTable, retrieves the table instance to be used.
      *
@@ -214,6 +219,4 @@ abstract class ZendExt_Dao_Abstract
     {
         return $this->_getTable($operation, $shardingArg);
     }
-
-
 }
