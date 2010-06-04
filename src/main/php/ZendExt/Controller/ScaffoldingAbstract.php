@@ -61,7 +61,7 @@ abstract class ZendExt_Controller_ScaffoldingAbstract
         $request = $this->getRequest();
 
         if ($request->isPost()) {
-            return;
+            return $this->_newForm();
         }
 
         $dataSource = new $this->_dataSource();
@@ -101,7 +101,7 @@ abstract class ZendExt_Controller_ScaffoldingAbstract
         $request = $this->getRequest();
 
         if ($request->isPost()) {
-            return;
+            return ;
         }
 
         $dataSource = new $this->_dataSource();
@@ -224,5 +224,35 @@ abstract class ZendExt_Controller_ScaffoldingAbstract
             $indexField = array_search($pkField, $fields);
             unset($fields[$indexField]);
         }
+    }
+
+    /**
+     * Create a new form.
+     *
+     * @return void.
+     */
+    private function _newForm()
+    {
+        $builder = new $this->_builderClass();
+        $fields = $builder->getFieldsNames();
+
+        $form = new Zend_Form();
+        $form->disableLoadDefaultDecorators(true)
+             ->setAttrib('id', '')
+             ->setAttrib('class', '')
+             ->setAction('')
+             ->setMethod('post')
+             ->addDecorator('HtmlTag', 	array('tag' => 'dl','class' => ''));
+
+        foreach ($fields as $field) {
+            $form->addElement('text', $field , array(
+                'Label'=>$field . ':',
+                //TODO: Verificar en la db o builder si el campo es requerido o no
+                'required'   => true
+            ));
+        }
+        $form->addElement('submit', 'send');
+
+        return $form;
     }
 }
