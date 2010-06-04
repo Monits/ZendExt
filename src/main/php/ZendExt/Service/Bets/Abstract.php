@@ -29,8 +29,8 @@ abstract class ZendExt_Service_Bets_Abstract
 
     const TIME_OUT = 5;
 
+    protected $_timeOut = self::TIME_OUT;
     protected $_availableChannels = array();
-
     protected $_channelClass;
 
     /**
@@ -71,7 +71,7 @@ abstract class ZendExt_Service_Bets_Abstract
     {
         $client = new Zend_Http_Client($url);
 
-        $client->setConfig(array('timeout' => self::TIME_OUT));
+        $client->setConfig(array('timeout' => $this->_timeOut));
         $client->setHeaders('Cookie', $cookies);
         $client->setRawData($postData);
 

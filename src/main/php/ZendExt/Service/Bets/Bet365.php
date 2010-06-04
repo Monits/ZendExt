@@ -30,6 +30,7 @@ class ZendExt_Service_Bets_Bet365 extends ZendExt_Service_Bets_Abstract
         'ZendExt_Service_Bets_Bet365_Channel_SoccerWorldCup';
 
     protected $_availableChannels = array(self::CHANNEL_SOCCER_WORLD_CUP);
+    protected $_timeOut = 10;
 
     /**
      * @var FBFCoach_Service_Bets_Bet365_Channel_Interface
