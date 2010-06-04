@@ -200,7 +200,29 @@ class ZendExt_Service_Facebook
         $params = array(
             'uid' => $userId
         );
-        $res = $this->_makeApiCall('dashboard.incrementCount', $params);
+        $this->_makeApiCall('dashboard.incrementCount', $params);
+    }
+
+    /**
+     * Set the users counter to a value.
+     *
+     * @param integer $userId The user id. If null, defaults to current user.
+     * @param integer $count  The new value. Defaults to 0.
+     *
+     * @return void
+     */
+    public function setCounter($userId = null, $count = 0)
+    {
+        if ($userId === null) {
+
+            $userId = $this->getUserId();
+        }
+
+        $params = array(
+            'uid' => $userId,
+            'count' => $count
+        );
+        $this->_makeApiCall('dashboard.setCount', $params);
     }
 
     /**
