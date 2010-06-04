@@ -74,7 +74,7 @@ class ZendExt_Service_Bets_Bet365_Channel_Parser
     {
         preg_match_all(
             '/<td class="an3 w" width="238">([^<]+)<\/td>\s*<td [^>]+><img [' .
-            '^>]+><img [^>]+><\/td>\s*<td [^>]+>([^<]+)<\/td>\s*<td [^>]+>([' .
+            '^>]+>(<img [^>]+>)?<\/td>\s*<td [^>]+>([^<]+)<\/td>\s*<td [^>]+>([' .
             '^<]+)<\/td>\s*<td [^>]+>([^<]+)<\/td>/',
             $this->_text,
             $matches
@@ -83,9 +83,9 @@ class ZendExt_Service_Bets_Bet365_Channel_Parser
 
         foreach ($matches[1] as $key => $match) {
             $ret[$match] = array(
-                '1' => $matches[2][$key],
-                'X' => $matches[3][$key],
-                '2' => $matches[4][$key]
+                '1' => $matches[3][$key],
+                'X' => $matches[4][$key],
+                '2' => $matches[5][$key]
             );
         }
 
