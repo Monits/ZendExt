@@ -82,7 +82,23 @@ class ZendExt_Service_DataFactory_Fixture
         'Chile'           => 'Chile',
         'Suiza'           => 'Switzerland',
         'Honduras'        => 'Honduras',
-        'España'          => 'Spain'
+        'España'          => 'Spain',
+        '1º Grupo A'      => '1º Group A',
+        '2º Grupo A'      => '2º Group A',
+        '1º Grupo B'      => '1º Group B',
+        '2º Grupo B'      => '2º Group B',
+        '1º Grupo C'      => '1º Group C',
+        '2º Grupo C'      => '2º Group C',
+        '1º Grupo D'      => '1º Group D',
+        '2º Grupo D'      => '2º Group D',
+        '1º Grupo E'      => '1º Group E',
+        '2º Grupo E'      => '2º Group E',
+        '1º Grupo F'      => '1º Group F',
+        '2º Grupo F'      => '2º Group F',
+        '1º Grupo G'      => '1º Group G',
+        '2º Grupo G'      => '2º Group G',
+        '1º Grupo H'      => '1º Group H',
+        '2º Grupo H'      => '2º Group H'
     );
 
     const STATE_FINISHED = 'Finalizado';
@@ -115,6 +131,10 @@ class ZendExt_Service_DataFactory_Fixture
             ->item(0)->getAttribute('gmt');
 
         $dates = $doc->getElementsByTagName('fecha');
+
+        $tz = $doc->getElementsByTagName('horaActual')
+            ->item(0)->getAttribute('gmt');
+
 
         foreach ($dates as $date) {
 
@@ -176,14 +196,14 @@ class ZendExt_Service_DataFactory_Fixture
     private function _getTeamData(DOMElement $match, $team)
     {
         $teamNode = $match->getElementsByTagName($team)->item(0);
-        $name = $teamNode->nodeValue;
+        $name = trim($teamNode->nodeValue);
         $officialName = $this->_transformTeamName($name);
         $goals = $match->getElementsByTagName('goles'.$team)
             ->item(0)->nodeValue;
         $penaltyGoals = $match->getElementsByTagName('golesDefPenales'.$team)
             ->item(0)->nodeValue;
 
-        $shortName = $teamNode->getAttribute('paisSigla');
+        $shortName = trim($teamNode->getAttribute('paisSigla'));
 
         if ($shortName === '') {
 
@@ -194,8 +214,6 @@ class ZendExt_Service_DataFactory_Fixture
             $code = $this->_getCodeFromName($name, $shortName);
             $shortName = $this->_transformTeamShortName($name, $shortName);
         }
-
-
 
         return array(
                    'name' => $officialName,

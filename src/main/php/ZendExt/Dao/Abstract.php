@@ -66,29 +66,17 @@ abstract class ZendExt_Dao_Abstract
             return $this->_getTableForDefaultAdapter();
         }
 
-        // Assure an entry for the table exists
-        if (!isset(self::$_tables[$this->_tableClass])) {
-            self::$_tables[$this->_tableClass] = array();
+        if (!isset(
+                self::$_tables[$this->_tableClass][$operation][$shard]['table']
+            )) {
+
+            $adapter = $this->_getAdapterForShard($shard, $operation);
+            $table = new $this->_tableClass($adapter);
+            self::$_tables[$this->_tableClass][$operation][$shard]['table']
+                = $table;
         }
 
-        if (!isset(self::$_tables[$this->_tableClass][$operation])) {
-            self::$_tables[$this->_tableClass][$operation] = array();
-        }
-
-        if (!isset(self::$_tables[$this->_tableClass][$operation][$shard])) {
-            // Retrieve the adapter to be used for the instance
-            $dbNames = (array) self::$_config->getShardDbs(
-                $this->_tableClass,
-                $shard,
-                $operation
-            );
-
-            // Pick anyone at random
-            $table = $this->_createTableWithAnyAdapter($dbNames);
-            self::$_tables[$this->_tableClass][$operation][$shard] = $table;
-        }
-
-        return self::$_tables[$this->_tableClass][$operation][$shard];
+        return self::$_tables[$this->_tableClass][$operation][$shard]['table'];
     }
 
     /**
@@ -122,7 +110,8 @@ abstract class ZendExt_Dao_Abstract
                 );
 
                 // Pick anyone at random
-                $table = $this->_createTableWithAnyAdapter($defaultDbs);
+                $adapter = $this->_chooseAdapter($defaultDbs);
+                $table = new $this->_tableClass($adapter);
                 self::$_tables[$this->_tableClass]['default'] = $table;
             }
 
@@ -158,17 +147,61 @@ abstract class ZendExt_Dao_Abstract
     }
 
     /**
-     * Creates a new table using a random adapter from the given list.
+     * Get an adapter for a given shard.
+     *
+     * @param int    $shard     The id of shard to be used.
+     * @param string $operation The operation to be performed on the table.
+     *                          See {@link #OPERATION_READ}
+     *                          and {@link #OPERATION_WRITE}
+     *
+     * @return Zend_Db_Adapter_Abstract The adapter to use.
+     */
+    protected function _getAdapterForShard($shard,
+        $operation = self::OPERATION_READ)
+    {
+        if (null === self::$_config) {
+
+            return Zend_Db_Table_Abstract::getDefaultAdapter();
+        }
+
+        // Assure an entry for the table exists
+        if (!isset(self::$_tables[$this->_tableClass])) {
+            self::$_tables[$this->_tableClass] = array();
+        }
+
+        if (!isset(self::$_tables[$this->_tableClass][$operation])) {
+            self::$_tables[$this->_tableClass][$operation] = array();
+        }
+
+        if (!isset(self::$_tables[$this->_tableClass][$operation][$shard])) {
+            // Retrieve the adapter to be used for the instance
+            $dbNames = (array) self::$_config->getShardDbs(
+                $this->_tableClass,
+                $shard,
+                $operation
+            );
+
+            // Pick anyone at random
+            $adapter = $this->_chooseAdapter($dbNames);
+            self::$_tables[$this->_tableClass][$operation][$shard]['adapter']
+                = $adapter;
+        }
+
+        return
+            self::$_tables[$this->_tableClass][$operation][$shard]['adapter'];
+    }
+
+    /**
+     * Creates a new adapter using a random adapter from the given list.
      *
      * @param array $dbs The list of possible adapters to be used for the table.
      *
-     * @return Zend_Db_Table_Abstract The newly created table.
+     * @return Zend_Db_Adapter_Abstract The newly created adapter.
      */
-    private function _createTableWithAnyAdapter(array $dbs)
+    private function _chooseAdapter(array $dbs)
     {
         $dbName = $dbs[array_rand($dbs)];
-        $db = self::$_config->getDb($dbName);
-        return new $this->_tableClass($db);
+        return self::$_config->getDb($dbName);
     }
 
     /**
