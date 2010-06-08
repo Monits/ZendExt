@@ -23,7 +23,7 @@
  * @link      http://www.monits.com/
  * @since     1.0.0
  */
-class ZendExt_Crud_Template_New implements ZendExt_Crud_Template
+class ZendExt_Crud_Template_New extends ZendExt_Crud_TemplateAbstract
 {
     protected $_view;
 
@@ -46,14 +46,14 @@ class ZendExt_Crud_Template_New implements ZendExt_Crud_Template
      */
     public function render($title = null)
     {
-        $template = new ZendExt_Crud_TemplateAbstract();
         if (null !== $title) {
-            $template->setTitle($title);
+            $this->setTitle($title);
         }
-        $template->header();
+
+        $this->header();
         // TODO : Hacer HTML completo y bonito
         echo $this->_view->form;
 
-        $template->footer();
+        $this->footer();
     }
 }

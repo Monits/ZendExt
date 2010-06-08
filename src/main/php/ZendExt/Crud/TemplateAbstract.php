@@ -23,7 +23,7 @@
  * @link      http://www.monits.com/
  * @since     1.0.0
  */
-class ZendExt_Crud_TemplateAbstract
+abstract class ZendExt_Crud_TemplateAbstract implements ZendExt_Crud_Template
 {
     private $_title = '';
 

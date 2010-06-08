@@ -28,7 +28,7 @@ abstract class ZendExt_Controller_CRUDAbstract
 {
     protected $_builderClass = null;
     protected $_fieldToColumnMap = null;
-    protected $_itemsPerPage = 30;
+    protected $_itemsPerPage = 10;
 
     protected $_dataSource = null;
 
@@ -81,6 +81,10 @@ abstract class ZendExt_Controller_CRUDAbstract
         $paginator->setItemCountPerPage($ipp);
 
         $this->view->paginator = $paginator;
+
+        $renderer = new ZendExt_Crud_Template_List($this->view);
+        $renderer->render('List of ' . $this->_builderClass);
+
     }
 
     /**
