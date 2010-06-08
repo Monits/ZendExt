@@ -70,9 +70,6 @@ abstract class ZendExt_Controller_CRUDAbstract
 
         $table = $this->_dataSource->getTable();
 
-        $table = new Zend_Db_Table_Abstract();
-        $table->info('cols');
-
         $select = $table->select()
                         ->order(
                             $orderBy,
