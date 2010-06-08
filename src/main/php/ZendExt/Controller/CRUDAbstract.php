@@ -70,6 +70,9 @@ abstract class ZendExt_Controller_CRUDAbstract
 
         $table = $this->_dataSource->getTable();
 
+        $table = new Zend_Db_Table_Abstract();
+        $table->info('cols');
+
         $select = $table->select()
                         ->order(
                             $orderBy,
@@ -99,7 +102,7 @@ abstract class ZendExt_Controller_CRUDAbstract
             // Render the script
             $renderer = new ZendExt_Crud_Template_New($this->view);
 
-            $renderer->render('New '. $this->_formName);
+            $renderer->render($this->_formName);
             $this->_helper->viewRenderer->setNoRender();
             return;
         }
@@ -151,11 +154,17 @@ abstract class ZendExt_Controller_CRUDAbstract
             }
 
             // Display the form with the current values
-            return $this->_newForm($pk);
+            $this->view->Updateform = $this->_newForm($pk);
+            // Render the script
+            $renderer = new ZendExt_Crud_Template_Update($this->view);
+
+            $renderer->render($this->_formName);
+            $this->_helper->viewRenderer->setNoRender();
+            return;
         }
 
         // Update database!
-
+        $builder = new $this->_builderClass();
         $fields = $builder->getFieldsNames();
 
         $pk = $this->_dataSource->getPk();
@@ -284,19 +293,17 @@ abstract class ZendExt_Controller_CRUDAbstract
      */
     private function _getRow(array $pk)
     {
-        $table = $this->_dataSource->getTable();
 
+        $table = $this->_dataSource->getTable();
         $select = $table->select();
 
-        $where = array();
         foreach ($pk as $field => $value) {
-            $column = array_search($field, $this->_fieldToColumnMap);
-            $where[] = $select->where($column . ' = ?', $value);
+            $column = $this->_fieldToColumnMap[$field];
+            $select->where($column . ' = ?', $value);
         }
 
-        $row = $table->fetchRow($where);
-
-        if (null === $fieldValue) {
+        $row = $table->fetchRow($select);
+        if (null === $row) {
             return null;
         }
 
@@ -310,14 +317,13 @@ abstract class ZendExt_Controller_CRUDAbstract
      *
      * @return void.
      */
-    private function _newForm($pk = null)
+    private function _newForm(array $pk = null)
     {
         $row = null;
 
         if (null !== $pk) {
             $row = $this->_getRow($pk);
         }
-
         $builder = new $this->_builderClass();
         $fields = $builder->getFieldsNames();
 
@@ -372,6 +378,7 @@ abstract class ZendExt_Controller_CRUDAbstract
                 }
             }
         }
+
         // TODO : If there is a better fit than 'text' use that
         return 'text';
     }
