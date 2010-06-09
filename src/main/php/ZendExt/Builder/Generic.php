@@ -183,7 +183,8 @@ class ZendExt_Builder_Generic
      *
      * @return mixed
      */
-    public function getDefault($field) {
+    public function getDefault($field)
+    {
         return $this->_fields[$field]['default'];
     }
 
@@ -194,7 +195,8 @@ class ZendExt_Builder_Generic
      *
      * @return boolean
      */
-    public function hasDefault($field) {
+    public function hasDefault($field)
+    {
         return array_key_exists('default', $this->_fields[$field]);
     }
 }

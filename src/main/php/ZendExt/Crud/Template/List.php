@@ -97,7 +97,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             echo '<td>';
             echo '<form action="/index/delete" method="post">';
                 echo '<input class="button_delete" type="submit"',
-                    		' name="delete" value="Delete">';
+                            ' name="delete" value="Delete">';
             foreach ($this->_view->pk as $k) {
                 $field = array_search($k, $this->_view->fieldsMap);
                 echo "<input type=\"hidden\" name=\"{$field}\"',
