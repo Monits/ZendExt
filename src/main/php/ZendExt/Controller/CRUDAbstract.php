@@ -279,7 +279,8 @@ abstract class ZendExt_Controller_CRUDAbstract
             }
 
             // Only validate if the given value is not a default
-            if (!$builder->hasDefault($field) || $value != $builder->getDefault($field)) {
+            if (!$builder->hasDefault($field)
+                    || $value != $builder->getDefault($field)) {
                 $builder->$method($value);
             }
 

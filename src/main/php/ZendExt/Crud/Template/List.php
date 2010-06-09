@@ -70,8 +70,8 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         $i = 0;
 
         echo '<style type="text/css">' .
-				'.field {font-size: 14px}' .
-            	'.cell {font-size: 13px}' .
+                '.field {font-size: 14px}' .
+                '.cell {font-size: 13px}' .
                 '.delete {float: right}' .
             '</style>';
 
@@ -96,11 +96,13 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             }
             echo '<td>';
             echo '<form action="/index/delete" method="post">';
-                echo '<input class="button_delete" type="submit" name="delete" value="Delete">';
-                foreach ($this->_view->pk as $k) {
-                    $field = array_search($k, $this->_view->fieldsMap);
-                    echo "<input type=\"hidden\" name=\"{$field}\" value=\"{$arrCols[$k]}\">";
-                }
+                echo '<input class="button_delete" type="submit"',
+                    		' name="delete" value="Delete">';
+            foreach ($this->_view->pk as $k) {
+                $field = array_search($k, $this->_view->fieldsMap);
+                echo "<input type=\"hidden\" name=\"{$field}\"',
+                		' value=\"{$arrCols[$k]}\">";
+            }
             echo '</form>';
             echo '</td>';
             echo '</div>';
@@ -128,7 +130,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             $this->_view->paginator->getTotalItemCount() /
             $this->_view->paginator->getItemCountPerPage()
         );
-        echo "<center>";
+        echo '<center>';
         echo '<div class="pageBar">';
 
         if ($first != $current) {
@@ -148,6 +150,6 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         }
 
         echo '</div>';
-        echo "</center>";
+        echo '</center>';
     }
 }

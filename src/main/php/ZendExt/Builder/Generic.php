@@ -177,16 +177,22 @@ class ZendExt_Builder_Generic
     }
 
     /**
+     * Get the default value of the field.
      *
-     * @param $field
+     * @param string $field The field.
+     *
+     * @return mixed
      */
     public function getDefault($field) {
         return $this->_fields[$field]['default'];
     }
 
     /**
+     * Checks if the given field has default value.
      *
-     * @param $field
+     * @param string $field The field.
+     *
+     * @return boolean
      */
     public function hasDefault($field) {
         return array_key_exists('default', $this->_fields[$field]);
