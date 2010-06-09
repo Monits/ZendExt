@@ -23,14 +23,14 @@
  * @link      http://www.monits.com/
  * @since     1.0.0
  */
-class ZendExt_Crud_Template_Update implements ZendExt_Crud_Template
+class ZendExt_Crud_Template_Update extends ZendExt_Crud_TemplateAbstract
 {
     protected $_view;
 
     /**
      * Crud template construct.
      *
-     * @param Zend_View $view
+     * @param Zend_View $view The view.
      */
     public function __construct(Zend_View $view)
     {
@@ -46,14 +46,13 @@ class ZendExt_Crud_Template_Update implements ZendExt_Crud_Template
      */
     public function render($title = null)
     {
-        $template = new ZendExt_Crud_TemplateAbstract();
         if (null !== $title) {
-            $template->setTitle($title);
+            $this->setTitle($title);
         }
-        $template->header();
+        $this->header();
         // TODO : Hacer HTML completo y bonito
         echo $this->_view->Updateform;
 
-        $template->footer();
+        $this->footer();
     }
 }

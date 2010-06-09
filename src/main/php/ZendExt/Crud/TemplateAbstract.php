@@ -66,5 +66,4 @@ abstract class ZendExt_Crud_TemplateAbstract implements ZendExt_Crud_Template
     {
         $this->_title = $title;
     }
-
 }

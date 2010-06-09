@@ -68,26 +68,43 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
 
         $items = $this->_view->paginator->getCurrentItems();
         $i = 0;
+
+        echo '<style type="text/css">' .
+				'.field {font-size: 14px}' .
+            	'.cell {font-size: 13px}' .
+                '.delete {float: right}' .
+            '</style>';
+
+
         echo '<table>';
 
         $arrCols = $items->offsetGet(1)->toArray();
 
         foreach ($arrCols as $col => $c) {
-            echo '<th>' . $col . '</th>';
+            echo '<th class="field">' . $col . '</th>';
         }
 
         foreach ($items as $item) {
             $arrCols = $item->toArray();
-            echo '<div class="item">';
             echo '<tr>';
+            echo '<div class="cell">';
             foreach ($arrCols as $col => $c) {
                 echo '<td>';
                 echo '<span class="' . $col .
-                    '" 	' . $c . '</span>';
+                    '" style="font-size: 8px">' . $c . '</span>';
                 echo '</td>';
             }
-            echo '</tr>';
+            echo '<td>';
+            echo '<form action="/index/delete" method="post">';
+                echo '<input class="button_delete" type="submit" name="delete" value="Delete">';
+                foreach ($this->_view->pk as $k) {
+                    $field = array_search($k, $this->_view->fieldsMap);
+                    echo "<input type=\"hidden\" name=\"{$field}\" value=\"{$arrCols[$k]}\">";
+                }
+            echo '</form>';
+            echo '</td>';
             echo '</div>';
+            echo '</tr>';
         }
         echo '</table>';
 
@@ -111,7 +128,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             $this->_view->paginator->getTotalItemCount() /
             $this->_view->paginator->getItemCountPerPage()
         );
-
+        echo "<center>";
         echo '<div class="pageBar">';
 
         if ($first != $current) {
@@ -131,5 +148,6 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         }
 
         echo '</div>';
+        echo "</center>";
     }
 }

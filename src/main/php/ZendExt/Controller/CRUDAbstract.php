@@ -61,19 +61,23 @@ abstract class ZendExt_Controller_CRUDAbstract
 
         $page           = $this->_getParam('page', self::DEFAULT_PAGE);
         $ipp            = $this->_getParam('ipp', $this->_itemsPerPage);
-        $orderBy        = $this->_getParam('orderBy', $pk);
+        $orderBy        = $this->_getParam('by', $pk);
         $orderAlignment = $this->_getParam('order', 'ASC');
 
         if ($orderBy != $pk) {
             $orderBy = $this->_fieldToColumnMap[$orderBy];
         }
 
+        if (is_array($orderBy)) {
+            $orderBy = implode(',', $pk);
+        }
+
         $table = $this->_dataSource->getTable();
 
         $select = $table->select()
                         ->order(
-                            $orderBy,
-                            $orderAlignment == 'ASC' ? 'ASC' : 'DESC'
+                            $orderBy . ' '
+                            . ($orderAlignment == 'ASC' ? 'ASC' : 'DESC')
                         );
 
         $paginator = Zend_Paginator::factory($select);
@@ -81,6 +85,8 @@ abstract class ZendExt_Controller_CRUDAbstract
         $paginator->setItemCountPerPage($ipp);
 
         $this->view->paginator = $paginator;
+        $this->view->pk = $pk;
+        $this->view->fieldsMap = $this->_fieldToColumnMap;
 
         $renderer = new ZendExt_Crud_Template_List($this->view);
         $renderer->render('List of ' . $this->_builderClass);
@@ -127,6 +133,7 @@ abstract class ZendExt_Controller_CRUDAbstract
             $data = $this->_completeData($fields, $table);
 
             $table->insert($data);
+            $this->_redirect('/' . $request->getControllerName() . '/list');
 
         } catch (ZendExt_Builder_ValidationException $e) {
             $this->view->failedField = $e->getField();
@@ -182,10 +189,13 @@ abstract class ZendExt_Controller_CRUDAbstract
 
             $table->update($data, $where);
 
+            $this->_redirect('/' . $request->getControllerName() . '/list');
         } catch (ZendExt_Builder_ValidationException $e) {
             $this->view->failedField = $e->getField();
             $this->view->errors = $e->getErrors();
         }
+
+
     }
 
     /**
@@ -197,10 +207,10 @@ abstract class ZendExt_Controller_CRUDAbstract
     {
         $request = $this->getRequest();
 
-        if ($request->isPost()) {
+        if (!$request->isPost()) {
+            $this->_redirect('/' . $request->getControllerName() . '/list');
             return;
         }
-
 
         $pk = $this->_dataSource->getPk();
 
@@ -215,6 +225,8 @@ abstract class ZendExt_Controller_CRUDAbstract
             $this->view->failedField = $e->getField();
             $this->view->errors = $e->getErrors();
         }
+
+        $this->_redirect('/' . $request->getControllerName() . '/list');
     }
 
     /**
@@ -261,7 +273,16 @@ abstract class ZendExt_Controller_CRUDAbstract
             $method = 'with' . ucfirst($field);
             $value = $this->_getParam($field);
 
-            $builder->$method($value);
+            // If empty, take the default (if there is any)
+            if (empty($value) && $builder->hasDefault($field)) {
+                $value = $builder->getDefault($field);
+            }
+
+            // Only validate if the given value is not a default
+            if (!$builder->hasDefault($field) || $value != $builder->getDefault($field)) {
+                $builder->$method($value);
+            }
+
             $data[$this->_fieldToColumnMap[$field]] = $value;
         }
 

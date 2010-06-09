@@ -30,7 +30,7 @@ class ZendExt_Crud_Template_New extends ZendExt_Crud_TemplateAbstract
     /**
      * Crud template construct.
      *
-     * @param Zend_View $view
+     * @param Zend_View $view The view.
      */
     public function __construct(Zend_View $view)
     {
