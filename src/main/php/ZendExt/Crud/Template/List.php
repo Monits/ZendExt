@@ -30,7 +30,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
     /**
      * Crud template construct.
      *
-     * @param Zend_View $view
+     * @param Zend_View $view The view
      */
     public function __construct(Zend_View $view)
     {
@@ -38,13 +38,12 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
     }
 
     /**
- 	 *
- 	 * Render the list.
- 	 *
- 	 * @param Zend_Paginator $paginator
- 	 * @param int $page The page to be rendered.
- 	 * @param int $ipp Items per page.
- 	*/
+     * Render the list.
+     *
+     * @param text $title The title of the form.
+     *
+     * @return void
+     */
     public function render($title = null)
     {
         if (null !== $title) {
@@ -61,7 +60,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
     /**
      * Renders the list.
      *
-     * @returns void
+     * @return void
      */
     private function _renderList()
     {
@@ -69,28 +68,28 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
 
         $items = $this->_view->paginator->getCurrentItems();
         $i = 0;
-        echo "<table>";
+        echo '<table>';
 
         $arrCols = $items->offsetGet(1)->toArray();
 
         foreach ($arrCols as $col => $c) {
-            echo "<th>" . $col . "</th>";
+            echo '<th>' . $col . '</th>';
         }
 
         foreach ($items as $item) {
             $arrCols = $item->toArray();
-            echo "<div class='item>'";
-            echo "<tr>";
+            echo '<div class="item">';
+            echo '<tr>';
             foreach ($arrCols as $col => $c) {
-                echo "<td>";
-                echo "<span class='" . $col .
-                    "' style='display:table-row'>" . $c . "</span>";
-                echo "</td>";
+                echo '<td>';
+                echo '<span class="' . $col .
+                    '" 	' . $c . '</span>';
+                echo '</td>';
             }
-            echo "</tr>";
-            echo "</div>";
+            echo '</tr>';
+            echo '</div>';
         }
-        echo "</table>";
+        echo '</table>';
 
         $this->_renderPageBar();
     }
@@ -113,24 +112,24 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             $this->_view->paginator->getItemCountPerPage()
         );
 
-        echo "<div class='pageBar'>";
+        echo '<div class="pageBar">';
 
         if ($first != $current) {
-            echo "<span class='page'><a href='/?page=" . $first .
-                    "'> First </a></span>";
-            echo "<span class='page'><a href='/?page=" . $previous .
-                    "'> Previous </a></span>";
+            echo "<span class=\"page\"><a href=\"/?page={$first}"
+                    . '"First </a></span>';
+            echo "<span class=\"page\"><a href=\"/?page={$previous}"
+                    . '"> Previous </a></span>';
         }
 
-        echo "<span class='page'>Current</span>";
+        echo '<span class=\"page\">Current</span>';
 
         if ($last != $current) {
-            echo "<span class='page'><a href='/?page=" . $next .
-                    " '> Next </a></span>";
-            echo "<span class='page'><a href='/?page=" . $last .
-                    "'> Last </a></span>";
+            echo "<span class=\"page\"><a href=\"/?page={$next}"
+                    . '"> Next </a></span>';
+            echo "<span class=\"page\"><a href=\"/?page={$last}"
+                    . '"> Last </a></span>';
         }
 
-        echo "</div>";
+        echo '</div>';
     }
 }
