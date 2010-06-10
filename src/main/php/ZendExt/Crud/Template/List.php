@@ -114,8 +114,8 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         echo '<div class="pageBar">';
 
         if ($first != $current) {
-            echo "<span class=\"page\"><a href=\"/?page={$first}"
-                    . '"First </a></span>';
+            echo "<span class=\"page\"><a href=\"/?page={$first}\">"
+                    . 'First </a></span>';
             echo "<span class=\"page\"><a href=\"/?page={$previous}"
                     . '"> Previous </a></span>';
         }
