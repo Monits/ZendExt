@@ -39,6 +39,10 @@ abstract class ZendExt_Dao_Abstract
      */
     const OPERATION_WRITE = 'w';
 
+    const DATA_KEY_TABLE = 'table';
+    const DATA_KEY_ADAPTER = 'adapter';
+    const DATA_KEY_DEFAULT = 'default';
+
 
     private static $_tables = array();
 
@@ -66,17 +70,19 @@ abstract class ZendExt_Dao_Abstract
             return $this->_getTableForDefaultAdapter();
         }
 
-        if (!isset(
-                self::$_tables[$this->_tableClass][$operation][$shard]['table']
-            )) {
+        $shardData = $this->_getShardData($operation, $shard);
+        if (!isset($tableList[self::DATA_KEY_TABLE])) {
 
             $adapter = $this->_getAdapterForShard($shard, $operation);
+
             $table = new $this->_tableClass($adapter);
-            self::$_tables[$this->_tableClass][$operation][$shard]['table']
-                = $table;
+
+            $shardData = $this->_setShardData(
+                $operation, $shard, self::DATA_KEY_TABLE, $table
+            );
         }
 
-        return self::$_tables[$this->_tableClass][$operation][$shard]['table'];
+        return $shardData[self::DATA_KEY_TABLE];
     }
 
     /**
@@ -96,15 +102,12 @@ abstract class ZendExt_Dao_Abstract
             return $this->_getTableForDefaultAdapter();
         }
 
-        // Assure an entry for the table exists
-        if (!isset(self::$_tables[$this->_tableClass])) {
-            self::$_tables[$this->_tableClass] = array();
-        }
-
         // If the sharding arg is not present,
         // retrieve a connection from the default
         if (null === $shardingArg) {
-            if (!isset(self::$_tables[$this->_tableClass]['default'])) {
+            if (!isset(
+                    self::$_tables[$this->_tableClass][self::DATA_KEY_DEFAULT]
+                )) {
                 $defaultDbs = (array) self::$_config->getDefaultShardDbs(
                     $this->_tableClass
                 );
@@ -112,10 +115,11 @@ abstract class ZendExt_Dao_Abstract
                 // Pick anyone at random
                 $adapter = $this->_chooseAdapter($defaultDbs);
                 $table = new $this->_tableClass($adapter);
-                self::$_tables[$this->_tableClass]['default'] = $table;
+                self::$_tables[$this->_tableClass][self::DATA_KEY_DEFAULT]
+                    = $table;
             }
 
-            return self::$_tables[$this->_tableClass]['default'];
+            return self::$_tables[$this->_tableClass][self::DATA_KEY_DEFAULT];
         }
 
         // Apply sharding
@@ -137,6 +141,7 @@ abstract class ZendExt_Dao_Abstract
         $shardingClass = self::$_config->getShardingStrategy(
             $this->_tableClass
         );
+
         if (!isset(self::$_shardingStrategies[$shardingClass])) {
             self::$_shardingStrategies[$shardingClass] = new $shardingClass();
         }
@@ -164,16 +169,9 @@ abstract class ZendExt_Dao_Abstract
             return Zend_Db_Table_Abstract::getDefaultAdapter();
         }
 
-        // Assure an entry for the table exists
-        if (!isset(self::$_tables[$this->_tableClass])) {
-            self::$_tables[$this->_tableClass] = array();
-        }
+        $shardData = $this->_getShardData($operation, $shard);
 
-        if (!isset(self::$_tables[$this->_tableClass][$operation])) {
-            self::$_tables[$this->_tableClass][$operation] = array();
-        }
-
-        if (!isset(self::$_tables[$this->_tableClass][$operation][$shard])) {
+        if (empty($shardData)) {
             // Retrieve the adapter to be used for the instance
             $dbNames = (array) self::$_config->getShardDbs(
                 $this->_tableClass,
@@ -183,12 +181,12 @@ abstract class ZendExt_Dao_Abstract
 
             // Pick anyone at random
             $adapter = $this->_chooseAdapter($dbNames);
-            self::$_tables[$this->_tableClass][$operation][$shard]['adapter']
-                = $adapter;
+            $shardData = $this->_setShardData(
+                $operation, $shard, self::DATA_KEY_DEFAULT, $adapter
+            );
         }
 
-        return
-            self::$_tables[$this->_tableClass][$operation][$shard]['adapter'];
+        return $shardData[self::DATA_KEY_DEFAULT];
     }
 
     /**
@@ -220,6 +218,46 @@ abstract class ZendExt_Dao_Abstract
     }
 
     /**
+     * Retrieves the shard's data.
+     *
+     * @param string $operation The operation to be performed on the table.
+     *                          See {@link #OPERATION_READ}
+     *                          and {@link #OPERATION_WRITE}
+     * @param int    $shard     The id of shard to be used.
+     *
+     * @return array
+     */
+    private function _getShardData($operation, $shard)
+    {
+        // Make sure it exists
+        if (!isset(self::$_tables[$this->_tableClass][$operation][$shard])) {
+            self::$_tables[$this->_tableClass][$operation][$shard] = array();
+        }
+
+        return self::$_tables[$this->_tableClass][$operation][$shard];
+    }
+
+    /**
+     * Sets a data value for the requested shard.
+     *
+     * @param string $operation The operation to be performed on the table.
+     *                          See {@link #OPERATION_READ}
+     *                          and {@link #OPERATION_WRITE}
+     * @param int    $shard     The id of shard to be used.
+     * @param string $section   The section under which to store the data.
+     * @param any    $data      The data to be stored.
+     *
+     * @return array The shard's data.
+     */
+    private function _setShardData($operation, $shard, $section, $data)
+    {
+        $table = $this->_tableClass;
+        self::$_tables[$table][$operation][$shard][$section] = $data;
+
+        return $this->_getShardData($operation, $shard);
+    }
+
+    /**
      * Configures the DAO to know which adapter to use for each request.
      *
      * @param ZendExt_Application_Resource_Multidb $config The configuration
@@ -238,7 +276,7 @@ abstract class ZendExt_Dao_Abstract
     }
 
     /**
-     * Wrapper for _getTable, retrieves the table instance to be used.
+     * Retrieves the table instance to be used.
      *
      * @param string $operation   The operation to be performed on the table.
      *                            See {@link #OPERATION_READ}
