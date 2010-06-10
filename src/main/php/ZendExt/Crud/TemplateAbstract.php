@@ -30,7 +30,7 @@ abstract class ZendExt_Crud_TemplateAbstract implements ZendExt_Crud_Template
     /**
      * Set the title of the form.
      *
-     * @param $title The new title for the form.
+     * @param string $title The new title for the form.
      *
      * @return void
      */
@@ -60,7 +60,8 @@ abstract class ZendExt_Crud_TemplateAbstract implements ZendExt_Crud_Template
                          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
             echo '<html>';
             echo '<head>';
-            echo     '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />';
+            echo     '<meta http-equiv="Content-Type" content="text/html;
+                         charset=UTF-8" />';
             echo     '<title>'. $this->_title .'</title>';
             echo '</head>';
             echo '<body>';

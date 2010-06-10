@@ -130,7 +130,7 @@ abstract class ZendExt_Controller_CRUDAbstract
          */
         if ($this->_dataSource->isSequence()) {
             $pk = $this->_dataSource->getPk();
-            $fields = $this->_unsetPK($pk, $fields);
+            $fields = $this->_unsetPk($pk, $fields);
         }
 
         try {
@@ -347,7 +347,7 @@ abstract class ZendExt_Controller_CRUDAbstract
      *
      * @return array
      */
-    private function _unsetPK($pk, $fields)
+    private function _unsetPk($pk, $fields)
     {
         foreach ((array) $pk as $k) {
             $pkField = array_search($k, $this->_fieldToColumnMap);
@@ -387,7 +387,8 @@ abstract class ZendExt_Controller_CRUDAbstract
     /**
      * Create a new form.
      *
-     * @param array $pk        Optional array for field => value of primary to do the lookup.
+     * @param array $pk        Optional array for field => value
+     *                         of primary to do the lookup.
      * @param array $dataField Optional array for field => value.
      *
      * @return void.
