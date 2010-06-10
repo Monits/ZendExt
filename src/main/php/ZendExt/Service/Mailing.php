@@ -43,8 +43,8 @@ class ZendExt_Service_Mailing
      *
      * @return void
      */
-    public function __construct(Zend_View $view, array $smtpConfig, $mail,
-        $subject, $from)
+    public function __construct(Zend_View $view, array $smtpConfig,
+        $mail = null, $subject = null, $from = null)
     {
         $this->_view = $view;
         $this->_mail = $mail;
@@ -55,7 +55,6 @@ class ZendExt_Service_Mailing
             $smtpConfig['host'], $smtpConfig
         );
     }
-
 
     /**
      * Assigns variables for the mail template.
@@ -82,7 +81,6 @@ class ZendExt_Service_Mailing
         $this->_mail = $mail;
     }
 
-
     /**
      * Retrieves which mail is going to be sent.
      *
@@ -104,7 +102,6 @@ class ZendExt_Service_Mailing
     {
         $this->_subject = $subject;
     }
-
 
     /**
      * Retrieves the mails' subject.
@@ -160,7 +157,15 @@ class ZendExt_Service_Mailing
         $mail->setBodyHtml($content);
 
         $mail->send($this->_transport);
+    }
 
+    /**
+     * Clears all the templates variables.
+     *
+     * @return void
+     */
+    public function clearVars()
+    {
         $this->_view->clearVars();
     }
 
