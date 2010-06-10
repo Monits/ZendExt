@@ -24,7 +24,7 @@
  * @since     1.0.0
  */
 abstract class ZendExt_Controller_CRUDAbstract
-    	extends Zend_Controller_Action
+        extends Zend_Controller_Action
 {
     protected $_builderClass = null;
     protected $_fieldToColumnMap = null;
@@ -33,6 +33,8 @@ abstract class ZendExt_Controller_CRUDAbstract
     protected $_dataSource = null;
 
     protected $_formName = '';
+
+    protected $_formData = null;
 
     const DEFAULT_PAGE = 1;
 
@@ -113,8 +115,8 @@ abstract class ZendExt_Controller_CRUDAbstract
             $this->_helper->viewRenderer->setNoRender();
             return;
         }
-
         $data = array();
+
         $builder = new $this->_builderClass();
         $fields = $builder->getFieldsNames();
 
@@ -124,20 +126,34 @@ abstract class ZendExt_Controller_CRUDAbstract
          */
         if ($this->_dataSource->isSequence()) {
             $pk = $this->_dataSource->getPk();
-            $this->_unsetPK($pk, $fields);
+            $fields = $this->_unsetPK($pk, $fields);
         }
 
         try {
             $table = $this->_dataSource->getTable();
 
-            $data = $this->_completeData($fields, $table);
+            $data = $this->_completeData($fields);
 
             $table->insert($data);
+
+            // TODO : Optionally alow the user to "add another" and rerender the empty form with a success message
+
             $this->_redirect('/' . $request->getControllerName() . '/list');
 
         } catch (ZendExt_Builder_ValidationException $e) {
             $this->view->failedField = $e->getField();
             $this->view->errors = $e->getErrors();
+
+            $data = $this->_getData($fields);
+            // Assign the form
+            $this->view->form = $this->_newForm(null, $data);
+
+            // Render the script
+            $renderer = new ZendExt_Crud_Template_New($this->view);
+
+            $renderer->render($this->_formName);
+            $this->_helper->viewRenderer->setNoRender();
+            // TODO : Re-render form with error messages
         }
     }
 
@@ -177,8 +193,6 @@ abstract class ZendExt_Controller_CRUDAbstract
 
         $pk = $this->_dataSource->getPk();
 
-        $this->_unsetPK($pk, $fields);
-
         $data = array();
         try{
             $table = $this->_dataSource->getTable();
@@ -193,6 +207,16 @@ abstract class ZendExt_Controller_CRUDAbstract
         } catch (ZendExt_Builder_ValidationException $e) {
             $this->view->failedField = $e->getField();
             $this->view->errors = $e->getErrors();
+
+            $data = $this->_getData($fields);
+            // Assign the form
+            $this->view->Updateform = $this->_newForm(null, $data);
+            // Render the script
+            $renderer = new ZendExt_Crud_Template_Update($this->view);
+
+            $renderer->render($this->_formName);
+            $this->_helper->viewRenderer->setNoRender();
+            // TODO : Re-render form with error messages
         }
 
 
@@ -247,7 +271,6 @@ abstract class ZendExt_Controller_CRUDAbstract
             $field = array_search($k, $this->_fieldToColumnMap);
             $method = 'with' . ucfirst($field);
             $value = $this->_getParam($field);
-
             $builder->$method($value);
             $where[] = $adapter->quoteInto($k . ' = ?', $value);
         }
@@ -258,21 +281,19 @@ abstract class ZendExt_Controller_CRUDAbstract
     /**
      * Retrieves the data from the form for each field.
      *
-     * @param array                  $fields The names of the fields.
-     * @param Zend_Db_Table_Abstract $table  The table.
+     * @param array $fields The names of the fields.
      *
      * @return array
      */
-    private function _completeData(array $fields, $table)
+    private function _completeData(array $fields)
     {
-        $adapter = $table->getAdapter();
-        $builder = new $this->_builderClass();
         $data = array();
 
-        foreach ($fields as $field) {
-            $method = 'with' . ucfirst($field);
-            $value = $this->_getParam($field);
+        $builder = new $this->_builderClass();
 
+        foreach ($fields as $field) {
+            $value = $this->_getParam($field);
+            $method = 'with' . ucfirst($field);
             // If empty, take the default (if there is any)
             if (empty($value) && $builder->hasDefault($field)) {
                 $value = $builder->getDefault($field);
@@ -286,25 +307,43 @@ abstract class ZendExt_Controller_CRUDAbstract
 
             $data[$this->_fieldToColumnMap[$field]] = $value;
         }
-
         return $data;
     }
 
+    /**
+     * Retrieves the data from the form for each field without builder validate.
+     *
+     * @param array $fields The names of the fields.
+     *
+     * @return array
+     */
+    private function _getData(array $fields)
+    {
+        $data = array();
+
+        foreach ($fields as $field) {
+            $value = $this->_getParam($field);
+            $data[$field] = $value;
+        }
+        return $data;
+    }
     /**
      * Unset the primary key in the form.
      *
      * @param array|string $pk     The primary key to be unseted.
      * @param array        $fields The name of the felds.
      *
-     * @return void
+     * @return array
      */
     private function _unsetPK($pk, $fields)
     {
         foreach ((array) $pk as $k) {
             $pkField = array_search($k, $this->_fieldToColumnMap);
             $indexField = array_search($pkField, $fields);
+
             unset($fields[$indexField]);
         }
+        return $fields;
     }
 
     /**
@@ -336,11 +375,12 @@ abstract class ZendExt_Controller_CRUDAbstract
     /**
      * Create a new form.
      *
-     * @param array $pk Optional array for field => value of primary to do the lookup.
+     * @param array $pk        Optional array for field => value of primary to do the lookup.
+     * @param array $dataField Optional array for field => value.
      *
      * @return void.
      */
-    private function _newForm(array $pk = null)
+    private function _newForm(array $pk = null, array $dataField = null)
     {
         $row = null;
 
@@ -357,27 +397,40 @@ abstract class ZendExt_Controller_CRUDAbstract
              ->setMethod('post')
              ->addDecorator('HtmlTag', array('tag' => 'dl','class' => ''));
 
-        foreach ($fields as $field) {
-            $type = $this->_getType($field);
+        foreach ($fields as $key => $field) {
+            $type = ucfirst($this->_getType($field));
 
-            $options = array(
-                        'Label'    => $field . ':',
-                        //TODO: Verificar en la db o builder si el campo es requerido o no
-                        'required' => true
-                       );
+            $zendElement = 'Zend_Form_Element_' . $type;
 
-            if ($type == 'hidden') {
-                $options = null;
+            $elements[$key] = new $zendElement($field);
+            if ($type !== 'Hidden') {
+                $decorators = array('Errors', array(
+                        'Label', array('tag' => 'dt'))
+                );
+                $elements[$key]->addDecorators($decorators);
+                $elements[$key]->setLabel($field . ' :')
+                              /*
+                               * TODO: Verificar en la db o builder
+                               *       si el campo es requerido o no.
+                               */
+                              ->setRequired(true);
             }
 
-            $form->addElement($type , $field, $options);
-
-            if (null !== $row) {
+            if (null !== $row ) {
                 $column = $this->_fieldToColumnMap[$field];
                 $value = $row[$column];
-                $form->setDefault($field, $value);
+                $elements[$key]->setValue($value);
+            }
+            if (null !==$dataField && 'Hidden' !== $type) {
+                $value = $dataField[$field];
+                $elements[$key]->setValue($value);
+                if ($this->view->failedField == $field) {
+                    $elements[$key]->addErrors($this->view->errors);
+                }
             }
         }
+        $form->addElements($elements);
+
         $form->addElement('submit', 'send');
 
         return $form;

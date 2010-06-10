@@ -58,7 +58,7 @@ abstract class ZendExt_Crud_TemplateAbstract implements ZendExt_Crud_Template
     /**
      * Set the title of the form.
      *
-     * @param $title
+     * @param $title The new title for the form.
      *
      * @return void
      */
