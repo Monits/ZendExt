@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Service to send html mails massively.
  *
@@ -34,13 +33,13 @@ class ZendExt_Service_Mailing
 
     /**
      * Creates a new mailing service.
-     * 
-     * @param Zend_View $view The view object to render the templates.
+     *
+     * @param Zend_View $view       The view object to render the templates.
      * @param array     $smtpConfig The smpt server configuration.
-     * @param string    $mail Which mail to send, NOT the address
-     *                        to send the e-mail.
-     * @param string    $subject The mails' subject.
-     * @param string    $from The mails' from address.
+     * @param string    $mail       Which mail to send, NOT the address
+     *                              to send the e-mail.
+     * @param string    $subject    The mails' subject.
+     * @param string    $from       The mails' from address.
      *
      * @return void
      */
@@ -60,9 +59,9 @@ class ZendExt_Service_Mailing
 
     /**
      * Assigns variables for the mail template.
-     * 
+     *
      * @param string $var The variable name.
-     * @param mixed $val  The variable value.
+     * @param mixed  $val The variable value.
      *
      * @return void
      */
@@ -73,7 +72,7 @@ class ZendExt_Service_Mailing
 
     /**
      * Sets which mail to send.
-     * 
+     *
      * @param string $mail The mail name.
      *
      * @return void
@@ -85,8 +84,8 @@ class ZendExt_Service_Mailing
 
 
     /**
-     * Retrieves which mail is going to be sent. 
-     * 
+     * Retrieves which mail is going to be sent.
+     *
      * @return string
      */
     public function getMail()
@@ -96,7 +95,7 @@ class ZendExt_Service_Mailing
 
     /**
      * Sets the mails' subject.
-     * 
+     *
      * @param string $subject The subject
      *
      * @return void
@@ -109,7 +108,7 @@ class ZendExt_Service_Mailing
 
     /**
      * Retrieves the mails' subject.
-     * 
+     *
      * @return string
      */
     public function getSubject()
@@ -119,7 +118,7 @@ class ZendExt_Service_Mailing
 
     /**
      * Sets the mails' from address.
-     * 
+     *
      * @param string $from The mail address.
      *
      * @return void
@@ -131,7 +130,7 @@ class ZendExt_Service_Mailing
 
     /**
      * Retrieves the mails' from address.
-     * 
+     *
      * @return string
      */
     public function getFrom()
@@ -140,8 +139,8 @@ class ZendExt_Service_Mailing
     }
 
     /**
-     * Sends a mail to the given address. 
-     * 
+     * Sends a mail to the given address.
+     *
      * @param string $to The e-mail address where to send the mail.
      *
      * @return void
@@ -149,8 +148,8 @@ class ZendExt_Service_Mailing
     public function send($to)
     {
         /**
-         * This is renderer first of all so if something
-         *  explodes no mail will be sent. 
+         * This is rendered first of all so if something
+         *  explodes no mail will be sent.
          */
         $content = $this->_view->render($this->_mail . '.phtml');
         $mail = new Zend_Mail($this->_view->getEncoding());
