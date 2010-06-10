@@ -11,7 +11,6 @@
  * @since     1.0.0
  */
 
-
 /**
  * Cache backend implemented using memcached with support for multiget.
  *
@@ -28,12 +27,13 @@ class ZendExt_Cache_Backend_Memcached extends Zend_Cache_Backend_Memcached
 {
 
     /**
-     * Test if a cache is available for the given id and (if yes) return it (false else)
+     * Test if a cache is available for the given id and return it.
      *
      * @param string  $id                     Cache id
-     * @param boolean $doNotTestCacheValidity If set to true, the cache validity won't be tested
+     * @param boolean $doNotTestCacheValidity If set to true, the cache
+     *                                        validity won't be tested
      *
-     * @return string|false cached datas
+     * @return string|false cached datas, or false if not found
      */
     public function load($id, $doNotTestCacheValidity = false)
     {
