@@ -173,7 +173,7 @@ class ZendExt_Builder_Generic
      */
     public function getFieldsNames()
     {
-       return array_keys($this->_fields);
+        return array_keys($this->_fields);
     }
 
     /**
