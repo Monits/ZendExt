@@ -93,6 +93,8 @@ abstract class ZendExt_Controller_CRUDAbstract
         $renderer = new ZendExt_Crud_Template_List($this->view);
         $renderer->render('List of ' . $this->_builderClass);
 
+        $this->_helper->viewRenderer->setNoRender();
+
     }
 
     /**
