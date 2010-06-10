@@ -123,13 +123,13 @@ class ZendExt_Builder_Generic
 
         if (!isset($config->class)) {
             throw new ZendExt_Builder_Exception(
-                'Invalid config, no class to be builded specyfied.'
+                'Invalid config, no class to be builded specified.'
             );
         }
 
         if (!isset($config->fields)) {
             throw new ZendExt_Builder_Exception(
-                'Invalid config, no fields specyfied.'
+                'Invalid config, no fields specified.'
             );
         }
 
