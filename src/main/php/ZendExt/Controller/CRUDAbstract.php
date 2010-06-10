@@ -36,6 +36,10 @@ abstract class ZendExt_Controller_CRUDAbstract
 
     protected $_formData = null;
 
+    protected $_templateList = null;
+    protected $_templateNew = null;
+    protected $_templateUpdate = null;
+
     const DEFAULT_PAGE = 1;
 
     /**
@@ -66,21 +70,22 @@ abstract class ZendExt_Controller_CRUDAbstract
         $orderBy        = $this->_getParam('by', $pk);
         $orderAlignment = $this->_getParam('order', 'ASC');
 
-        if ($orderBy != $pk) {
-            $orderBy = $this->_fieldToColumnMap[$orderBy];
+        $orderAlignment = ($orderAlignment == 'ASC' ? 'ASC' : 'DESC');
+
+        if (!is_array($orderBy)) {
+            $orderBy = explode(',', $orderBy);
         }
 
-        if (is_array($orderBy)) {
-            $orderBy = implode(',', $pk);
+        $arr = array();
+        foreach ($orderBy as $key) {
+            $arr[] = $this->_fieldToColumnMap[$key] . ' ' . $orderAlignment;
         }
+        $orderBy = $arr;
 
         $table = $this->_dataSource->getTable();
 
         $select = $table->select()
-                        ->order(
-                            $orderBy . ' '
-                            . ($orderAlignment == 'ASC' ? 'ASC' : 'DESC')
-                        );
+                        ->order($orderBy);
 
         $paginator = Zend_Paginator::factory($select);
         $paginator->setCurrentPageNumber($page);
@@ -89,13 +94,13 @@ abstract class ZendExt_Controller_CRUDAbstract
         $this->view->paginator = $paginator;
         $this->view->pk = $pk;
         $this->view->fieldsMap = $this->_fieldToColumnMap;
+        $this->view->controllerName = $request->getControllerName();
 
         $renderer = new ZendExt_Crud_Template_List($this->view);
         $renderer->setTitle('List of ' . $this->_builderClass);
         $renderer->render();
 
         $this->_helper->viewRenderer->setNoRender();
-
     }
 
     /**
@@ -145,7 +150,7 @@ abstract class ZendExt_Controller_CRUDAbstract
              *        and rerender the empty form with a success message.
              */
 
-            $this->_redirect('/' . $request->getControllerName() . '/list');
+            $this->_redirectTo('list');
 
         } catch (ZendExt_Builder_ValidationException $e) {
             $this->view->failedField = $e->getField();
@@ -205,13 +210,13 @@ abstract class ZendExt_Controller_CRUDAbstract
         try{
             $table = $this->_dataSource->getTable();
 
-            $data = $this->_completeData($fields, $table);
+            $data = $this->_completeData($fields);
 
             $where = $this->_completeWhere($pk, $table);
 
             $table->update($data, $where);
 
-            $this->_redirect('/' . $request->getControllerName() . '/list');
+            $this->_redirectTo('list');
         } catch (ZendExt_Builder_ValidationException $e) {
             $this->view->failedField = $e->getField();
             $this->view->errors = $e->getErrors();
@@ -241,7 +246,7 @@ abstract class ZendExt_Controller_CRUDAbstract
         $request = $this->getRequest();
 
         if (!$request->isPost()) {
-            $this->_redirect('/' . $request->getControllerName() . '/list');
+            $this->_redirectTo('list');
             return;
         }
 
@@ -259,7 +264,7 @@ abstract class ZendExt_Controller_CRUDAbstract
             $this->view->errors = $e->getErrors();
         }
 
-        $this->_redirect('/' . $request->getControllerName() . '/list');
+        $this->_redirectTo('list');
     }
 
     /**
@@ -470,5 +475,24 @@ abstract class ZendExt_Controller_CRUDAbstract
 
         // TODO : If there is a better fit than 'text' use that
         return 'text';
+    }
+
+    /**
+     * Redirects to the given action.
+     *
+     * @param string $action The action.
+     *
+     * @return void
+     */
+    protected function _redirectTo($action) {
+        $module = $this->getRequest()->getModuleName();
+
+        if ('default' !== $module) {
+            $url = '/' . $this->getRequest()->getControllerName() . '/' . $action;
+        } else {
+            $url = '/' . $module . '/' . $this->getRequest()->getControllerName() . '/' . $action;
+        }
+
+        $this->_redirect($url);
     }
 }

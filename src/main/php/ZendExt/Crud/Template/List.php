@@ -47,7 +47,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         $this->_renderPageBar();
 
         $items = $this->_view->paginator->getCurrentItems();
-        $i = 0;
+        $controllerName = $this->_view->controllerName;
 
         echo '<style type="text/css">';
         $this->_style();
@@ -60,33 +60,51 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         foreach ($arrCols as $col => $c) {
             echo '<th class="field">' . $col . '</th>';
         }
+
         $trColor = 'normColor';
+
         foreach ($items as $item) {
+
             $arrCols = $item->toArray();
+
             echo '<tr class="'.$trColor.'" >';
+
             foreach ($arrCols as $col => $c) {
                 echo '<td>';
-                echo '<span class="colValue">' . $c . '</span>';
+                echo '<span class="colValue">';
+                $isPk = in_array($col, $this->_view->pk);
+                if ($isPk) {
+                    echo '<a href="/' . $controllerName . '/update/';
+                    foreach ($this->_view->pk as $k) {
+                        $field = array_search($k, $this->_view->fieldsMap);
+                        echo $field . '/'. $arrCols[$k] . '/';
+                    }
+                    echo '">';
+                }
+                echo $c . ($isPk ? '</a>' : '') . '</span>';
                 echo '</td>';
             }
+
             echo '<td>';
-            echo '<form action="/index/delete" method="post">';
-                echo '<input class="button_delete" type="submit"',
-                            ' name="delete" value="Delete">';
+            echo '<form action="/' . $controllerName . '/delete" method="post">',
+                	'<input class="button_delete" type="submit"',
+    				' name="delete" value="Delete">';
+
             foreach ($this->_view->pk as $k) {
                 $field = array_search($k, $this->_view->fieldsMap);
                 echo "<input type=\"hidden\" name=\"{$field}\"',
                 		' value=\"{$arrCols[$k]}\">";
             }
             echo '</form>';
-            echo '</td>';
+
+            echo '</td>'; // delete
+
+//            echo '</div>'; //row
             echo '</tr>';
-            if ($trColor == 'altColor') {
-                $trColor = 'normColor';
-            } else {
-                $trColor = 'altColor';
-            }
+
+            $trColor = $trColor == 'altColor' ? 'normColor' : 'altColor';
         }
+
         echo '</table>';
 
         $this->_renderPageBar();
@@ -118,7 +136,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
                     . '"> Previous </a></span>';
         }
 
-        echo '<span class=\"page\">Current</span>';
+        echo '<span class="page">Current</span>';
 
         if ($last != $current) {
             echo "<span class=\"page\"><a href=\"/?page={$next}"
@@ -145,7 +163,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             'td {text-align:center;}' .
             '.colValue {font-size: 12px}' .
             'th {padding:3px;background-color:#A7C942;color:#ffffff;}' .
-            'tr.altColor td {color:#000000;background-color:#EAF2D3;}' .
+            'tr.altColor td {color:#000000;background-color:#EAF2D3;heigth}' .
             'div.pageBar {margin-left:50%;}';
     }
 }
