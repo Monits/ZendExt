@@ -49,12 +49,9 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         $items = $this->_view->paginator->getCurrentItems();
         $i = 0;
 
-        echo '<style type="text/css">' .
-                '.field {font-size: 14px}' .
-                '.cell {font-size: 13px}' .
-                '.delete {float: right}' .
-            '</style>';
-
+        echo '<style type="text/css">';
+        $this->_style();
+        echo '</style>';
 
         echo '<table>';
 
@@ -63,15 +60,13 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         foreach ($arrCols as $col => $c) {
             echo '<th class="field">' . $col . '</th>';
         }
-
+        $trColor = 'normColor';
         foreach ($items as $item) {
             $arrCols = $item->toArray();
-            echo '<tr>';
-            echo '<div class="cell">';
+            echo '<tr class="'.$trColor.'" >';
             foreach ($arrCols as $col => $c) {
                 echo '<td>';
-                echo '<span class="' . $col .
-                    '" style="font-size: 8px">' . $c . '</span>';
+                echo '<span class="colValue">' . $c . '</span>';
                 echo '</td>';
             }
             echo '<td>';
@@ -85,8 +80,12 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             }
             echo '</form>';
             echo '</td>';
-            echo '</div>';
             echo '</tr>';
+            if ($trColor == 'altColor') {
+                $trColor = 'normColor';
+            } else {
+                $trColor = 'altColor';
+            }
         }
         echo '</table>';
 
@@ -110,7 +109,6 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             $this->_view->paginator->getTotalItemCount() /
             $this->_view->paginator->getItemCountPerPage()
         );
-        echo '<center>';
         echo '<div class="pageBar">';
 
         if ($first != $current) {
@@ -130,6 +128,24 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         }
 
         echo '</div>';
-        echo '</center>';
+    }
+
+    /**
+     * Set the style of the list.
+     *
+     * @return void
+     */
+    protected function _style()
+    {
+
+       echo '.field {font-size: 14px}' .
+            '.delete {float: right}' .
+            'table {border-collapse:collapse;}' .
+            'table, th, td {border: 1px solid black;}' .
+            'td {text-align:center;}' .
+            '.colValue {font-size: 12px}' .
+            'th {padding:3px;background-color:#A7C942;color:#ffffff;}' .
+            'tr.altColor td {color:#000000;background-color:#EAF2D3;}' .
+            'div.pageBar {margin-left:50%;}';
     }
 }
