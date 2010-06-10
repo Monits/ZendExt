@@ -225,6 +225,25 @@ class ZendExt_Service_Facebook
         $this->_makeApiCall('dashboard.setCount', $params);
     }
 
+
+    /**
+     * Get the users info.
+     *
+     * @param integer $userId The id of the user to get infor of.
+     * @param array   $fields An array with the names of the fields to retrieve.
+     *
+     * @return array
+     */
+    public function getUserInfo($userId=null, array $fields)
+    {
+        if (null === $userId) {
+
+            $userId = $this->getUserId();
+        }
+
+        return $this->_fb->api_client->users_getInfo($userId, $fields);
+    }
+
     /**
      * Make a request to rest API.
      *
@@ -233,11 +252,12 @@ class ZendExt_Service_Facebook
      *
      * @return string The response given by the API
      */
-    private function _makeApiCall($method, array $params = array())
+    private function _makeApiCall($method, array $params = array(), $format='xml')
     {
         $get = array(
             'method' => $method,
-            'api_key' => $this->_apiKey
+            'api_key' => $this->_apiKey,
+            'format' => $format
         );
 
         $post = $params;
