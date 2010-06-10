@@ -42,7 +42,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
      *
      * @return void
      */
-    private function _renderContent()
+    protected function _renderContent()
     {
         $this->_renderPageBar();
 

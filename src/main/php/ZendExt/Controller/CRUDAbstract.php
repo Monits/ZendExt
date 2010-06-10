@@ -320,7 +320,10 @@ abstract class ZendExt_Controller_CRUDAbstract
     }
 
     /**
-     * Retrieves the data from the form for each field without builder validate.
+     * Retrieves the data from the form.
+     *
+     * Retrieves the data from the form
+     * for each field without builder validate.
      *
      * @param array $fields The names of the fields.
      *

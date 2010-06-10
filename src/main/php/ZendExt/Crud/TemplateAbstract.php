@@ -44,7 +44,7 @@ abstract class ZendExt_Crud_TemplateAbstract implements ZendExt_Crud_Template
      *
      * @return void
      */
-    private function _renderContent()
+    protected function _renderContent()
     {
     }
 
