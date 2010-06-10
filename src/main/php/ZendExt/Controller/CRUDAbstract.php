@@ -91,7 +91,8 @@ abstract class ZendExt_Controller_CRUDAbstract
         $this->view->fieldsMap = $this->_fieldToColumnMap;
 
         $renderer = new ZendExt_Crud_Template_List($this->view);
-        $renderer->render('List of ' . $this->_builderClass);
+        $renderer->setTitle('List of ' . $this->_builderClass);
+        $renderer->render();
 
         $this->_helper->viewRenderer->setNoRender();
 
@@ -112,8 +113,9 @@ abstract class ZendExt_Controller_CRUDAbstract
 
             // Render the script
             $renderer = new ZendExt_Crud_Template_New($this->view);
+            $renderer->setTitle($this->_formName);
+            $renderer->render();
 
-            $renderer->render($this->_formName);
             $this->_helper->viewRenderer->setNoRender();
             return;
         }
@@ -138,7 +140,10 @@ abstract class ZendExt_Controller_CRUDAbstract
 
             $table->insert($data);
 
-            // TODO : Optionally alow the user to "add another" and rerender the empty form with a success message
+            /**
+             * TODO : Optionally alow the user to "add another"
+             *        and rerender the empty form with a success message.
+             */
 
             $this->_redirect('/' . $request->getControllerName() . '/list');
 
@@ -152,8 +157,8 @@ abstract class ZendExt_Controller_CRUDAbstract
 
             // Render the script
             $renderer = new ZendExt_Crud_Template_New($this->view);
-
-            $renderer->render($this->_formName);
+            $renderer->setTitle($this->_formName);
+            $renderer->render();
             $this->_helper->viewRenderer->setNoRender();
             // TODO : Re-render form with error messages
         }
@@ -184,7 +189,8 @@ abstract class ZendExt_Controller_CRUDAbstract
             // Render the script
             $renderer = new ZendExt_Crud_Template_Update($this->view);
 
-            $renderer->render($this->_formName);
+            $renderer->setTitle($this->_formName);
+            $renderer->render();
             $this->_helper->viewRenderer->setNoRender();
             return;
         }
@@ -216,7 +222,8 @@ abstract class ZendExt_Controller_CRUDAbstract
             // Render the script
             $renderer = new ZendExt_Crud_Template_Update($this->view);
 
-            $renderer->render($this->_formName);
+            $renderer->setTitle($this->_formName);
+            $renderer->render();
             $this->_helper->viewRenderer->setNoRender();
             // TODO : Re-render form with error messages
         }

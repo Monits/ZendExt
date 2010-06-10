@@ -38,21 +38,12 @@ class ZendExt_Crud_Template_Update extends ZendExt_Crud_TemplateAbstract
     }
 
     /**
-     * Render the form.
-     *
-     * @param string $title The title of the form.
+     * The content to be render between head() and footer().
      *
      * @return void
      */
-    public function render($title = null)
+    protected function _renderContent()
     {
-        if (null !== $title) {
-            $this->setTitle($title);
-        }
-        $this->header();
-        // TODO : Hacer HTML completo y bonito
         echo $this->_view->Updateform;
-
-        $this->footer();
     }
 }

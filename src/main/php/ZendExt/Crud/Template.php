@@ -28,9 +28,7 @@ interface ZendExt_Crud_Template
     /**
      * Render the form.
      *
-     * @param string $title The title of the form.
-     *
      * @return void
      */
-    public function render($title = null);
+    public function render();
 }

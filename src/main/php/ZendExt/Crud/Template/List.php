@@ -38,31 +38,11 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
     }
 
     /**
-     * Render the list.
-     *
-     * @param text $title The title of the form.
-     *
-     * @return void
-     */
-    public function render($title = null)
-    {
-        if (null !== $title) {
-            $this->setTitle($title);
-        }
-
-        $this->header();
-
-        $this->_renderList();
-
-        $this->footer();
-    }
-
-    /**
      * Renders the list.
      *
      * @return void
      */
-    private function _renderList()
+    private function _renderContent()
     {
         $this->_renderPageBar();
 
