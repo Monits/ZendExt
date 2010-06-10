@@ -120,21 +120,24 @@ class ZendExt_Builder_Generic
     public static function factory($config)
     {
         $builder = new ZendExt_Builder_Generic();
+        if ($config instanceof Zend_Config) {
+            $config = $config->toArray();
+        }
 
-        if (!isset($config->class) || !class_exists($config->class)) {
+        if (!isset($config['class']) || !class_exists($config['class'])) {
             throw new ZendExt_Builder_Exception(
                 'Invalid config, no class to be builded specified.'
             );
         }
 
-        if (!isset($config->fields)) {
+        if (!isset($config['fields']) || !is_array($config['fields'])) {
             throw new ZendExt_Builder_Exception(
                 'Invalid config, no fields specified.'
             );
         }
 
-        $builder->_class = $config->class;
-        $builder->_fields = $config->fields->toArray();
+        $builder->_class = $config['class'];
+        $builder->_fields = $config['fields'];
 
         return $builder;
     }
