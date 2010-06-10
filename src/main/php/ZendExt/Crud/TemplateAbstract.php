@@ -55,18 +55,22 @@ abstract class ZendExt_Crud_TemplateAbstract implements ZendExt_Crud_Template
      */
     public function render()
     {
-        echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-                     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
-        echo '<html>';
-        echo '<head>';
-        echo     '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />';
-        echo     '<title>'. $this->_title .'</title>';
-        echo '</head>';
-        echo '<body>';
+        if (Zend_Layout::getMvcInstance() === null) {
+            echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+                         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
+            echo '<html>';
+            echo '<head>';
+            echo     '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />';
+            echo     '<title>'. $this->_title .'</title>';
+            echo '</head>';
+            echo '<body>';
+        }
 
         $this->_renderContent();
 
-        echo '</body>';
-        echo '</html>';
+        if (Zend_Layout::getMvcInstance() === null) {
+            echo '</body>';
+            echo '</html>';
+        }
     }
 }
