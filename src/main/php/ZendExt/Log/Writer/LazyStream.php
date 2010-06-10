@@ -79,7 +79,7 @@ class ZendExt_Log_Writer_LazyStream extends Zend_Log_Writer_Stream
     private function _openStream()
     {
         if (!is_resource($this->_stream)) {
-            if (! $this->_stream = @fopen($this->_name, $this->_mode, false)) {
+            if (!($this->_stream = @fopen($this->_name, $this->_mode))) {
                 $msg = '"' . $this->_name . '" cannot be opened with mode "'
                     . $this->_mode . '"';
                 throw new Zend_Log_Exception($msg);
