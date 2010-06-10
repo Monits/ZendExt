@@ -121,7 +121,7 @@ class ZendExt_Builder_Generic
     {
         $builder = new ZendExt_Builder_Generic();
 
-        if (!isset($config->class)) {
+        if (!isset($config->class) || !class_exists($config->class)) {
             throw new ZendExt_Builder_Exception(
                 'Invalid config, no class to be builded specified.'
             );
@@ -134,7 +134,7 @@ class ZendExt_Builder_Generic
         }
 
         $builder->_class = $config->class;
-        $builder->_fields = $config->fields;
+        $builder->_fields = $config->fields->toArray();
 
         return $builder;
     }
