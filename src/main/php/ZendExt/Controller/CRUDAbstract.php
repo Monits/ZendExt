@@ -78,7 +78,7 @@ abstract class ZendExt_Controller_CRUDAbstract
 
         $arr = array();
         foreach ($orderBy as $key) {
-            $arr[] = $this->_fieldToColumnMap[$key] . ' ' . $orderAlignment;
+            $arr[] = $key . ' ' . $orderAlignment;
         }
         $orderBy = $arr;
 

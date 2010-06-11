@@ -58,7 +58,8 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         $arrCols = $items->offsetGet(1)->toArray();
 
         foreach ($arrCols as $col => $c) {
-            echo '<th class="field">' . $col . '</th>';
+            $field = array_search($col, $this->_view->fieldsMap);
+            echo '<th class="field">' . $field . '</th>';
         }
 
         $trColor = 'normColor';
@@ -140,9 +141,9 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
 
         if ($last != $current) {
             echo "<span class=\"page\"><a href=\"/?page={$next}"
-                    . '"> Next </a></span>';
+                    . '">Next</a></span>';
             echo "<span class=\"page\"><a href=\"/?page={$last}"
-                    . '"> Last </a></span>';
+                    . '">Last</a></span>';
         }
 
         echo '</div>';
@@ -164,6 +165,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             '.colValue {font-size: 12px}' .
             'th {padding:3px;background-color:#A7C942;color:#ffffff;}' .
             'tr.altColor td {color:#000000;background-color:#EAF2D3;heigth}' .
-            'div.pageBar {margin-left:50%;}';
+            'div.pageBar {margin-left:50%;}' .
+            'span.page a{padding:3px;}';
     }
 }
