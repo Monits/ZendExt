@@ -56,11 +56,19 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         echo '<table>';
 
         $arrCols = $items->offsetGet(1)->toArray();
-
+        $order = 'ASC';
         foreach ($arrCols as $col => $c) {
             $field = array_search($col, $this->_view->fieldsMap);
-            echo '<th class="field">' . $field . '</th>';
+            echo '<th class="field">';
+            echo '<a  class ="order" href="/' . $controllerName . '/list/';
+            echo 'order' . '/';
+            echo $order;
+            echo '/by/' . $col . '">';
+            echo $field;
+            echo '</a>';
+            echo '</th>';
         }
+        echo '<th class="field"></th>';
 
         $trColor = 'normColor';
 
@@ -166,6 +174,9 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             'th {padding:3px;background-color:#A7C942;color:#ffffff;}' .
             'tr.altColor td {color:#000000;background-color:#EAF2D3;heigth}' .
             'div.pageBar {margin-left:50%;}' .
-            'span.page a{padding:3px;}';
+            'span.page a{padding:3px;}' .
+            'a.order:link{color:#ffffff;text-decoration:none;}' .
+            'a.order:hover{color:#ffffff}' .
+            'a.order:visited{color:#ffffff;text-decoration:none;}';
     }
 }
