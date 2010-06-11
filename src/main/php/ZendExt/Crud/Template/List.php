@@ -54,8 +54,10 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         echo '</style>';
 
         echo '<table>';
+        echo '<thead>';
+        echo '<tr>';
 
-        $arrCols = $items->offsetGet(1)->toArray();
+        $arrCols = $items->offsetGet(0)->toArray();
         $order = $this->_view->order;
         $orderField = $this->_view->orderField;
 
@@ -63,8 +65,8 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
 
         foreach ($arrCols as $col => $c) {
             $field = array_search($col, $this->_view->fieldsMap);
-            echo '<th class="field">';
-            echo '<a  class ="order" href="/' . $controllerName . '/list/';
+            echo '<th class="row">';
+            echo '<a  class ="cols" href="/' . $controllerName . '/list/';
             echo 'page/' . $currentPage . '/';
             echo 'order' . '/';
             if ($col == $orderField) {
@@ -77,7 +79,10 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             echo '</a>';
             echo '</th>';
         }
-        echo '<th class="field"></th>';
+        echo '</tr>';
+        echo '</thead>';
+        echo '<tbody>';
+        //echo '<th class="field"></th>';
 
         $trColor = 'normColor';
 
@@ -104,9 +109,10 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             }
 
             echo '<td>';
-            echo '<form action="/' . $controllerName . '/delete" method="post">',
-                	'<input class="button_delete" type="submit"',
-    				' name="delete" value="Delete">';
+            echo '<form action="/' . $controllerName . '/delete"',
+                    ' method="post">',
+                    '<input class="button_delete" type="submit"',
+                    ' name="delete" value="Delete">';
 
             foreach ($this->_view->pk as $k) {
                 $field = array_search($k, $this->_view->fieldsMap);
@@ -117,12 +123,12 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
 
             echo '</td>'; // delete
 
-//            echo '</div>'; //row
             echo '</tr>';
 
             $trColor = $trColor == 'altColor' ? 'normColor' : 'altColor';
         }
 
+        echo '</tbody>';
         echo '</table>';
 
         $this->_renderPageBar();
@@ -151,27 +157,27 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         echo '<div class="pageBar">';
 
         if ($first != $current) {
-            echo "<span class=\"page\">";
+            echo '<span class="page">';
             echo "<a href=\"/{$controllerName}/list/page/{$first}"
                     . "/order/{$order}/by/{$orderField}\">First"
-                    . "</a></span>";
-            echo "<span class=\"page\">";
+                    . '</a></span>';
+            echo '<span class="page">';
             echo"<a href=\"/{$controllerName}/list/page/{$previous}"
                     . "/order/{$order}/by/{$orderField}\">Previous"
-                    . "</a></span>";
+                    . '</a></span>';
         }
 
         echo '<span class="page">Current</span>';
 
         if ($last != $current) {
-            echo "<span class=\"page\">";
+            echo '<span class="page">';
             echo "<a href=\"/{$controllerName}/list/page/{$next}"
                     . "/order/{$order}/by/{$orderField}\">Next"
-                    . "</a></span>";
-            echo "<span class=\"page\">";
-            echo "<a href=\"/{$controllerName}/list/page/{$last}"
+                    . '</a></span>';
+            echo '<span class=\"page\">';
+            echo '<a href="/' . $controllerName . '/list/page/' . $last
                     . "/order/{$order}/by/{$orderField}\">Last"
-                    . "</a></span>";
+                    . '</a></span>';
         }
 
         echo '</div>';
@@ -185,7 +191,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
     protected function _style()
     {
 
-       echo '.field {font-size: 14px}' .
+        echo '.field {font-size: 14px}' .
             '.delete {float: right}' .
             'table {border-collapse:collapse;}' .
             'table, th, td {border: 1px solid black;}' .
@@ -193,12 +199,13 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             '.colValue {font-size: 12px}' .
             'th {padding:3px;background-color:#A7C942;color:#ffffff;}' .
             'tr.altColor td {color:#000000;background-color:#EAF2D3;heigth}' .
-            'div.pageBar {margin-left:auto;margin-right:auto;width:300px;text-align:center;}' .
+            'div.pageBar {margin-left:auto;margin-right:auto;',
+                   'width:300px;text-align:center;}' .
             'span.page a{padding:4px;}' .
             'a:link{text-decoration:none;}' .
             'a:visited{text-decoration:none;}' .
-            'a.order:link{color:#ffffff;}' .
-            'a.order:hover{color:#ffffff}' .
-            'a.order:visited{color:#ffffff;}';
+            'a.cols:link{color:#ffffff;}' .
+            'a.cols:hover{color:#ffffff}' .
+            'a.cols:visited{color:#ffffff;}';
     }
 }

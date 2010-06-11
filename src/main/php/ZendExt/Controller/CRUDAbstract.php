@@ -489,13 +489,16 @@ abstract class ZendExt_Controller_CRUDAbstract
      *
      * @return void
      */
-    protected function _redirectTo($action) {
+    protected function _redirectTo($action)
+    {
         $module = $this->getRequest()->getModuleName();
 
         if ('default' !== $module) {
-            $url = '/' . $this->getRequest()->getControllerName() . '/' . $action;
+            $url = '/' . $this->getRequest()->getControllerName() . '/'
+                    . $action;
         } else {
-            $url = '/' . $module . '/' . $this->getRequest()->getControllerName() . '/' . $action;
+            $url = '/' . $module . '/'
+                . $this->getRequest()->getControllerName() . '/' . $action;
         }
 
         $this->_redirect($url);
