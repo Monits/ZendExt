@@ -61,7 +61,10 @@ abstract class ZendExt_Controller_CRUDAbstract
     {
         $request = $this->getRequest();
 
-        $pk = $this->_dataSource->getPk();
+        foreach ((array)$this->_dataSource->getPk() as $key) {
+            $pk[] = $key;
+        }
+
         $builder = new $this->_builderClass();
         $fields = $builder->getFieldsNames();
 
@@ -80,17 +83,19 @@ abstract class ZendExt_Controller_CRUDAbstract
         foreach ($orderBy as $key) {
             $arr[] = $key . ' ' . $orderAlignment;
         }
-        $orderBy = $arr;
+        $order = $arr;
 
         $table = $this->_dataSource->getTable();
 
         $select = $table->select()
-                        ->order($orderBy);
+                        ->order($order);
 
         $paginator = Zend_Paginator::factory($select);
         $paginator->setCurrentPageNumber($page);
         $paginator->setItemCountPerPage($ipp);
 
+        $this->view->orderField = $orderBy[0];
+        $this->view->order = $orderAlignment;
         $this->view->paginator = $paginator;
         $this->view->pk = $pk;
         $this->view->fieldsMap = $this->_fieldToColumnMap;

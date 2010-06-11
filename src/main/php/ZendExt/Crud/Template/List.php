@@ -56,13 +56,22 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         echo '<table>';
 
         $arrCols = $items->offsetGet(1)->toArray();
-        $order = 'ASC';
+        $order = $this->_view->order;
+        $orderField = $this->_view->orderField;
+
+        $currentPage = $this->_view->paginator->getCurrentPageNumber();
+
         foreach ($arrCols as $col => $c) {
             $field = array_search($col, $this->_view->fieldsMap);
             echo '<th class="field">';
             echo '<a  class ="order" href="/' . $controllerName . '/list/';
+            echo 'page/' . $currentPage . '/';
             echo 'order' . '/';
-            echo $order;
+            if ($col == $orderField) {
+                echo $order == 'ASC' ? 'DESC' : 'ASC';
+            } else {
+                echo 'ASC';
+            }
             echo '/by/' . $col . '">';
             echo $field;
             echo '</a>';
@@ -128,6 +137,9 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
     {
         $paginator = $this->_view->paginator;
 
+        $order = $this->_view->order;
+        $orderField = $this->_view->orderField;
+        $controllerName = $this->_view->controllerName;
         $first =  1;
         $previous = $this->_view->paginator->getCurrentPageNumber() - 1;
         $current = $this->_view->paginator->getCurrentPageNumber();
@@ -139,19 +151,27 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         echo '<div class="pageBar">';
 
         if ($first != $current) {
-            echo "<span class=\"page\"><a href=\"/?page={$first}\">"
-                    . 'First </a></span>';
-            echo "<span class=\"page\"><a href=\"/?page={$previous}"
-                    . '"> Previous </a></span>';
+            echo "<span class=\"page\">";
+            echo "<a href=\"/{$controllerName}/list/page/{$first}"
+                    . "/order/{$order}/by/{$orderField}\">First"
+                    . "</a></span>";
+            echo "<span class=\"page\">";
+            echo"<a href=\"/{$controllerName}/list/page/{$previous}"
+                    . "/order/{$order}/by/{$orderField}\">Previous"
+                    . "</a></span>";
         }
 
         echo '<span class="page">Current</span>';
 
         if ($last != $current) {
-            echo "<span class=\"page\"><a href=\"/?page={$next}"
-                    . '">Next</a></span>';
-            echo "<span class=\"page\"><a href=\"/?page={$last}"
-                    . '">Last</a></span>';
+            echo "<span class=\"page\">";
+            echo "<a href=\"/{$controllerName}/list/page/{$next}"
+                    . "/order/{$order}/by/{$orderField}\">Next"
+                    . "</a></span>";
+            echo "<span class=\"page\">";
+            echo "<a href=\"/{$controllerName}/list/page/{$last}"
+                    . "/order/{$order}/by/{$orderField}\">Last"
+                    . "</a></span>";
         }
 
         echo '</div>';
@@ -173,10 +193,12 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             '.colValue {font-size: 12px}' .
             'th {padding:3px;background-color:#A7C942;color:#ffffff;}' .
             'tr.altColor td {color:#000000;background-color:#EAF2D3;heigth}' .
-            'div.pageBar {margin-left:50%;}' .
-            'span.page a{padding:3px;}' .
-            'a.order:link{color:#ffffff;text-decoration:none;}' .
+            'div.pageBar {margin-left:auto;margin-right:auto;width:300px;text-align:center;}' .
+            'span.page a{padding:4px;}' .
+            'a:link{text-decoration:none;}' .
+            'a:visited{text-decoration:none;}' .
+            'a.order:link{color:#ffffff;}' .
             'a.order:hover{color:#ffffff}' .
-            'a.order:visited{color:#ffffff;text-decoration:none;}';
+            'a.order:visited{color:#ffffff;}';
     }
 }
