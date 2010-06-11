@@ -57,32 +57,36 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         echo '<thead>';
         echo '<tr>';
 
-        $arrCols = $items->offsetGet(0)->toArray();
         $order = $this->_view->order;
         $orderField = $this->_view->orderField;
 
         $currentPage = $this->_view->paginator->getCurrentPageNumber();
 
-        foreach ($arrCols as $col => $c) {
-            $field = array_search($col, $this->_view->fieldsMap);
+        foreach ($this->_view->fieldsMap as $field => $col) {
             echo '<th class="row">';
             echo '<a  class ="cols" href="/' . $controllerName . '/list/';
             echo 'page/' . $currentPage . '/';
             echo 'order' . '/';
-            if ($col == $orderField) {
+            if (in_array($col, $orderField)) {
                 echo $order == 'ASC' ? 'DESC' : 'ASC';
             } else {
                 echo 'ASC';
             }
-            echo '/by/' . $col . '">';
+            echo '/by/' . $col;
+            echo (
+                    $this->_view->defaultIpp ==
+                    $this->_view->paginator->getItemCountPerPage() ?
+                    '' : "/ipp/{$this->_view->paginator->getItemCountPerPage()}"
+            );
+            echo '">';
             echo $field;
             echo '</a>';
             echo '</th>';
         }
+
         echo '</tr>';
         echo '</thead>';
         echo '<tbody>';
-        //echo '<th class="field"></th>';
 
         $trColor = 'normColor';
 
@@ -143,6 +147,8 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
     {
         $paginator = $this->_view->paginator;
 
+        $defaultIpp = $this->_view->defaultIpp;
+        $ipp = $this->_view->paginator->getItemCountPerPage();
         $order = $this->_view->order;
         $orderField = $this->_view->orderField;
         $controllerName = $this->_view->controllerName;
@@ -151,33 +157,44 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         $current = $this->_view->paginator->getCurrentPageNumber();
         $next = $this->_view->paginator->getCurrentPageNumber() + 1;
         $last = ceil(
-            $this->_view->paginator->getTotalItemCount() /
-            $this->_view->paginator->getItemCountPerPage()
+            $this->_view->paginator->getTotalItemCount() / $ipp
         );
         echo '<div class="pageBar">';
 
         if ($first != $current) {
             echo '<span class="page">';
-            echo "<a href=\"/{$controllerName}/list/page/{$first}"
-                    . "/order/{$order}/by/{$orderField}\">First"
-                    . '</a></span>';
+            echo "<a href=\"/{$controllerName}/list/page/{$first}",
+                    "/order/{$order}/by/",
+                    implode(',', $orderField),
+                    ($defaultIpp == $ipp ? '' : "/ipp/{$ipp}"),
+                    '">First',
+                    '</a></span>';
             echo '<span class="page">';
-            echo"<a href=\"/{$controllerName}/list/page/{$previous}"
-                    . "/order/{$order}/by/{$orderField}\">Previous"
-                    . '</a></span>';
+            echo"<a href=\"/{$controllerName}/list/page/{$previous}",
+                    "/order/{$order}/by/",
+                    implode(',', $orderField),
+                    ($defaultIpp == $ipp ? '' : "/ipp/{$ipp}"),
+                    '">Previous',
+                    '</a></span>';
         }
 
         echo '<span class="page">Current</span>';
 
         if ($last != $current) {
             echo '<span class="page">';
-            echo "<a href=\"/{$controllerName}/list/page/{$next}"
-                    . "/order/{$order}/by/{$orderField}\">Next"
-                    . '</a></span>';
+            echo "<a href=\"/{$controllerName}/list/page/{$next}",
+                    "/order/{$order}/by/",
+                    implode(',', $orderField),
+                    ($defaultIpp == $ipp ? '' : "/ipp/{$ipp}"),
+                    '">Next',
+                    '</a></span>';
             echo '<span class=\"page\">';
-            echo '<a href="/' . $controllerName . '/list/page/' . $last
-                    . "/order/{$order}/by/{$orderField}\">Last"
-                    . '</a></span>';
+            echo '<a href="/' . $controllerName . '/list/page/' . $last,
+                    "/order/{$order}/by/",
+                    implode(',', $orderField),
+                    ($defaultIpp == $ipp ? '' : "/ipp/{$ipp}"),
+                    '">Last',
+                    '</a></span>';
         }
 
         echo '</div>';
@@ -203,7 +220,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
                    'width:300px;text-align:center;}' .
             'span.page a{padding:4px;}' .
             'a:link{text-decoration:none;}' .
-            'a:visited{text-decoration:none;}' .
+            'a:visited{color:blue;text-decoration:none;}' .
             'a.cols:link{color:#ffffff;}' .
             'a.cols:hover{color:#ffffff}' .
             'a.cols:visited{color:#ffffff;}';

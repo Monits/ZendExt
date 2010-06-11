@@ -94,12 +94,13 @@ abstract class ZendExt_Controller_CRUDAbstract
         $paginator->setCurrentPageNumber($page);
         $paginator->setItemCountPerPage($ipp);
 
-        $this->view->orderField = $orderBy[0];
+        $this->view->orderField = $orderBy;
         $this->view->order = $orderAlignment;
         $this->view->paginator = $paginator;
         $this->view->pk = $pk;
         $this->view->fieldsMap = $this->_fieldToColumnMap;
         $this->view->controllerName = $request->getControllerName();
+        $this->view->defaultIpp = $this->_itemsPerPage;
 
         if (null == $this->_templateList) {
             $title = 'List of ' . $this->_builderClass;
