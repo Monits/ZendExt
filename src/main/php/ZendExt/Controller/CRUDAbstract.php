@@ -101,11 +101,13 @@ abstract class ZendExt_Controller_CRUDAbstract
         $this->view->fieldsMap = $this->_fieldToColumnMap;
         $this->view->controllerName = $request->getControllerName();
 
-        $renderer = new ZendExt_Crud_Template_List($this->view);
-        $renderer->setTitle('List of ' . $this->_builderClass);
-        $renderer->render();
-
-        $this->_helper->viewRenderer->setNoRender();
+        if (null == $this->_templateList) {
+            $title = 'List of ' . $this->_builderClass;
+            $this->_renderTemplate('List', $title);
+        } else {
+            $template = $this->_templateList;
+            $this->_helper->viewRenderer->renderScript($template);
+        }
     }
 
     /**
@@ -122,11 +124,12 @@ abstract class ZendExt_Controller_CRUDAbstract
             $this->view->form = $this->_newForm();
 
             // Render the script
-            $renderer = new ZendExt_Crud_Template_New($this->view);
-            $renderer->setTitle($this->_formName);
-            $renderer->render();
-
-            $this->_helper->viewRenderer->setNoRender();
+            if (null == $this->_templateNew) {
+                $this->_renderTemplate('New', $this->_formName);
+            } else {
+                $template = $this->_templateNew;
+                $this->_helper->viewRenderer->renderScript($template);
+            }
             return;
         }
         $data = array();
@@ -166,10 +169,12 @@ abstract class ZendExt_Controller_CRUDAbstract
             $this->view->form = $this->_newForm(null, $data);
 
             // Render the script
-            $renderer = new ZendExt_Crud_Template_New($this->view);
-            $renderer->setTitle($this->_formName);
-            $renderer->render();
-            $this->_helper->viewRenderer->setNoRender();
+            if (null == $this->_templateNew) {
+                $this->_renderTemplate('New', $this->_formName);
+            } else {
+                $template = $this->_templateNew;
+                $this->_helper->viewRenderer->renderScript($template);
+            }
             // TODO : Re-render form with error messages
         }
     }
@@ -197,11 +202,12 @@ abstract class ZendExt_Controller_CRUDAbstract
             // Display the form with the current values
             $this->view->Updateform = $this->_newForm($pk);
             // Render the script
-            $renderer = new ZendExt_Crud_Template_Update($this->view);
-
-            $renderer->setTitle($this->_formName);
-            $renderer->render();
-            $this->_helper->viewRenderer->setNoRender();
+            if (null == $this->_templateUpdate) {
+                $this->_renderTemplate('Update', $this->_formName);
+            } else {
+                $template = $this->_templateUpdate;
+                $this->_helper->viewRenderer->renderScript($template);
+            }
             return;
         }
 
@@ -230,11 +236,12 @@ abstract class ZendExt_Controller_CRUDAbstract
             // Assign the form
             $this->view->Updateform = $this->_newForm(null, $data);
             // Render the script
-            $renderer = new ZendExt_Crud_Template_Update($this->view);
-
-            $renderer->setTitle($this->_formName);
-            $renderer->render();
-            $this->_helper->viewRenderer->setNoRender();
+            if (null == $this->_templateUpdate) {
+                $this->_renderTemplate('Update', $this->_formName);
+            } else {
+                $template = $this->_templateUpdate;
+                $this->_helper->viewRenderer->renderScript($template);
+            }
             // TODO : Re-render form with error messages
         }
 
@@ -502,5 +509,24 @@ abstract class ZendExt_Controller_CRUDAbstract
         }
 
         $this->_redirect($url);
+    }
+
+    /**
+     * Render the form/list.
+     *
+     * @param string $type  The type of render.
+     * @param string $title The title of the form.
+     *
+     * @return void
+     */
+    private function _renderTemplate($type, $title)
+    {
+        $template = 'ZendExt_Crud_Template_' . $type;
+
+        $renderer = new $template($this->view);
+        $renderer->setTitle($title);
+        $renderer->render();
+
+        $this->_helper->viewRenderer->setNoRender();
     }
 }
