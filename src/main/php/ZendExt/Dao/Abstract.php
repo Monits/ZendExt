@@ -290,4 +290,48 @@ abstract class ZendExt_Dao_Abstract
     {
         return $this->_getTable($operation, $shardingArg);
     }
+
+    /**
+     * Computes the shard ids for the tables given shard values.
+     *
+     * @param array $shardingArg Shard Array with values
+     *                           on which to perform sharding.
+     *
+     * @return array
+     */
+    public function getShardsForValues(array $shardingArgs)
+    {
+        $shards = array();
+        foreach ($shardingArgs as $id) {
+            $shards[$this->_getShardId($id)][] = $id;
+        }
+        return $shards;
+    }
+
+    /**
+     * Get the rows of the shards and retrieves a rowset.
+     *
+     * @param string $where        SQL where clause.
+     * @param array  $shardingArgs Array with values
+     *                             on which to perform sharding.
+     *
+     * @return array
+     */
+    public function selectForShard($where, array $shardingArgs)
+    {
+        $shards = $this->getShardsForValues($shardingArgs);
+
+        $rowset = array();
+
+        foreach ($shards as $shard => $idsForShard) {
+            $table = $this->_getTableForShard($shard, self::OPERATION_READ);
+            $adapter = $table->getAdapter();
+
+            $select = $adapter->quoteInto($where, $idsForShard);
+            foreach ($table->fetchAll($select) as $row) {
+                $rowset[] = $row;
+            }
+        }
+        return $rowset;
+    }
 }
