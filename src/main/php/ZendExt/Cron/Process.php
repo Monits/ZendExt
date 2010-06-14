@@ -28,7 +28,12 @@ final class ZendExt_Cron_Process
     private static $_defaultOptions = array(
                                           'configDir' => 'config/strategies',
                                           'outputFile' => 'php://stdout',
-                                          'logDir' => 'log/'
+                                          'log' => array(
+                                              'path' => 'log/'
+                                          ),
+                                          'pid' => array(
+                                              'path' => 'pid/'
+                                          )
                                       );
 
     /**
@@ -52,6 +57,8 @@ final class ZendExt_Cron_Process
      */
     private $_logger;
 
+    private $_pidFile;
+
     /**
      * Creates a new offline process.
      *
@@ -68,6 +75,8 @@ final class ZendExt_Cron_Process
 
         $this->_loadConfig($config, $extra);
         $this->_setupLogger();
+
+        $this->_pidFile = $this->_config->pid->path.'/'.$this->_config->pid->file;
     }
 
     /**
@@ -102,7 +111,12 @@ final class ZendExt_Cron_Process
         $this->_logger->info('Initializing process...');
         $bootstrap = $this->_bootstrap();
 
-        file_put_contents($this->_config->pidFile, getmypid());
+
+        if (!file_exists($this->_config->pid->path)) {
+
+            mkdir($this->_config->pid->path, 0744, true);
+        }
+        file_put_contents($this->_pidFile, getmypid());
         $this->_strategy->init($this->_config->strategy, $bootstrap);
 
         $this->_allowsProgress = $this->_strategy
@@ -221,7 +235,8 @@ final class ZendExt_Cron_Process
         $this->_logger->info('Cleaning up...');
 
         $this->_strategy->shutdown();
-        unlink($this->_config->pidFile);
+
+        unlink($this->_pidFile);
     }
 
     /**
@@ -235,8 +250,7 @@ final class ZendExt_Cron_Process
      */
     public function execute()
     {
-
-        if ( file_exists($this->_config->pidFile) ) {
+        if ( file_exists($this->_pidFile) ) {
 
             $strategyReflector = new ReflectionClass($this->_strategy);
             $msg = 'A lock file was found when trying to execute '
