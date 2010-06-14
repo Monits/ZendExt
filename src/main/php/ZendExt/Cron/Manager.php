@@ -162,9 +162,11 @@ class ZendExt_Cron_Manager
     {
         $this->_log->info('Spawning new process...');
 
+        // This assumes the application entry point is the launcher
+        // Which is, I hope, a fairly good guess.
         $exec = 'php -dinclude_path='.get_include_path()
-            .' Launcher.php'
-            .' -c '.$this->_configFile.' ';
+            .' -f '.$_SERVER['PHP_SELF']
+            .' -- -c '.$this->_configFile.' ';
 
         foreach ($config as $key => $value) {
             $exec .= $key.'='.$value.' ';
