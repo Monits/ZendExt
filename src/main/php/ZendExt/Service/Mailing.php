@@ -30,6 +30,7 @@ class ZendExt_Service_Mailing
     protected $_mail;
     protected $_subject;
     protected $_from;
+    protected $_fromName;
 
     /**
      * Creates a new mailing service.
@@ -40,16 +41,18 @@ class ZendExt_Service_Mailing
      *                              to send the e-mail.
      * @param string    $subject    The mails' subject.
      * @param string    $from       The mails' from address.
+     * @param string    $fromName   The mails' sender.
      *
      * @return void
      */
     public function __construct(Zend_View $view, array $smtpConfig,
-        $mail = null, $subject = null, $from = null)
+        $mail = null, $subject = null, $from = null, $fromName = null)
     {
         $this->_view = $view;
         $this->_mail = $mail;
         $this->_subject = $subject;
         $this->_from = $from;
+        $this->_fromName = $fromName;
 
         $this->_transport = new Zend_Mail_Transport_Smtp(
             $smtpConfig['host'], $smtpConfig
@@ -114,9 +117,9 @@ class ZendExt_Service_Mailing
     }
 
     /**
-     * Sets the mails' from address.
+     * Sets the name of the sender.
      *
-     * @param string $from The mail address.
+     * @param string $from The sender's address.
      *
      * @return void
      */
@@ -126,13 +129,35 @@ class ZendExt_Service_Mailing
     }
 
     /**
-     * Retrieves the mails' from address.
+     * Retrieves the sender's address.
      *
      * @return string
      */
     public function getFrom()
     {
         return $this->_from;
+    }
+
+    /**
+     * Sets the sender's name.
+     *
+     * @param string $name The sender's name.
+     *
+     * @return void
+     */
+    public function setFromName($name)
+    {
+        $this->_fromName = $name;
+    }
+
+    /**
+     * Retrieves the sender's name.
+     *
+     * @return string
+     */
+    public function getFromName()
+    {
+        return $this->_fromName;
     }
 
     /**
@@ -153,8 +178,10 @@ class ZendExt_Service_Mailing
 
         $mail->addTo($to);
         $mail->setSubject($this->_subject);
-        $mail->setFrom($this->_from);
+        $mail->setFrom($this->_from, $this->_fromName);
         $mail->setBodyHtml($content);
+
+        // TODO : Prepare plain text version of mail to be set!!!
 
         $mail->send($this->_transport);
     }
