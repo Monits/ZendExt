@@ -164,7 +164,7 @@ class ZendExt_Cron_Manager
 
         // This assumes the application entry point is the launcher
         // Which is, I hope, a fairly good guess.
-        $exec = 'php -dinclude_path='.get_include_path()
+        $exec = 'php -c '.get_cfg_var('cfg_file_path')
             .' -f '.$_SERVER['PHP_SELF']
             .' -- -c '.$this->_configFile.' ';
 
@@ -285,6 +285,7 @@ class ZendExt_Cron_Manager
         }
 
         $this->_waitForChildren();
+        $process->cleanup();
     }
 
     /**

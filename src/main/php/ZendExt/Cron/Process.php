@@ -229,7 +229,7 @@ final class ZendExt_Cron_Process
      *
      * @return void
      */
-    private function _cleanup()
+    public function cleanup()
     {
 
         $this->_logger->info('Cleaning up...');
@@ -298,8 +298,6 @@ final class ZendExt_Cron_Process
         $info = 'Peak memory usage during execution: '
             .memory_get_peak_usage().' bytes';
         $this->_logger->info($info);
-
-        $this->_cleanup();
     }
 
     /**
@@ -311,7 +309,7 @@ final class ZendExt_Cron_Process
     {
 
         $this->_logger->info('Something happend and cleanup was forced.');
-        $this->_cleanup();
+        $this->cleanup();
     }
 
     /**
