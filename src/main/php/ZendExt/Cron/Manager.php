@@ -357,7 +357,12 @@ class ZendExt_Cron_Manager
 
         if ($this->_log) {
 
-            $this->_log->$level($output);
+            try {
+                $this->_log->$level($output);
+            } catch (Exception $e) {
+                error_log($output);
+                error_log($e->__toString());
+            }
         } else {
 
             error_log($output);
@@ -377,32 +382,8 @@ class ZendExt_Cron_Manager
     public function shutdownHandler()
     {
 
-        $isError = false;
-
-        if ( $error = error_get_last() ) {
-
-            switch ( $error['type'] ) {
-                case E_ERROR:
-                case E_CORE_ERROR:
-                case E_COMPILE_ERROR:
-                case E_USER_ERROR:
-                    $isError = true;
-                    break;
-
-                default:
-                    /*
-                     * Any other error state is handled by errorHandler
-                     * so there's no need for this function to do it too.
-                     */
-                    ;
-                    break;
-            }
-        }
-
-        if ( $isError ) {
-
-            error_log($error['message']);
-        }
+        $error = error_get_last();
+        error_log($error['message']);
     }
 
     /**
