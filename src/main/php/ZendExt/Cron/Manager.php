@@ -113,18 +113,14 @@ class ZendExt_Cron_Manager
 
         if ($logConfig->mail) {
 
+            $transport = null;
             if ($logConfig->mail->transport == 'smtp') {
 
                 $transport = new Zend_Mail_Transport_Smtp(
                     $logConfig->mail->host,
                     $logConfig->mail->config->toArray()
                 );
-            } else {
-
-                $transport = new Zend_Mail_Transport_Sendmail();
             }
-
-            Zend_Mail::setDefaultTransport($transport);
 
             $mail = new Zend_Mail('UTF-8');
             if (is_string($logConfig->mail->to)) {
@@ -138,7 +134,7 @@ class ZendExt_Cron_Manager
 
             $filter = new Zend_Log_Filter_Priority(Zend_Log::CRIT);
 
-            $mailWriter = new Zend_Log_Writer_Mail($mail);
+            $mailWriter = new ZendExt_Log_Writer_Mail($mail, null, $transport);
             $mailWriter->addFilter($filter);
 
             $this->_log->addWriter($mailWriter);
