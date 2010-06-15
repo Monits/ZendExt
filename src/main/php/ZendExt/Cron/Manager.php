@@ -258,6 +258,7 @@ class ZendExt_Cron_Manager
         $this->_loadStrategy($strategyName);
         ZendExt_Cron_Persistance::setCurrentProcess($strategyName);
 
+        $cleanup = false;
         try {
 
             $strategy = new $strategyName();
@@ -269,6 +270,7 @@ class ZendExt_Cron_Manager
                 $extraConfig
             );
             $process->execute();
+            $cleanup = true;
         } catch ( ZendExt_Cron_LockException $e ) {
 
             $this->_log->crit($e->getMessage());
@@ -278,14 +280,13 @@ class ZendExt_Cron_Manager
         } catch ( Exception $e ) {
 
             $this->_log->crit($e->__toString());
-            if ( isset($process) ) {
-
-                $process->forceCleanup();
-            }
         }
 
         $this->_waitForChildren();
-        $process->cleanup();
+        if ($cleanup) {
+
+            $process->cleanup();
+        }
     }
 
     /**

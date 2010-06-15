@@ -282,7 +282,6 @@ final class ZendExt_Cron_Process
         } catch ( Exception $e ) {
 
             $this->_logger->crit($e->__toString());
-            $this->forceCleanup();
 
             throw new ZendExt_Cron_ErrorException(
                 'An unexpected error caused the process to stop running.'
