@@ -381,9 +381,10 @@ class ZendExt_Cron_Manager
      */
     public function shutdownHandler()
     {
-
         $error = error_get_last();
-        error_log($error['message']);
+        if ($error) {
+            error_log($error['message']);
+        }
     }
 
     /**
