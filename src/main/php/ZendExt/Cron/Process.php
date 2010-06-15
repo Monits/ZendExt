@@ -144,9 +144,7 @@ final class ZendExt_Cron_Process
 
                 if ($appConfig->resources) {
 
-                    $resources = $appConfig->resources->toArray();
-                    reset($resources);
-                    $resources = current($resources);
+                    $resources = array_keys($appConfig->resources->toArray());
                 } else {
 
                     $resources = null;
