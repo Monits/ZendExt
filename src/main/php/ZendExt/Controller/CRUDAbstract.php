@@ -150,7 +150,12 @@ abstract class ZendExt_Controller_CRUDAbstract
         try {
             $table = $this->_dataSource->getTable();
 
-            $data = $this->_completeData($fields);
+            $build = true;
+            if ($this->_dataSource->isSequence()) {
+                $build = false;
+            }
+
+            $data = $this->_completeData($fields, $build);
 
             $table->insert($data);
 
@@ -190,7 +195,6 @@ abstract class ZendExt_Controller_CRUDAbstract
         $request = $this->getRequest();
 
         if (!$request->isPost()) {
-
             // Retrieve params for primary key
             $pkFields = $this->_dataSource->getPk();
 
@@ -222,7 +226,7 @@ abstract class ZendExt_Controller_CRUDAbstract
         try{
             $table = $this->_dataSource->getTable();
 
-            $data = $this->_completeData($fields);
+            $data = $this->_completeData($fields, true);
 
             $where = $this->_completeWhere($pk, $table);
 
@@ -309,10 +313,11 @@ abstract class ZendExt_Controller_CRUDAbstract
      * Retrieves the data from the form for each field.
      *
      * @param array $fields The names of the fields.
+     * @param bool  $build  Define if is used the method build().
      *
      * @return array
      */
-    private function _completeData(array $fields)
+    private function _completeData(array $fields, $build = false)
     {
         $data = array();
 
@@ -333,6 +338,9 @@ abstract class ZendExt_Controller_CRUDAbstract
             }
 
             $data[$this->_fieldToColumnMap[$field]] = $value;
+        }
+        if (true == $build) {
+            $builder->build();
         }
         return $data;
     }
@@ -429,34 +437,52 @@ abstract class ZendExt_Controller_CRUDAbstract
              ->addDecorator('HtmlTag', array('tag' => 'dl','class' => ''));
 
         foreach ($fields as $key => $field) {
-            $type = ucfirst($this->_getType($field));
+            $type = $this->_getType($field);
 
-            $zendElement = 'Zend_Form_Element_' . $type;
-
-            $elements[$key] = new $zendElement($field);
-            if ($type !== 'Hidden') {
-                $decorators = array('Errors', array(
+            if (is_array($type)) {
+                $elements[$key] = new Zend_Form_Element_Radio($field);
+                $decorators = array(array(
                         'Label', array('tag' => 'dt'))
                 );
                 $elements[$key]->addDecorators($decorators);
-                $elements[$key]->setLabel($field . ' :')
-                              /*
-                               * TODO: Verificar en la db o builder
-                               *       si el campo es requerido o no.
-                               */
-                              ->setRequired(true);
-            }
+                $elements[$key]->setLabel($field . ' :');
+                $elements[$key]->addMultiOptions($type);
 
-            if (null !== $row ) {
-                $column = $this->_fieldToColumnMap[$field];
-                $value = $row[$column];
-                $elements[$key]->setValue($value);
-            }
-            if (null !==$dataField && 'Hidden' !== $type) {
-                $value = $dataField[$field];
-                $elements[$key]->setValue($value);
-                if ($this->view->failedField == $field) {
-                    $elements[$key]->addErrors($this->view->errors);
+                if (null !== $row ) {
+                    $column = $this->_fieldToColumnMap[$field];
+                    $value = $row[$column];
+                    $elements[$key]->setValue($value);
+                }
+
+            } else {
+                $zendElement = 'Zend_Form_Element_' . $type;
+
+                $elements[$key] = new $zendElement($field);
+                if ($type !== 'Hidden') {
+                    $decorators = array('Errors', array(
+                            'Label', array('tag' => 'dt'))
+                    );
+                    $elements[$key]->addDecorators($decorators);
+                    $elements[$key]->setLabel($field . ' :');
+
+                    $desc = $this->_getFieldDescription($field, 'NULLABLE');
+                    $required = true == $desc ? false : true;
+
+                    $elements[$key]->setRequired($required);
+
+                }
+
+                if (null !== $row ) {
+                    $column = $this->_fieldToColumnMap[$field];
+                    $value = $row[$column];
+                    $elements[$key]->setValue($value);
+                }
+                if (null !==$dataField && 'Hidden' !== $type) {
+                    $value = $dataField[$field];
+                    $elements[$key]->setValue($value);
+                    if ($this->view->failedField == $field) {
+                        $elements[$key]->addErrors($this->view->errors);
+                    }
                 }
             }
         }
@@ -472,7 +498,7 @@ abstract class ZendExt_Controller_CRUDAbstract
      *
      * @param string $field The field.
      *
-     * @return string
+     * @return string|array
      */
     private function _getType($field)
     {
@@ -481,13 +507,46 @@ abstract class ZendExt_Controller_CRUDAbstract
             foreach ((array) $pk as $k) {
                 $pkField = array_search($k, $this->_fieldToColumnMap);
                 if ($pkField == $field) {
-                    return 'hidden';
+                    return 'Hidden';
                 }
             }
         }
 
+        $desc = $this->_getFieldDescription($field, 'DATA_TYPE');
+
+        if ($desc == 'text') {
+            return 'Textarea';
+        }
+
+        $enum = strpos($desc, 'enum');
+        if (false !== $enum) {
+            $ret = array();
+            foreach ($this->_getEnum($desc) as $enumVal) {
+                $ret[$enumVal] = $enumVal;
+            }
+            return $ret;
+        }
+
         // TODO : If there is a better fit than 'text' use that
-        return 'text';
+        return 'Text';
+    }
+
+    /**
+     * Retrieves a array with values for the radio buttons.
+     *
+     * @param string $enum The enum string given by the table description.
+     *
+     * @return array
+     */
+    private function _getEnum($enum)
+    {
+        // TODO : Test this in other dbs besides MySQL
+        $enum = str_replace(
+            array('enum','(',')','\''), array('', '', '', ''), $enum
+        );
+        $enum = explode(',', $enum);
+
+        return $enum;
     }
 
     /**
@@ -529,5 +588,43 @@ abstract class ZendExt_Controller_CRUDAbstract
         $renderer->render();
 
         $this->_helper->viewRenderer->setNoRender();
+    }
+
+    /**
+     * Retrieves the description of the field from the database.
+     *
+     * @param string $field           The field .
+     * @param string $descriptionType The type of description to retrieve.
+     *
+     * The value of each array element is an associative array
+     * with the following keys:
+     *  SCHEMA_NAME     => string; name of database or schema
+     *  TABLE_NAME      => string;
+     *  COLUMN_NAME     => string; column name
+     *  COLUMN_POSITION => number; ordinal position of column in table
+     *  DATA_TYPE       => string; SQL datatype name of column
+     *  DEFAULT         => string; default expression of column, null if none
+     *  NULLABLE        => boolean; true if column can have nulls
+     *  LENGTH          => number; length of CHAR/VARCHAR
+     *  SCALE           => number; scale of NUMERIC/DECIMAL
+     *  PRECISION       => number; precision of NUMERIC/DECIMAL
+     *  UNSIGNED        => boolean; unsigned property of an integer type
+     *  PRIMARY         => boolean; true if column is part of the primary key
+     *  PRIMARY_POSITION => integer; position of column in primary key
+     *
+     * @return string
+     */
+    private function _getFieldDescription($field, $descriptionType)
+    {
+        $table = $this->_dataSource->getTable();
+        $adapter = $table->getAdapter();
+        $description = $adapter->describeTable(
+                $table->info(Zend_Db_Table_Abstract::NAME)
+        );
+
+        $column = $this->_fieldToColumnMap[$field];
+        $desc = $description[$column][$descriptionType];
+
+        return $desc;
     }
 }
