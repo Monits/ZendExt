@@ -150,9 +150,42 @@ class GenericTest extends PHPUnit_Framework_TestCase
             $this->_builder->withHasValidation('foo');
             $this->fail();
         } catch (ZendExt_Builder_ValidationException $e) {
+            $this->assertEquals(
+                'hasValidation',
+                $e->getField()
+            );
+
+            $this->assertNotNull($e->getErrors());
         }
 
         $this->_builder->withHasValidation('1');
+
+        $builder = ZendExt_Builder_Generic::factory(
+            array(
+                'class' => 'stdClass',
+                'fields' => array(
+                    'invalidValidator' => array(
+                        'validators' => array(
+                            'stdClass'
+                        )
+                    ),
+                    'singleValidator' => array(
+                        'validators' => new Zend_Validate_int()
+                    )
+                )
+            )
+        );
+
+        try {
+            $builder->withInvalidValidator('asd');
+            $this->fail();
+        } catch(ZendExt_Builder_Exception $e) {
+        }
+
+        $this->assertEquals(
+            $builder,
+            $builder->withSingleValidator(123)
+        );
     }
 
     /**
@@ -193,6 +226,20 @@ class GenericTest extends PHPUnit_Framework_TestCase
         $this->_builder->withHasRequired('foo');
         $result = $this->_builder->build();
         $this->assertType('stdClass', $result);
+    }
+
+    /**
+     * Test the getFieldsNames method.
+     *
+     * @return void
+     */
+    public function testGetFieldNames()
+    {
+        $this->assertNotNull($this->_builder->getFieldsNames());
+        $this->assertEquals(
+            array('empty', 'hasDefault', 'hasValidation', 'hasRequired'),
+            $this->_builder->getFieldsNames()
+        );
     }
 }
 
