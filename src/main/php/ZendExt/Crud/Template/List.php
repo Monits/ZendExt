@@ -209,6 +209,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
     {
 
         echo '.field {font-size: 14px}' .
+            '.colValue{padding:3px}' .
             '.delete {float: right}' .
             'table {border-collapse:collapse;}' .
             'table, th, td {border: 1px solid black;}' .
