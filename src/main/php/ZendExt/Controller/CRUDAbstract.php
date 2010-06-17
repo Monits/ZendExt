@@ -171,8 +171,10 @@ abstract class ZendExt_Controller_CRUDAbstract
             $this->view->errors = $e->getErrors();
 
             $data = $this->_getData($fields);
+            $checks = $this->_getCheckboxValue($fields);
+
             // Assign the form
-            $this->view->form = $this->_newForm(null, $data);
+            $this->view->form = $this->_newForm(null, $data, $checks);
 
             // Render the script
             if (null == $this->_templateNew) {
@@ -238,8 +240,10 @@ abstract class ZendExt_Controller_CRUDAbstract
             $this->view->errors = $e->getErrors();
 
             $data = $this->_getData($fields);
+            $checks = $this->_getCheckboxValue($fields);
+
             // Assign the form
-            $this->view->Updateform = $this->_newForm(null, $data);
+            $this->view->Updateform = $this->_newForm(null, $data, $checks);
             // Render the script
             if (null == $this->_templateUpdate) {
                 $this->_renderTemplate('Update', $this->_formName);
@@ -322,18 +326,17 @@ abstract class ZendExt_Controller_CRUDAbstract
         $data = array();
 
         $builder = new $this->_builderClass();
-
         foreach ($fields as $field) {
             $value = $this->_getParam($field);
             $method = 'with' . ucfirst($field);
-            // If empty, take the default (if there is any)
-            if (empty($value) && $builder->hasDefault($field)) {
-                $value = $builder->getDefault($field);
-            }
+            $isChecked = $this->_getParam('check' . $field);
 
-            // Only validate if the given value is not a default
-            if (!$builder->hasDefault($field)
-                    || $value != $builder->getDefault($field)) {
+            if ('0' == $isChecked) {
+                // If empty, take the default (if there is any)
+                if ($builder->hasDefault($field)) {
+                    $value = $builder->getDefault($field);
+                }
+            } else {
                 $builder->$method($value);
             }
 
@@ -365,6 +368,26 @@ abstract class ZendExt_Controller_CRUDAbstract
         }
         return $data;
     }
+
+    /**
+     * Retrieves the values of the checkbox of the nullable fields.
+     *
+     * @param array $fields The names of the fields.
+     *
+     * @return array
+     */
+    private function _getCheckboxValue(array $fields)
+    {
+        $data = array();
+
+        foreach ($fields as $field) {
+            $isChecked = $this->_getParam('check' . $field);
+
+            $data[$field] = $isChecked;
+        }
+        return $data;
+    }
+
     /**
      * Unset the primary key in the form.
      *
@@ -416,10 +439,12 @@ abstract class ZendExt_Controller_CRUDAbstract
      * @param array $pk        Optional array for field => value
      *                         of primary to do the lookup.
      * @param array $dataField Optional array for field => value.
+     * @param array $checks    Optional array for field => checkbox value.
      *
      * @return void.
      */
-    private function _newForm(array $pk = null, array $dataField = null)
+    private function _newForm(
+            array $pk = null, array $dataField = null, array $checks = null)
     {
         $row = null;
 
@@ -436,57 +461,101 @@ abstract class ZendExt_Controller_CRUDAbstract
              ->setMethod('post')
              ->addDecorator('HtmlTag', array('tag' => 'dl','class' => ''));
 
-        foreach ($fields as $key => $field) {
+        $checkbox = array();
+        $elements = array();
+        foreach ($fields as $field) {
             $type = $this->_getType($field);
+            $nullable = $this->_getFieldDescription($field, 'NULLABLE');
 
+            //if type is a array add a input type radio
             if (is_array($type)) {
-                $elements[$key] = new Zend_Form_Element_Radio($field);
+                $elements[$field] = new Zend_Form_Element_Radio($field);
                 $decorators = array(array(
                         'Label', array('tag' => 'dt'))
                 );
-                $elements[$key]->addDecorators($decorators);
-                $elements[$key]->setLabel($field . ' :');
-                $elements[$key]->addMultiOptions($type);
+                $elements[$field]->addDecorators($decorators);
+                $elements[$field]->setLabel($field . ' :');
+                $elements[$field]->addMultiOptions($type);
 
                 if (null !== $row ) {
                     $column = $this->_fieldToColumnMap[$field];
                     $value = $row[$column];
-                    $elements[$key]->setValue($value);
+                    $elements[$field]->setValue($value);
+                }
+                if (null !==$dataField && 'Hidden' !== $type) {
+                    $value = $dataField[$field];
+                    $elements[$field]->setValue($value);
+                    if ($this->view->failedField == $field) {
+                        $elements[$field]->addErrors($this->view->errors);
+                    }
                 }
 
             } else {
                 $zendElement = 'Zend_Form_Element_' . $type;
 
-                $elements[$key] = new $zendElement($field);
+                $elements[$field] = new $zendElement($field);
                 if ($type !== 'Hidden') {
                     $decorators = array('Errors', array(
                             'Label', array('tag' => 'dt'))
                     );
-                    $elements[$key]->addDecorators($decorators);
-                    $elements[$key]->setLabel($field . ' :');
+                    $elements[$field]->addDecorators($decorators);
+                    $elements[$field]->setLabel($field . ' :');
 
-                    $desc = $this->_getFieldDescription($field, 'NULLABLE');
-                    $required = true == $desc ? false : true;
+                    $required = true == $nullable ? false : true;
 
-                    $elements[$key]->setRequired($required);
-
+                    $elements[$field]->setRequired($required);
                 }
 
                 if (null !== $row ) {
                     $column = $this->_fieldToColumnMap[$field];
                     $value = $row[$column];
-                    $elements[$key]->setValue($value);
+                    $elements[$field]->setValue($value);
                 }
+
                 if (null !==$dataField && 'Hidden' !== $type) {
                     $value = $dataField[$field];
-                    $elements[$key]->setValue($value);
+                    $elements[$field]->setValue($value);
                     if ($this->view->failedField == $field) {
-                        $elements[$key]->addErrors($this->view->errors);
+                        $elements[$field]->addErrors($this->view->errors);
                     }
                 }
+
+            }
+
+            /*
+             * if the field can be null add a checkbox
+             * to make de field able or disable.
+             */
+            if (true == $nullable) {
+                $checkbox[$field] = new Zend_Form_Element_Checkbox(
+                    'check' . $field
+                );
+                $checkbox[$field]->setAttrib('id', 'check'.$field);
+                $checkValue = 'checked';
+                if (null !== $checks) {
+                    $checkValue = $checks[$field] == '0' ? '' : 'checked';
+                }
+                if ('' == $checkValue) {
+                    $elements[$field]->setAttrib('disable', true);
+                } else {
+                    $checkbox[$field]->setAttrib('checked', $checkValue);
+                }
+                $jsFunction = 'checkField(\''.$field.'\')';
+
+                $checkbox[$field]->setAttrib('onClick', $jsFunction);
+
+                $checkbox[$field]->setLabel('Disable/enable the field');
             }
         }
-        $form->addElements($elements);
+
+        foreach ($elements as $field => $value) {
+
+            $form->addElement($elements[$field]);
+            $existCheck = array_key_exists($field, $checkbox);
+            if (true == $existCheck) {
+                $form->addElement($checkbox[$field]);
+            }
+        }
 
         $form->addElement('submit', 'send');
 
@@ -619,7 +688,7 @@ abstract class ZendExt_Controller_CRUDAbstract
         $table = $this->_dataSource->getTable();
         $adapter = $table->getAdapter();
         $description = $adapter->describeTable(
-                $table->info(Zend_Db_Table_Abstract::NAME)
+            $table->info(Zend_Db_Table_Abstract::NAME)
         );
 
         $column = $this->_fieldToColumnMap[$field];

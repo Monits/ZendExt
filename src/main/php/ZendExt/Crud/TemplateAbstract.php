@@ -70,6 +70,23 @@ abstract class ZendExt_Crud_TemplateAbstract implements ZendExt_Crud_Template
         $this->_renderContent();
 
         if (Zend_Layout::getMvcInstance() === null) {
+            echo "<script type='text/javascript'>
+                    function checkField(fieldName) {
+                        var field = document.getElementById(fieldName);
+                        var checkbox = document.getElementById(
+                            'check' + fieldName
+                        );
+
+                        check = checkbox.getAttribute('checked');
+
+                        if (false == checkbox.checked) {
+                            field.setAttribute('disabled', true);
+                        } else {
+                            field.removeAttribute('disabled')
+                        }
+                    }
+                </script>";
+
             echo '</body>';
             echo '</html>';
         }
