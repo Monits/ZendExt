@@ -451,6 +451,7 @@ abstract class ZendExt_Controller_CRUDAbstract
         if (null !== $pk) {
             $row = $this->_getRow($pk);
         }
+
         $builder = new $this->_builderClass();
         $fields = $builder->getFieldsNames();
 
@@ -477,19 +478,6 @@ abstract class ZendExt_Controller_CRUDAbstract
                 $elements[$field]->setLabel($field . ' :');
                 $elements[$field]->addMultiOptions($type);
 
-                if (null !== $row ) {
-                    $column = $this->_fieldToColumnMap[$field];
-                    $value = $row[$column];
-                    $elements[$field]->setValue($value);
-                }
-                if (null !==$dataField && 'Hidden' !== $type) {
-                    $value = $dataField[$field];
-                    $elements[$field]->setValue($value);
-                    if ($this->view->failedField == $field) {
-                        $elements[$field]->addErrors($this->view->errors);
-                    }
-                }
-
             } else {
                 $zendElement = 'Zend_Form_Element_' . $type;
 
@@ -504,24 +492,23 @@ abstract class ZendExt_Controller_CRUDAbstract
                     $required = true == $nullable ? false : true;
 
                     $elements[$field]->setRequired($required);
-                }
 
-                if (null !== $row ) {
-                    $column = $this->_fieldToColumnMap[$field];
-                    $value = $row[$column];
-                    $elements[$field]->setValue($value);
                 }
-
-                if (null !==$dataField && 'Hidden' !== $type) {
-                    $value = $dataField[$field];
-                    $elements[$field]->setValue($value);
-                    if ($this->view->failedField == $field) {
-                        $elements[$field]->addErrors($this->view->errors);
-                    }
-                }
-
             }
 
+            if (null !==$dataField && 'Hidden' !== $type) {
+                $value = $dataField[$field];
+                $elements[$field]->setValue($value);
+                if ($this->view->failedField == $field) {
+                    $elements[$field]->addErrors($this->view->errors);
+                }
+            }
+
+            if (null !== $row ) {
+                $column = $this->_fieldToColumnMap[$field];
+                $value = $row[$column];
+                $elements[$field]->setValue($value);
+            }
             /*
              * if the field can be null add a checkbox
              * to make de field able or disable.
@@ -546,9 +533,6 @@ abstract class ZendExt_Controller_CRUDAbstract
 
                 $checkbox[$field]->setLabel('Disable/enable the field');
             }
-        }
-
-        foreach ($elements as $field => $value) {
 
             $form->addElement($elements[$field]);
             $existCheck = array_key_exists($field, $checkbox);
