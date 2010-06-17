@@ -33,10 +33,10 @@ class ZendExt_Log_Writer_Mail extends Zend_Log_Writer_Mail
      * optional Zend_Layout instance.  If Zend_Layout is being used,
      * $this->_layout->events will be set for use in the layout template.
      *
-     * @param  Zend_Mail                    $mail      Mail instance
-     * @param  Zend_Layout                  $layout    Layout instance;
+     * @param Zend_Mail                    $mail      Mail instance
+     * @param Zend_Layout                  $layout    Layout instance;
      *                                                 optional
-     * @param  Zend_Mail_Transport_Abstract $transport Transport instance;
+     * @param Zend_Mail_Transport_Abstract $transport Transport instance;
      *                                                 optional
      *
      * @return void

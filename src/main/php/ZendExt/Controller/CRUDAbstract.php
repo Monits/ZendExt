@@ -496,6 +496,13 @@ abstract class ZendExt_Controller_CRUDAbstract
                 }
             }
 
+            //Complete the form with the DB data for update form.
+            if (null !== $row ) {
+                $column = $this->_fieldToColumnMap[$field];
+                $value = $row[$column];
+                $elements[$field]->setValue($value);
+            }
+
             if (null !==$dataField && 'Hidden' !== $type) {
                 $value = $dataField[$field];
                 $elements[$field]->setValue($value);
@@ -504,11 +511,6 @@ abstract class ZendExt_Controller_CRUDAbstract
                 }
             }
 
-            if (null !== $row ) {
-                $column = $this->_fieldToColumnMap[$field];
-                $value = $row[$column];
-                $elements[$field]->setValue($value);
-            }
             /*
              * if the field can be null add a checkbox
              * to make de field able or disable.

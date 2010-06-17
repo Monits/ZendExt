@@ -229,8 +229,8 @@ class ZendExt_Service_Facebook
     /**
      * Get the users info.
      *
-     * @param integer $userId The id of the user to get infor of.
      * @param array   $fields An array with the names of the fields to retrieve.
+     * @param integer $userId The id of the user to get infor of.
      *
      * @return array
      */
