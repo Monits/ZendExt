@@ -294,8 +294,8 @@ abstract class ZendExt_Dao_Abstract
     /**
      * Computes the shard ids for the tables given shard values.
      *
-     * @param array $shardingArg Shard Array with values
-     *                           on which to perform sharding.
+     * @param array $shardingArgs Shard Array with values
+     *                            on which to perform sharding.
      *
      * @return array
      */

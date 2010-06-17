@@ -75,8 +75,8 @@ final class ZendExt_Cron_Process
 
         $this->_loadConfig($config, $extra);
         $this->_setupLogger();
-
-        $this->_pidFile = $this->_config->pid->path.'/'.$this->_config->pid->file;
+        $configPath = $this->_config->pid->path;
+        $this->_pidFile = $configPath.'/'.$this->_config->pid->file;
     }
 
     /**

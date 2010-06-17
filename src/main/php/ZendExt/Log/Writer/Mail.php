@@ -33,8 +33,11 @@ class ZendExt_Log_Writer_Mail extends Zend_Log_Writer_Mail
      * optional Zend_Layout instance.  If Zend_Layout is being used,
      * $this->_layout->events will be set for use in the layout template.
      *
-     * @param  Zend_Mail $mail Mail instance
-     * @param  Zend_Layout $layout Layout instance; optional
+     * @param  Zend_Mail                    $mail      Mail instance
+     * @param  Zend_Layout                  $layout    Layout instance;
+     *                                                 optional
+     * @param  Zend_Mail_Transport_Abstract $transport Transport instance;
+     *                                                 optional
      *
      * @return void
      */
@@ -64,7 +67,8 @@ class ZendExt_Log_Writer_Mail extends Zend_Log_Writer_Mail
             // line and set it on the Zend_Mail object.
             $numEntries = $this->_getFormattedNumEntriesPerPriority();
             $this->_mail->setSubject(
-                "{$this->_subjectPrependText} ({$numEntries})");
+                "{$this->_subjectPrependText} ({$numEntries})"
+            );
         }
 
 
@@ -85,12 +89,13 @@ class ZendExt_Log_Writer_Mail extends Zend_Log_Writer_Mail
                 $this->_mail->setBodyHtml($this->_layout->render());
             } catch (Exception $e) {
                 trigger_error(
-                    "exception occurred when rendering layout; " .
-                        "unable to set html body for message; " .
-                        "message = {$e->getMessage()}; " .
-                        "code = {$e->getCode()}; " .
-                        "exception class = " . get_class($e),
-                    E_USER_NOTICE);
+                    'exception occurred when rendering layout; ' .
+                    'unable to set html body for message; ' .
+                    'message = {$e->getMessage()}; ' .
+                    'code = {$e->getCode()}; ' .
+                    'exception class = ' . get_class($e),
+                    E_USER_NOTICE
+                );
             }
         }
 
@@ -101,11 +106,12 @@ class ZendExt_Log_Writer_Mail extends Zend_Log_Writer_Mail
             $this->_mail->send($this->_transport);
         } catch (Exception $e) {
             trigger_error(
-                "unable to send log entries via email; " .
-                    "message = {$e->getMessage()}; " .
-                    "code = {$e->getCode()}; " .
-                        "exception class = " . get_class($e),
-                E_USER_WARNING);
+                'unable to send log entries via email; ' .
+                'message = {$e->getMessage()}; ' .
+                'code = {$e->getCode()}; ' .
+                'exception class = ' . get_class($e),
+                E_USER_WARNING
+            );
         }
 
     }

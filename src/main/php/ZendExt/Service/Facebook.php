@@ -234,7 +234,7 @@ class ZendExt_Service_Facebook
      *
      * @return array
      */
-    public function getUserInfo($userId=null, array $fields)
+    public function getUserInfo(array $fields, $userId = null)
     {
         if (null === $userId) {
 
@@ -249,10 +249,12 @@ class ZendExt_Service_Facebook
      *
      * @param string $method The api method to use.
      * @param array  $params Params to pass on.
+     * @param string $format The format.
      *
      * @return string The response given by the API
      */
-    private function _makeApiCall($method, array $params = array(), $format='xml')
+    private function _makeApiCall($method, array $params = array(),
+        $format = 'xml')
     {
         $get = array(
             'method' => $method,
