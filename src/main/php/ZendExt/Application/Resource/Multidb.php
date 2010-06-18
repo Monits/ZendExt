@@ -72,9 +72,6 @@ class ZendExt_Application_Resource_Multidb
         // Get shards and tables configuration
         $this->_shards = $options['shards'];
         $this->_tables = $options['tables'];
-
-        // Configure DAO
-        ZendExt_Dao_Abstract::setConfiguration($this);
     }
 
     /**
@@ -226,6 +223,11 @@ class ZendExt_Application_Resource_Multidb
         // If not already instantiated, create a new sharding strategy
         $shardingClass = $this->_getShardingStrategy($table);
 
+        if (null === $shardingClass) {
+
+            return null;
+        }
+
         if (!isset($this->_shardingStrategies[$shardingClass])) {
             $this->_shardingStrategies[$shardingClass] = new $shardingClass();
         }
@@ -265,6 +267,11 @@ class ZendExt_Application_Resource_Multidb
                 $operation
             );
 
+            if (0 === count($dbNames)) {
+
+                return null;
+            }
+
             // Pick anyone at random
             $adapter = $this->_chooseAdapter($dbNames);
             $dbData = $this->_setDbData(
@@ -293,6 +300,11 @@ class ZendExt_Application_Resource_Multidb
         if (!isset($this->_dbData[$db][self::DATA_KEY_DEFAULT])) {
 
             $defaultDbs = (array) $this->_getDefaultDbAdapters($table);
+            if (0 === count($defaultDbs)) {
+
+                return null;
+            }
+
             $adapter = $this->_chooseAdapter($defaultDbs);
 
             $this->_dbData[$db][self::DATA_KEY_DEFAULT] = $adapter;
@@ -321,6 +333,10 @@ class ZendExt_Application_Resource_Multidb
         } else {
 
             $shardId = $this->_getShardId($table, $shardingArg);
+            if (null === $shardId) {
+
+                return null;
+            }
             return $this->getAdapterForTableShard($table, $shardId, $operation);
         }
     }
@@ -385,7 +401,13 @@ class ZendExt_Application_Resource_Multidb
     {   
         $shards = array();
         foreach ($shardingArgs as $id) {
-            $shards[$this->_getShardId($table, $id)][] = $id;
+            $shardId = $this->_getShardId($table, $id);
+            if (null === $shardId) {
+
+                return null;
+            }
+
+            $shards[$shardId][] = $id;
         }   
 
         return $shards;

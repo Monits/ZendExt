@@ -363,4 +363,139 @@ class MultidbTest extends PHPUnit_Framework_TestCase
             )
         );
     }
+
+
+
+    /**
+     * Test what happens when no config or invalid config is set. 
+     * 
+     * @return void
+     */
+    public function testMissingConfig()
+    {
+        $config = array(
+            'adapters' => array(),
+            'tables' => array(),
+            'shards' => array()
+        );
+        $multidb = new ZendExt_Application_Resource_Multidb(
+            $config
+        );
+        $multidb->init();
+
+        $this->assertNull(
+            $multidb->getDefaultAdapterForTable('foo')
+        );
+
+        $this->assertNull(
+            $multidb->getAdapterForTable(
+                'foo', 
+                ZendExt_Application_Resource_Multidb::OPERATION_READ,
+                'asd'
+            )
+        );
+
+        $this->assertNull(
+            $multidb->getShardsForValues('foo', array(1))
+        );
+
+        $config = array(
+            'adapters' => array(),
+            'tables' => array(
+                'foo' => 'bar'
+            ),
+            'shards' => array()
+        );
+        $multidb = new ZendExt_Application_Resource_Multidb(
+            $config
+        );
+        $multidb->init();
+
+        $this->assertNull(
+            $multidb->getAdapterForTableShard(
+                'foo',
+                1, 
+                ZendExt_Application_Resource_Multidb::OPERATION_READ
+            )
+        );
+
+        $this->assertNull(
+            $multidb->getDefaultAdapterForTable(
+                'foo'
+            )
+        );
+
+        $config = array(
+            'adapters' => array(),
+            'tables' => array(
+                'foo' => 'bar'
+            ),
+            'shards' => array(
+                'bar' => array()
+            )
+        );
+        $multidb = new ZendExt_Application_Resource_Multidb(
+            $config
+        );
+        $multidb->init();
+
+        $this->assertNull(
+            $multidb->getDefaultAdapterForTable(
+                'foo'
+            )
+        );
+        $this->assertNull(
+            $multidb->getAdapterForTableShard(
+                'foo',
+                1,
+                ZendExt_Application_Resource_Multidb::OPERATION_READ
+            )
+        );
+
+        $config = array(
+            'adapters' => array(),
+            'tables' => array(
+                'foo' => 'bar'
+            ),
+            'shards' => array(
+                'bar' => array(
+                    'r' => array()
+                )
+            )
+        );
+        $multidb = new ZendExt_Application_Resource_Multidb(
+            $config
+        );
+        $multidb->init();
+
+        $this->assertNull(
+            $multidb->getAdapterForTableShard(
+                'foo',
+                1,
+                ZendExt_Application_Resource_Multidb::OPERATION_READ
+            )
+        );
+
+        $this->assertNull(
+            $multidb->getAdapterForTable(
+                'foo',
+                ZendExt_Application_Resource_Multidb::OPERATION_READ,
+                1
+            )
+        );
+    }
+
+    /**
+     * Test whether an exception is thrown when an invalid operation is used. 
+     * 
+     * @return void
+     */
+    public function testInvalidOperation()
+    {
+        try {
+            $this->_multidb->getAdapterForTable('Random_Table_1', 'foo', 'bar');
+            $this->fail();
+        } catch (Zend_Application_Resource_Exception $e) {
+        }
+    }
 }
