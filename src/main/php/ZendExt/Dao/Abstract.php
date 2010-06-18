@@ -30,17 +30,17 @@ abstract class ZendExt_Dao_Abstract
      *
      * @var string
      */
-    const OPERATION_READ = 'r';
+    const OPERATION_READ = ZendExt_Application_Resource_Multidb::OPERATION_READ;
 
     /**
      * Defines the write operation.
      *
      * @var string
      */
-    const OPERATION_WRITE = 'w';
+    const OPERATION_WRITE = 
+        ZendExt_Application_Resource_Multidb::OPERATION_WRITE;
 
     const DATA_KEY_TABLE = 'table';
-    const DATA_KEY_ADAPTER = 'adapter';
     const DATA_KEY_DEFAULT = 'default';
 
 
@@ -50,8 +50,26 @@ abstract class ZendExt_Dao_Abstract
 
     private static $_config = null;
 
-
     protected $_tableClass = null;
+
+    /**
+     * Given an adapter get the corresponding table.
+     *
+     * @param Zend_Db_Adapter_Abstract $adapter The adapter to search for.
+     *
+     * @return Zend_Db_Table_Abstract The associated table.
+     */
+    protected function _getTableForAdapter($adapter)
+    {
+        $key = spl_object_hash($adapter);
+        if (!isset(self::$_tables[$this->_tableClass][$key])) {
+
+            $table = new $this->_tableClass($adapter);
+            self::$_tables[$this->_tableClass][$key] = $table;
+        }
+
+        return self::$_tables[$this->_tableClass][$key];
+    }
 
     /**
      * Retrieves the table for the requested shard id.
@@ -70,19 +88,11 @@ abstract class ZendExt_Dao_Abstract
             return $this->_getTableForDefaultAdapter();
         }
 
-        $shardData = $this->_getShardData($operation, $shard);
-        if (!isset($tableList[self::DATA_KEY_TABLE])) {
+        $adapter = self::$_config->getAdapterForTableShard(
+            $this->_tableClass, $shard, $operation
+        );
 
-            $adapter = $this->_getAdapterForShard($shard, $operation);
-
-            $table = new $this->_tableClass($adapter);
-
-            $shardData = $this->_setShardData(
-                $operation, $shard, self::DATA_KEY_TABLE, $table
-            );
-        }
-
-        return $shardData[self::DATA_KEY_TABLE];
+        return $this->_getTableForAdapter($adapter);
     }
 
     /**
@@ -102,53 +112,11 @@ abstract class ZendExt_Dao_Abstract
             return $this->_getTableForDefaultAdapter();
         }
 
-        // If the sharding arg is not present,
-        // retrieve a connection from the default
-        if (null === $shardingArg) {
-            if (!isset(
-                    self::$_tables[$this->_tableClass][self::DATA_KEY_DEFAULT]
-                )) {
-                $defaultDbs = (array) self::$_config->getDefaultShardDbs(
-                    $this->_tableClass
-                );
-
-                // Pick anyone at random
-                $adapter = $this->_chooseAdapter($defaultDbs);
-                $table = new $this->_tableClass($adapter);
-                self::$_tables[$this->_tableClass][self::DATA_KEY_DEFAULT]
-                    = $table;
-            }
-
-            return self::$_tables[$this->_tableClass][self::DATA_KEY_DEFAULT];
-        }
-
-        // Apply sharding
-        $shardId = $this->_getShardId($shardingArg);
-
-        return $this->_getTableForShard($shardId, $operation);
-    }
-
-    /**
-     * Computes the shard id for the current table given a sharding value.
-     *
-     * @param any $shardingArg The value on which to perform sharding.
-     *
-     * @return int The shard id for the current table and the sharding value.
-     */
-    protected function _getShardId($shardingArg)
-    {
-        // If not already instantiated, create a new sharding strategy
-        $shardingClass = self::$_config->getShardingStrategy(
-            $this->_tableClass
+        $adapter = self::$_config->getAdapterForTable(
+            $this->_tableClass, $operation, $shardingArg
         );
 
-        if (!isset(self::$_shardingStrategies[$shardingClass])) {
-            self::$_shardingStrategies[$shardingClass] = new $shardingClass();
-        }
-
-        return self::$_shardingStrategies[$shardingClass]->getShard(
-            $shardingArg
-        );
+        return $this->_getTableForAdapter($adapter);
     }
 
     /**
@@ -169,24 +137,9 @@ abstract class ZendExt_Dao_Abstract
             return Zend_Db_Table_Abstract::getDefaultAdapter();
         }
 
-        $shardData = $this->_getShardData($operation, $shard);
-
-        if (empty($shardData)) {
-            // Retrieve the adapter to be used for the instance
-            $dbNames = (array) self::$_config->getShardDbs(
-                $this->_tableClass,
-                $shard,
-                $operation
-            );
-
-            // Pick anyone at random
-            $adapter = $this->_chooseAdapter($dbNames);
-            $shardData = $this->_setShardData(
-                $operation, $shard, self::DATA_KEY_DEFAULT, $adapter
-            );
-        }
-
-        return $shardData[self::DATA_KEY_DEFAULT];
+        return self::$_config->getAdapterForTableShard(
+            $this->_tableClass, $shard, $operation
+        );
     }
 
     /**
@@ -215,46 +168,6 @@ abstract class ZendExt_Dao_Abstract
         }
 
         return self::$_tables[$this->_tableClass];
-    }
-
-    /**
-     * Retrieves the shard's data.
-     *
-     * @param string $operation The operation to be performed on the table.
-     *                          See {@link #OPERATION_READ}
-     *                          and {@link #OPERATION_WRITE}
-     * @param int    $shard     The id of shard to be used.
-     *
-     * @return array
-     */
-    private function _getShardData($operation, $shard)
-    {
-        // Make sure it exists
-        if (!isset(self::$_tables[$this->_tableClass][$operation][$shard])) {
-            self::$_tables[$this->_tableClass][$operation][$shard] = array();
-        }
-
-        return self::$_tables[$this->_tableClass][$operation][$shard];
-    }
-
-    /**
-     * Sets a data value for the requested shard.
-     *
-     * @param string $operation The operation to be performed on the table.
-     *                          See {@link #OPERATION_READ}
-     *                          and {@link #OPERATION_WRITE}
-     * @param int    $shard     The id of shard to be used.
-     * @param string $section   The section under which to store the data.
-     * @param any    $data      The data to be stored.
-     *
-     * @return array The shard's data.
-     */
-    private function _setShardData($operation, $shard, $section, $data)
-    {
-        $table = $this->_tableClass;
-        self::$_tables[$table][$operation][$shard][$section] = $data;
-
-        return $this->_getShardData($operation, $shard);
     }
 
     /**
@@ -292,46 +205,104 @@ abstract class ZendExt_Dao_Abstract
     }
 
     /**
-     * Computes the shard ids for the tables given shard values.
-     *
-     * @param array $shardingArgs Shard Array with values
-     *                            on which to perform sharding.
-     *
-     * @return array
-     */
-    public function getShardsForValues(array $shardingArgs)
-    {
-        $shards = array();
-        foreach ($shardingArgs as $id) {
-            $shards[$this->_getShardId($id)][] = $id;
-        }
-        return $shards;
-    }
-
-    /**
      * Get the rows of the shards and retrieves a rowset.
      *
      * @param string $where        SQL where clause.
      * @param array  $shardingArgs Array with values
      *                             on which to perform sharding.
+     * @param array  $extra        Extra where conditions. If any needs quoting
+     *                             set the where string as key with the 
+     *                             corresponding value. Optional.
      *
      * @return array
      */
-    public function selectForShard($where, array $shardingArgs)
+    protected function _selectForShard($where, array $shardingArgs, 
+        array $extra = array())
     {
-        $shards = $this->getShardsForValues($shardingArgs);
+        $shards = self::$_config->getShardsForValues(
+            $this->_tableClass, $shardingArgs
+        );
 
         $rowset = array();
 
-        foreach ($shards as $shard => $idsForShard) {
+        foreach ($shards as $shard => $valuesForShard) {
             $table = $this->_getTableForShard($shard, self::OPERATION_READ);
             $adapter = $table->getAdapter();
 
-            $select = $adapter->quoteInto($where, $idsForShard);
-            foreach ($table->fetchAll($select) as $row) {
+            $cond = $this->_quoteWhere(
+                $adapter, $where, $valuesForShard, $extra
+            );
+            foreach ($table->fetchAll($cond) as $row) {
                 $rowset[] = $row;
             }
         }
         return $rowset;
+    }
+
+    /**
+     * Execute an update for an array of values in the correspoding shard. 
+     * 
+     * @param array  $data         The data to update.
+     * @param string $where        SQL where clause.
+     * @param array  $shardingArgs Array with values on which 
+     *                             to perform sharding.
+     * @param array  $extra        Extra where conditions. If any needs quoting
+     *                             set the where string as key with the 
+     *                             corresponding value. Optional.
+     *
+     * @return void
+     */
+    protected function _updateForShard($data, $where, array $shardingArgs,
+        array $extra = array())
+    {
+        $shards = self::$_config->getShardsForValues(
+            $this->_tableClass, $shardingArgs
+        );
+
+
+        $rowset = array();
+        foreach ($shards as $shard => $valuesForShard) {
+            $table = $this->_getTableForShard($shard, self::OPERATION_WRITE);
+            $adapter = $table->getAdapter();
+
+            $cond = $this->_quoteWhere(
+                $adapter, $where, $valuesForShard, $extra
+            );
+
+            $table->update($data, $cond);
+        }
+    }
+
+    /**
+     * Prepare a where clause.
+     *
+     * @param Zend_Db_Adapter_Abstract $adapter The adapter to use to quote.
+     * @param string                   $where   The base where clause.
+     * @param mixed                    $value   The value to quote into  $where.
+     * @param array                    $extra   Extra where conditions. If any 
+     *                                          needs quoting set the where 
+     *                                          string as key with the 
+     *                                          corresponding value. Optional.
+     *
+     * @return string the prepared where clause. 
+     */
+    protected function _quoteWhere(Zend_Db_Adapter_Abstract $adapter, $where, 
+        $value, array $extra = array())
+    {
+        $where = $adapter->quoteInto($where, $value);
+
+        foreach ($extra as $key => $value) {
+            $where .= ' AND ';
+
+            if (is_string($key)) {
+
+                $where .= $adapter->quoteInto($key, $value);
+            } else {
+
+                $where .= $key;
+            }
+        }
+
+        return $where;
     }
 }

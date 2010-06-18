@@ -82,7 +82,7 @@ class MultidbTest extends PHPUnit_Framework_TestCase
                     'default' => 'test_adapter_default'
                 ),
                 'master' => array(
-                    'shardingStrategy' => 'ZendExt_Sharding_Strategy_Random',
+                    'shardingStrategy' => 'ZendExt_Sharding_Strategy_Null',
                     'r' => array(
                         'test_adapter_rw'
                     ),
@@ -99,115 +99,10 @@ class MultidbTest extends PHPUnit_Framework_TestCase
             )
         );
 
-        $this->_multidb = new ZendExt_Application_Resource_Multidb($this->_config);
+        $this->_multidb = new ZendExt_Application_Resource_Multidb(
+            $this->_config
+        );
         $this->_multidb->init();
-    }
-
-    /**
-     * Test the getShardingStrategy method.
-     *
-     * @return void
-     */
-    public function testGetShardingStrategy()
-    {
-        $this->assertNull($this->_multidb->getShardingStrategy('non-existing-table'));
-        $this->assertEquals(
-            'ZendExt_Sharding_Strategy_Null',
-            $this->_multidb->getShardingStrategy('Random_Table_1')
-        );
-        $this->assertEquals(
-            'ZendExt_Sharding_Strategy_Null',
-            $this->_multidb->getShardingStrategy('Random_Table_2')
-        );
-        $this->assertEquals(
-            'ZendExt_Sharding_Strategy_Random',
-            $this->_multidb->getShardingStrategy('Random_Master_Table')
-        );
-    }
-
-    /**
-     * Test the getShardDbs method.
-     *
-     * @return void
-     */
-    public function testGetShardDbs()
-    {
-        $this->assertNull(
-            $this->_multidb->getShardDbs(
-                'non-existing-table', 0,
-                ZendExt_Application_Resource_Multidb::OPERATION_READ
-            )
-        );
-
-        try {
-            $this->_multidb->getShardDbs(
-                'Random_Master_Table', 0,
-                'non-existing-operation'
-            );
-
-            $this->fail('Could request a shard for a non-existing operation');
-        } catch (Zend_Application_Resource_Exception $e) {
-            // This is expected
-        }
-
-        $this->assertEquals(
-            $this->_config['shards']['master']['r'][0],
-            $this->_multidb->getShardDbs(
-                'Random_Master_Table', 0,
-                ZendExt_Application_Resource_Multidb::OPERATION_READ
-            )
-        );
-
-        $this->assertEquals(
-            $this->_config['shards']['realshard']['r'][0],
-            $this->_multidb->getShardDbs(
-                'Random_Table_2', 0,
-                ZendExt_Application_Resource_Multidb::OPERATION_READ
-            )
-        );
-
-        $this->assertEquals(
-            $this->_config['shards']['realshard']['w'][0],
-            $this->_multidb->getShardDbs(
-                'Random_Table_1', 0,
-                ZendExt_Application_Resource_Multidb::OPERATION_WRITE
-            )
-        );
-    }
-
-    /**
-     * Test the getDefaultShardDbs method.
-     *
-     * @return void
-     */
-    public function testGetDefaultShardDbs()
-    {
-        $this->assertNull(
-            $this->_multidb->getDefaultShardDbs(
-                'non-existing-table', 0
-            )
-        );
-
-        $this->assertEquals(
-            $this->_config['shards']['realshard']['default'],
-            $this->_multidb->getDefaultShardDbs(
-                'Random_Table_2', 0
-            )
-        );
-
-        $this->assertEquals(
-            $this->_config['shards']['realshard']['default'],
-            $this->_multidb->getDefaultShardDbs(
-                'Random_Table_1', 0
-            )
-        );
-
-        $this->assertEquals(
-            $this->_config['shards']['master']['default'],
-            $this->_multidb->getDefaultShardDbs(
-                'Random_Master_Table', 0
-            )
-        );
     }
 
     /**
@@ -296,6 +191,175 @@ class MultidbTest extends PHPUnit_Framework_TestCase
             $this->_multidb->getShardsForTable(
                 'Random_Table_1',
                 $operation
+            )
+        );
+    }
+
+    /**
+     * Test get adapter for table shard. 
+     * 
+     * @return void
+     */
+    public function testGetAdapterForTableShard()
+    {
+        $operation = ZendExt_Application_Resource_Multidb::OPERATION_WRITE;
+        $adapter = $this->_multidb->getAdapterForTableShard(
+            'Random_Table_1', 0, $operation
+        );
+        $config = $adapter->getConfig();
+
+        $this->assertEquals(
+            $this->_config['adapters']['test_adapter_w']['username'],
+            $config['username']
+        );
+
+
+        $operation = ZendExt_Application_Resource_Multidb::OPERATION_READ;
+        $adapter = $this->_multidb->getAdapterForTableShard(
+            'Random_Table_1', 0, $operation
+        );
+        $config = $adapter->getConfig();
+        $this->assertContains(
+            $config['username'],
+            array(
+                $this->_config['adapters']['test_adapter_w']['username'],
+                $this->_config['adapters']['test_adapter_r']['username']
+            )
+        );
+
+        $adapter2 = $this->_multidb->getAdapterForTableShard(
+            'Random_Table_1', 0, $operation
+        );
+        $config2 = $adapter2->getConfig();
+        $this->assertEquals($config['username'], $config2['username']);
+
+        $adapter2 = $this->_multidb->getAdapterForTableShard(
+            'Random_Table_2', 0, $operation
+        );
+        $config2 = $adapter2->getConfig();
+        $this->assertEquals($config['username'], $config2['username']);
+
+
+        $this->assertNull(
+            $this->_multidb->getAdapterForTableShard(
+                'non-existant-table', 0, $operation
+            )
+        );
+    }
+
+
+    /**
+     * Test get default adapter for table. 
+     * 
+     * @return void
+     */
+    public function testGetDefaultAdapterForTable()
+    {
+        $adapter = $this->_multidb->getDefaultAdapterForTable(
+            'non-existant-table'
+        );
+        $this->assertNull($adapter);
+
+        $adapter = $this->_multidb->getDefaultAdapterForTable(
+            'Random_Master_Table'
+        );
+        $config = $adapter->getConfig();
+
+        $this->assertEquals(
+            $this->_config['adapters']['test_adapter_rw']['username'],
+            $config['username']
+        );
+
+        $adapter = $this->_multidb->getDefaultAdapterForTable(
+            'Random_Table_1'
+        );
+        $config = $adapter->getConfig();
+
+        $this->assertEquals(
+            $this->_config['adapters']['test_adapter_default']['username'],
+            $config['username']
+        );
+    }
+
+    /**
+     * Test getAdapterForTable.
+     * 
+     * @return void
+     */
+    public function testGetAdapterForTable()
+    {
+        $adapter = $this->_multidb->getAdapterForTable(
+            'non-existant-table'
+        );
+        $this->assertNull($adapter);
+
+        $operation = ZendExt_Application_Resource_Multidb::OPERATION_READ;
+        $adapter = $this->_multidb->getAdapterForTable(
+            'Random_Table_1',
+            $operation
+        );
+        $config = $adapter->getConfig();
+
+        $this->assertEquals(
+            $this->_config['adapters']['test_adapter_default']['username'],
+            $config['username']
+        );
+
+
+        $adapter = $this->_multidb->getAdapterForTable(
+            'Random_Table_1', $operation, 'sarasa'
+        );
+        $config = $adapter->getConfig();
+        $this->assertContains(
+            $config['username'],
+            array(
+                $this->_config['adapters']['test_adapter_r']['username'],
+                $this->_config['adapters']['test_adapter_w']['username']
+            )
+        );
+
+        $operation = ZendExt_Application_Resource_Multidb::OPERATION_WRITE;
+        $adapter = $this->_multidb->getAdapterForTable(
+            'Random_Table_1', $operation, 'sarasa'
+        );
+        $config = $adapter->getConfig();
+
+        $this->assertEquals(
+            $this->_config['adapters']['test_adapter_w']['username'],
+            $config['username']
+        );
+
+        $adapter2 = $this->_multidb->getAdapterForTable(
+            'Random_Table_1', $operation, 'sarasa'
+        );
+        $config2 = $adapter2->getConfig();
+        $this->assertEquals(
+            $config['username'],
+            $config2['username']
+        );
+
+        $adapter = $this->_multidb->getAdapterForTable(
+            'Random_Master_Table', $operation, 'asd'
+        );
+        $config = $adapter->getConfig();
+        $this->assertEquals(
+            $this->_config['adapters']['test_adapter_rw']['username'],
+            $config['username']
+        );
+    }
+
+    /**
+     * Test getShardsForValues. 
+     * 
+     * @return void
+     */
+    public function testGetShardsForValues()
+    {
+        $this->assertType(
+            PHPUnit_Framework_Constraint_IsType::TYPE_ARRAY,
+            $this->_multidb->getShardsForValues(
+                'Random_Master_Table',
+                array(1, 2, 3)
             )
         );
     }
