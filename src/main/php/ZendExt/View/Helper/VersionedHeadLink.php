@@ -45,18 +45,17 @@ class ZendExt_View_Helper_VersionedHeadLink extends Zend_View_Helper_HeadLink
         $styles = array();
 
         if ($config instanceof Zend_Config) {
-
             $config = $config->toArray();
             $config = $config['item'];
         }
 
         foreach ($config as $style) {
-
             $styles[$style['name']] = $this->_createStylesheet(
                 $style['name'],
                 $style
             );
-            if ( !$ignoreDefault && isset( $style['default'] )
+
+            if (!$ignoreDefault && isset( $style['default'])
                 && $style['default'] ) {
 
                 $default[] = $style['name'];
