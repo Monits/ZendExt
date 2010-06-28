@@ -180,7 +180,6 @@ class ZendExt_Versioner
             if ($this->_time > $check) {
 
                 if (!file_exists($fileName)) {
-
                     //This behaviour doesnt feel right
                     //but neither does throwing an exception
                     return 0;
