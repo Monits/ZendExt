@@ -147,7 +147,6 @@ class ZendExt_View_Helper_VersionedHeadLink extends Zend_View_Helper_HeadLink
                 $version = $fileData->version;
             }
         } else {
-
             $uri = $name;
         }
 
