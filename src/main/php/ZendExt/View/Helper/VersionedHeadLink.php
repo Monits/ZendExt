@@ -151,7 +151,7 @@ class ZendExt_View_Helper_VersionedHeadLink extends Zend_View_Helper_HeadLink
             $uri = $name;
         }
 
-        if ( $version === null ) {
+        if ($version === null) {
 
             if ( isset($container['versioner'])
                 && ($container['versioner'] instanceof Zend_Versioner) ) {
