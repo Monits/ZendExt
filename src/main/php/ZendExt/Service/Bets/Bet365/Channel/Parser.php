@@ -73,8 +73,8 @@ class ZendExt_Service_Bets_Bet365_Channel_Parser
     private function _parse()
     {
         preg_match_all(
-            '/<td class="an3 w" width="238">([^<]+)<\/td>\s*<td [^>]+><img [' .
-            '^>]+>(<img [^>]+>)?<\/td>\s*<td [^>]+>([^<]+)<\/td>\s*<td [^>]+' .
+            '/<td class="an3 w" width="238">([^<]+)<\/td>\s*<td [^>]+>'.
+            '(<img [^>]+>)*<\/td>\s*<td [^>]+>([^<]+)<\/td>\s*<td [^>]+' .
             '>([^<]+)<\/td>\s*<td [^>]+>([^<]+)<\/td>/',
             $this->_text,
             $matches
