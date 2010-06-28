@@ -172,7 +172,6 @@ class ZendExt_Versioner
     public function getFileVersion($fileName)
     {
         if (!isset($this->_files[$fileName])) {
-
             $fileData = $this->_getFileData($fileName);
 
             //See if it's time to check for new versions.
