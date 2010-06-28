@@ -173,7 +173,7 @@ class ZendExt_View_Helper_VersionedHeadLink extends Zend_View_Helper_HeadLink
         $marker = strpos($uri, '?');
         if ($marker !== strlen($uri)-1) {
 
-            if ( $marker === false ) {
+            if ($marker === false) {
 
                 $uri .= '?';
             } else {
