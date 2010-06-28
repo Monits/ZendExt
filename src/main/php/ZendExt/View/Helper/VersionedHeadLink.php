@@ -141,11 +141,9 @@ class ZendExt_View_Helper_VersionedHeadLink extends Zend_View_Helper_HeadLink
                 $uri .= '?'.$fileData->args;
             }
 
-            if ( $fileData->external && $fileData->version === null ) {
-
+            if ($fileData->external && $fileData->version === null) {
                 return $uri;
             } else {
-
                 $version = $fileData->version;
             }
         } else {
