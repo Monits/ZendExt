@@ -82,7 +82,6 @@ class ZendExt_Versioner
         $this->_cache = $cache;
     }
 
-
     /**
      * Get the current Zend_Cache frontend instance being used.
      *
