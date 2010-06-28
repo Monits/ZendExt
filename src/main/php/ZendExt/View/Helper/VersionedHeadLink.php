@@ -66,7 +66,6 @@ class ZendExt_View_Helper_VersionedHeadLink extends Zend_View_Helper_HeadLink
         $container['styles'] = $styles;
 
         foreach ($default as $name) {
-
             $this->appendStylesheet($name);
         }
 
@@ -98,9 +97,9 @@ class ZendExt_View_Helper_VersionedHeadLink extends Zend_View_Helper_HeadLink
     protected function _isDuplicateStylesheet($uri)
     {
         foreach ($this->getContainer() as $item) {
-            if ( $item instanceof stdClass
+            if ($item instanceof stdClass
                 && ($item->rel == 'stylesheet')
-                && ($item->href == $uri) ) {
+                && ($item->href == $uri)) {
 
                 return true;
             }
