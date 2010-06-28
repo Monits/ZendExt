@@ -70,7 +70,6 @@ class ZendExt_Versioner
         }
     }
 
-
     /**
      * Set a Zend_Cache frontend instance.
      *
@@ -157,7 +156,6 @@ class ZendExt_Versioner
         $this->_updateDelayTime = $updateDelayTime;
     }
 
-
     /**
      * Get the time that must elapse before a version is increased.
      *
@@ -169,7 +167,6 @@ class ZendExt_Versioner
     {
         return $this->_updateDelayTime;
     }
-
 
     /**
      * Get the version for a given file.
@@ -224,7 +221,6 @@ class ZendExt_Versioner
         return $this->_files[$fileName]['version'];
     }
 
-
     /**
      * Load the file's data from internal or external cache.
      *
@@ -234,7 +230,6 @@ class ZendExt_Versioner
      */
     private function _getFileData($fileName)
     {
-
         if ( !isset($this->_files[$fileName]) ) {
 
             $result = $this->_cache->load(
