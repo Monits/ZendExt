@@ -92,7 +92,6 @@ class ZendExt_Versioner
         return $this->_cache;
     }
 
-
     /**
      * Set the key prefix to use in cache entries.
      *
