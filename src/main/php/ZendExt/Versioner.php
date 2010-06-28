@@ -58,13 +58,11 @@ class ZendExt_Versioner
             $this->_keyPrefix = $keyPrefix;
         }
 
-        if ( $checkInterval !== null ) {
-
+        if ($checkInterval !== null) {
             $this->_checkInterval = $checkInterval;
         }
 
-        if ( $updateDelayTime !== null ) {
-
+        if ($updateDelayTime !== null) {
             $this->_updateDelayTime = $updateDelayTime;
         }
     }
