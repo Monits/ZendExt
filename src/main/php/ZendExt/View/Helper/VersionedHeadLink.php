@@ -132,7 +132,7 @@ class ZendExt_View_Helper_VersionedHeadLink extends Zend_View_Helper_HeadLink
         $container = $this->getContainer();
         $version = null;
 
-        if ( isset( $container['styles'][$name] ) ) {
+        if (isset($container['styles'][$name])) {
             $fileData = $container['styles'][$name];
 
             $uri = $fileData->path;
