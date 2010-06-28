@@ -174,7 +174,7 @@ class ZendExt_Versioner
      */
     public function getFileVersion($fileName)
     {
-        if ( !isset($this->_files[$fileName]) ) {
+        if (!isset($this->_files[$fileName])) {
 
             $fileData = $this->_getFileData($fileName);
 
@@ -182,7 +182,7 @@ class ZendExt_Versioner
             $check = $fileData['lastCheckTime'] + $this->_checkInterval;
             if ($this->_time > $check) {
 
-                if ( !file_exists($fileName) ) {
+                if (!file_exists($fileName)) {
 
                     //This behaviour doesnt feel right
                     //but neither does throwing an exception
