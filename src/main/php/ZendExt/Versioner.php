@@ -143,7 +143,6 @@ class ZendExt_Versioner
         return $this->_checkInterval;
     }
 
-
     /**
      * Set the time that must elapse before a version is increased.
      *
