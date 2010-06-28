@@ -205,7 +205,6 @@ class ZendExt_Versioner
                     //not meet because it means that the file was updated
                     //But we still cant say it was.
                 } else {
-
                     //We make sure that the check time is updated
                     //to avoid unnecesary checking
                     $fileData['lastCheckTime'] = $this->_time;
