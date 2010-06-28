@@ -227,13 +227,12 @@ class ZendExt_Versioner
      */
     private function _getFileData($fileName)
     {
-        if ( !isset($this->_files[$fileName]) ) {
-
+        if (!isset($this->_files[$fileName])) {
             $result = $this->_cache->load(
                 $this->_keyPrefix . $this->_normalizeFilename($fileName)
             );
-            if ( $result === false ) {
 
+            if ($result === false) {
                 $result = array(
                     'lastCheckTime' => $this->_time,
                     'version' => 1
@@ -241,7 +240,6 @@ class ZendExt_Versioner
 
                 $this->_setFileData($fileName, $result);
             } else {
-
                 $this->_files[$fileName] = $result;
             }
         }
