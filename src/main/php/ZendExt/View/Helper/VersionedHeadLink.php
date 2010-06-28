@@ -137,8 +137,7 @@ class ZendExt_View_Helper_VersionedHeadLink extends Zend_View_Helper_HeadLink
 
             $uri = $fileData->path;
 
-            if ( $fileData->args ) {
-
+            if ($fileData->args) {
                 $uri .= '?'.$fileData->args;
             }
 
