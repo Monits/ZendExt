@@ -117,7 +117,6 @@ class ZendExt_Versioner
         return $this->_keyPrefix;
     }
 
-
     /**
      * Set the interval between update checks.
      *
