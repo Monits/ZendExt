@@ -54,8 +54,7 @@ class ZendExt_Versioner
         $this->_cache = $cache;
         $this->_time = time();
 
-        if ( $keyPrefix !== null ) {
-
+        if ($keyPrefix !== null) {
             $this->_keyPrefix = $keyPrefix;
         }
 
