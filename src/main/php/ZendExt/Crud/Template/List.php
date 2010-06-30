@@ -44,14 +44,20 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
      */
     protected function _renderContent()
     {
-        $this->_renderPageBar();
+        echo '<style type="text/css">';
+        $this->_style();
+        echo '</style>';
 
         $items = $this->_view->paginator->getCurrentItems();
         $controllerName = $this->_view->controllerName;
 
-        echo '<style type="text/css">';
-        $this->_style();
-        echo '</style>';
+        echo '<div class="newButton">';
+        echo     '<a href="/' . $controllerName . '/new">';
+        echo         '<button>New '. $controllerName .' </button>';
+        echo     '</a>';
+        echo '</div>';
+
+        $this->_renderPageBar();
 
         echo '<table>';
         echo '<thead>';
@@ -83,6 +89,9 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             echo '</a>';
             echo '</th>';
         }
+        echo '<th colspan="2">';
+        echo     'Modify';
+        echo '</th>';
 
         echo '</tr>';
         echo '</thead>';
@@ -113,6 +122,17 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             }
 
             echo '<td>';
+            echo '<a href="/' . $controllerName . '/update/';
+            foreach ($this->_view->pk as $k) {
+                $field = array_search($k, $this->_view->fieldsMap);
+                echo $field . '/'. $arrCols[$k] . '/';
+            }
+            echo '">';
+            echo '<button> Edit </button>';
+            echo '</a>';
+            echo '</td>';
+
+            echo '<td>';
             echo '<form action="/' . $controllerName . '/delete"',
                     ' method="post">',
                     '<input class="button_delete" type="submit"',
@@ -136,6 +156,12 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         echo '</table>';
 
         $this->_renderPageBar();
+
+        echo '<div class="newButton">';
+        echo     '<a href="/' . $controllerName . '/new">';
+        echo         '<button>New '. $controllerName .' </button>';
+        echo     '</a>';
+        echo '</div>';
     }
 
     /**
@@ -159,6 +185,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         $last = ceil(
             $this->_view->paginator->getTotalItemCount() / $ipp
         );
+
         echo '<div class="pageBar">';
 
         if ($first != $current) {

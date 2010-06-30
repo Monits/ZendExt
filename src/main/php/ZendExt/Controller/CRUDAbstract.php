@@ -32,7 +32,9 @@ abstract class ZendExt_Controller_CRUDAbstract
 
     protected $_dataSource = null;
 
-    protected $_formName = '';
+    protected $_updateTitle;
+    protected $_newTitle;
+    protected $_listTitle;
 
     protected $_formData = null;
 
@@ -103,7 +105,11 @@ abstract class ZendExt_Controller_CRUDAbstract
         $this->view->defaultIpp = $this->_itemsPerPage;
 
         if (null == $this->_templateList) {
-            $title = 'List of ' . $this->_builderClass;
+            $title = 'List';
+            if (null !== $this->_listTitle) {
+                $title = $this->_listTitle;
+            }
+
             $this->_renderTemplate('List', $title);
         } else {
             $template = $this->_templateList;
@@ -126,7 +132,12 @@ abstract class ZendExt_Controller_CRUDAbstract
 
             // Render the script
             if (null == $this->_templateNew) {
-                $this->_renderTemplate('New', $this->_formName);
+                $title = 'New';
+                if (null !== $this->_newTitle) {
+                    $title = $this->_newTitle;
+                }
+
+                $this->_renderTemplate('New', $title);
             } else {
                 $template = $this->_templateNew;
                 $this->_helper->viewRenderer->renderScript($template);
@@ -178,7 +189,12 @@ abstract class ZendExt_Controller_CRUDAbstract
 
             // Render the script
             if (null == $this->_templateNew) {
-                $this->_renderTemplate('New', $this->_formName);
+                $title = 'New';
+                if (null !== $this->_newTitle) {
+                    $title = $this->_newTitle;
+                }
+
+                $this->_renderTemplate('New', $title);
             } else {
                 $template = $this->_templateNew;
                 $this->_helper->viewRenderer->renderScript($template);
@@ -210,7 +226,12 @@ abstract class ZendExt_Controller_CRUDAbstract
             $this->view->Updateform = $this->_newForm($pk);
             // Render the script
             if (null == $this->_templateUpdate) {
-                $this->_renderTemplate('Update', $this->_formName);
+                $title = 'Update';
+                if (null !== $this->_updateTitle) {
+                    $title = $this->_updateTitle;
+                }
+
+                $this->_renderTemplate('Update', $title);
             } else {
                 $template = $this->_templateUpdate;
                 $this->_helper->viewRenderer->renderScript($template);
@@ -246,7 +267,12 @@ abstract class ZendExt_Controller_CRUDAbstract
             $this->view->Updateform = $this->_newForm(null, $data, $checks);
             // Render the script
             if (null == $this->_templateUpdate) {
-                $this->_renderTemplate('Update', $this->_formName);
+                $title = 'Update';
+                if (null !== $this->_updateTitle) {
+                    $title = $this->_updateTitle;
+                }
+
+                $this->_renderTemplate('Update', $title);
             } else {
                 $template = $this->_templateUpdate;
                 $this->_helper->viewRenderer->renderScript($template);
@@ -465,6 +491,7 @@ abstract class ZendExt_Controller_CRUDAbstract
         $checkbox = array();
         $elements = array();
         foreach ($fields as $field) {
+
             $type = $this->_getType($field);
             $nullable = $this->_getFieldDescription($field, 'NULLABLE');
 
@@ -519,21 +546,30 @@ abstract class ZendExt_Controller_CRUDAbstract
                 $checkbox[$field] = new Zend_Form_Element_Checkbox(
                     'check' . $field
                 );
-                $checkbox[$field]->setAttrib('id', 'check'.$field);
+
+                $checkbox[$field]->setAttrib('class', 'checkField');
                 $checkValue = 'checked';
                 if (null !== $checks) {
                     $checkValue = $checks[$field] == '0' ? '' : 'checked';
                 }
+                $textLabel = 'Enable';
+
                 if ('' == $checkValue) {
                     $elements[$field]->setAttrib('disable', true);
                 } else {
                     $checkbox[$field]->setAttrib('checked', $checkValue);
+
                 }
                 $jsFunction = 'checkField(\''.$field.'\')';
 
                 $checkbox[$field]->setAttrib('onClick', $jsFunction);
-
-                $checkbox[$field]->setLabel('Disable/enable the field');
+                $checkbox[$field]->setLabel($textLabel.' the field');
+                $checkbox[$field]->addDecorator(
+                    'Label', array(
+                        'tag' => 'dt',
+                        'class' => 'checkboxLabel'
+                    )
+                );
             }
 
             $form->addElement($elements[$field]);

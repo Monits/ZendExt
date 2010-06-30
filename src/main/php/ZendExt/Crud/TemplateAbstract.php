@@ -60,6 +60,9 @@ abstract class ZendExt_Crud_TemplateAbstract implements ZendExt_Crud_Template
                          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
             echo '<html>';
             echo '<head>';
+            echo '<style type="text/css">';
+            $this->_formStyle();
+            echo '</style>';
             echo     '<meta http-equiv="Content-Type" content="text/html;
                          charset=UTF-8" />';
             echo     '<title>'. $this->_title .'</title>';
@@ -91,5 +94,22 @@ abstract class ZendExt_Crud_TemplateAbstract implements ZendExt_Crud_Template
             echo '</body>';
             echo '</html>';
         }
+    }
+
+    /**
+     * Set the style of the form.
+     *
+     * @return string
+     */
+    private function _formStyle()
+    {
+
+        echo 'dt{float:left;display:inline;clear:left;width:230px}' .
+             'dd ul.errors{display:inline-block;margin:3px 0;color:red;}' .
+             'input{vertical-align: top;}' .
+             'dd{margin:0 0 10px;float:left}' .
+             '.checkboxLabel{margin-left: 30px; width: 200px;}';
+
+        return $style;
     }
 }
