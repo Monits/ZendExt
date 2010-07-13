@@ -91,8 +91,8 @@ class ZendExt_Log_Writer_Mail extends Zend_Log_Writer_Mail
                 trigger_error(
                     'exception occurred when rendering layout; ' .
                     'unable to set html body for message; ' .
-                    'message = {$e->getMessage()}; ' .
-                    'code = {$e->getCode()}; ' .
+                    "message = {$e->getMessage()}; " .
+                    "code = {$e->getCode()}; " .
                     'exception class = ' . get_class($e),
                     E_USER_NOTICE
                 );
@@ -107,12 +107,42 @@ class ZendExt_Log_Writer_Mail extends Zend_Log_Writer_Mail
         } catch (Exception $e) {
             trigger_error(
                 'unable to send log entries via email; ' .
-                'message = {$e->getMessage()}; ' .
-                'code = {$e->getCode()}; ' .
+                "message = {$e->getMessage()}; " .
+                "code = {$e->getCode()}; " .
                 'exception class = ' . get_class($e),
                 E_USER_WARNING
             );
         }
+    }
 
+    /**
+     * Factory method for ZendExt_Log_Writer_Mail.
+     *
+     * @param Zend_Config|array $config The config.
+     *
+     * @return ZendExt_Log_Writer_Mail
+     */
+    public static function factory($config)
+    {
+        if ($config instanceof Zend_Config) {
+
+            $config = $config->toArray();
+        }
+
+        $transport = null;
+        if ($config['transport'] == 'smtp') {
+
+            $transport = new Zend_Mail_Transport_Smtp(
+                $config['host'],
+                $config['config']
+            );
+        }
+
+        $mail = new Zend_Mail('UTF-8');
+        $mail->addTo($config['to']);
+        $mail->setFrom($config['from']);
+        $mail->setSubject($config['subject']);
+
+        return new ZendExt_Log_Writer_Mail($mail, null, $transport);
     }
 }
