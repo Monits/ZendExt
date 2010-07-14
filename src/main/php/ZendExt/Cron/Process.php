@@ -90,7 +90,9 @@ abstract class ZendExt_Cron_Process
         if ($this->_config->data->dir) {
 
             $dataDir = $this->_config->data->dir.'/';
-            $this->_persistance = new ZendExt_Cron_Persistance(get_class($this), $dataDir);
+            $this->_persistance = new ZendExt_Cron_Persistance(
+                get_class($this), $dataDir
+            );
         }
 
         try {
@@ -369,7 +371,6 @@ abstract class ZendExt_Cron_Process
      */
     private function _showStats($startTime)
     {
-
         $stats = '';
 
         if ($this->_allowProgress) {
