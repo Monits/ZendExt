@@ -23,17 +23,35 @@
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
-final class ZendExt_Cron_Persistance
+class ZendExt_Cron_Persistance
 {
 
-    private static $_dataDir = 'data/';
+    protected $_dataDir = 'data/';
 
     /**
      * The name of the process running.
      *
      * @var string
      */
-    private static $_process = null;
+    protected $_process = null;
+
+    /**
+     * Construct a new isntance.
+     *
+     * @param string $process The name of the process that uses the instance.
+     * @param string $dataDir The path to the data directory.
+     *
+     * @return void
+     */
+    public function __construct($process, $dataDir = null)
+    {
+        $this->_process = $process;
+
+        if (null !== $dataDir) {
+
+            $this->_dataDir = $dataDir;
+        }
+    }
 
     /**
      * Persist data so a process can re use it later on.
@@ -43,18 +61,17 @@ final class ZendExt_Cron_Persistance
      *
      * @return void
      */
-    public static function persist($name, $data)
+    public function persist($name, $data)
     {
+        $fileName = $this->_getPath($name);
+        $fileDir = dirname($fileName);
 
-        $filePath = self::$_dataDir.self::$_process.'/';
-        $fileName = $name.'.dat';
+        if ( !is_dir($fileDir) ) {
 
-        if ( !is_dir($filePath) ) {
-
-            mkdir($filePath, 0744, true);
+            mkdir($fileDir, 0744, true);
         }
 
-        file_put_contents($filePath.$fileName, serialize($data));
+        file_put_contents($fileName, serialize($data));
     }
 
     /**
@@ -66,12 +83,12 @@ final class ZendExt_Cron_Persistance
      *
      * @throws ZendExt_Exception
      */
-    public static function retrieve($name)
+    public function retrieve($name)
     {
 
-        $fileName = self::$_dataDir.self::$_process.'/'.$name.'.dat';
+        $fileName = $this->_getPath($name);
 
-        if ( !self::isPersisted($name) ) {
+        if ( !$this->isPersisted($name) ) {
 
             throw new ZendExt_Exception(
                 'Data persistance file '.$fileName.' not found.'
@@ -88,37 +105,40 @@ final class ZendExt_Cron_Persistance
      *
      * @return boolean
      */
-    public static function isPersisted($name)
+    public function isPersisted($name)
     {
-
-        return file_exists(self::$_dataDir.self::$_process.'/'.$name.'.dat');
+        return file_exists($this->_getPath($name));
     }
 
     /**
-     * Set the current process. Can only be called once.
+     * Get the path for a given name.
      *
-     * @param string $process The process name.
+     * @param string $name The name.
      *
-     * @return void
+     * @return string
      */
-    public static function setCurrentProcess($process)
+    protected function _getPath($name)
     {
-
-        if ( self::$_process === null ) {
-
-            self::$_process = $process;
-        }
+        return $this->_dataDir.$this->_process.'/'.$name.'.dat';
     }
 
     /**
-     * Set the data directory.
+     * Get the name of the current process.
      *
-     * @param string $dir The directory path.
-     *
-     * @return void
+     * @return string
      */
-    public static function setDataDirectory($dir)
+    public function getCurrentProcess()
     {
-        self::$_dataDir = $dir;
+        return $this->_process;
+    }
+
+    /**
+     * Get the path to the data directory.
+     *
+     * @return string
+     */
+    public function getDataDirectory()
+    {
+        return $this->_dataDir;
     }
 }

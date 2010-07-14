@@ -23,11 +23,16 @@
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
-class ZendExt_Cron_Manager
+final class ZendExt_Cron_Manager
 {
     const DATA_PATH = 'data/';
 
-    const STRATEGY_PATH = 'strategy/';
+    const PROCESS_PATH = 'process/';
+
+    private static $_defaultOptions = array(
+        'manager' => array(
+        )
+    );
 
     /**
      * @var Zend_Log
@@ -39,11 +44,11 @@ class ZendExt_Cron_Manager
      */
     private $_config;
 
-    private $_strategyDir;
+    private $_processDir;
 
     private $_configFile;
 
-    private $_forked = 0;
+    private $_forked = array();
 
     /**
      * Instance a new manager.
@@ -71,17 +76,13 @@ class ZendExt_Cron_Manager
     {
         $this->_initLog();
 
-        $dataDir = $this->_config->data->dir ?
-                $this->_config->data->dir.'/' : self::DATA_PATH;
-        ZendExt_Cron_Persistance::setDataDirectory($dataDir);
+        $this->_processDir = $this->_config->manager->processDir ?
+            $this->_config->manager->processDir : self::PROCESS_PATH;
 
-        $this->_strategyDir = $this->_config->manager->strategyDir ?
-            $this->_config->manager->strategyDir : self::STRATEGY_PATH;
-
-        if ( $this->_config->manager->strategyNamespace ) {
+        if ( $this->_config->manager->processNamespace ) {
 
             Zend_Loader_Autoloader::getInstance()->registerNamespace(
-                $this->_config->manager->strategyNamespace
+                $this->_config->manager->processNamespace
             );
         }
     }
@@ -99,64 +100,49 @@ class ZendExt_Cron_Manager
             //We dont have any config, so just do something default
             $writer = new Zend_Log_Writer_Stream('php://stdout');
 
-            $this->_log = new Zend_Log();
-            $this->_log->addWriter($writer);
+            $this->_logger = new Zend_Log();
+            $this->_logger->addWriter($writer);
             return;
         }
 
-        if (!file_exists($logConfig->path)) {
+        $logConfig = $logConfig->toArray();
+        if ($this->_config->manager->logPath) {
 
-            mkdir($logConfig->path, 0744, true);
-        }
+            $path = $this->_config->manager->logPath;
+            foreach ($logConfig as $key => $value) {
 
-        $this->_log = new Zend_Log();
+                if (isset($value['writerName'])
+                    && $value['writerName'] == 'Stream'
+                    && isset($value['writerParams']['stream'])
+                    && !is_resource($value['writerParams']['stream'])) {
 
-        if ($logConfig->mail) {
-
-            $transport = null;
-            if ($logConfig->mail->transport == 'smtp') {
-
-                $transport = new Zend_Mail_Transport_Smtp(
-                    $logConfig->mail->host,
-                    $logConfig->mail->config->toArray()
-                );
+                    $logConfig[$key]['writerParams']['stream'] = $path.'/'.
+                        $value['writerParams']['stream'];
+                }
             }
 
-            $mail = new Zend_Mail('UTF-8');
-            if (is_string($logConfig->mail->to)) {
-                $to = $logConfig->mail->to;
-            } else {
-                $to = $logConfig->mail->to->toArray();
+            if (!is_dir($path)) {
+
+                mkdir($path, 0744, true);
             }
-            $mail->addTo($to);
-            $mail->setFrom($logConfig->mail->from);
-            $mail->setSubject($logConfig->mail->subject);
-
-            $filter = new Zend_Log_Filter_Priority(Zend_Log::CRIT);
-
-            $mailWriter = new ZendExt_Log_Writer_Mail($mail, null, $transport);
-            $mailWriter->addFilter($filter);
-
-            $this->_log->addWriter($mailWriter);
         }
 
-        $streamWriter = new Zend_Log_Writer_Stream(
-            $logConfig->path.'/'.$logConfig->file
-        );
-        $this->_log->addWriter($streamWriter);
+        $this->_logger = Zend_Log::factory($logConfig);
     }
 
     /**
      * Fork & run a new process.
      *
-     * @param string $strategy The name of the strategy to run.
-     * @param array  $config   Config to override default strategy config.
+     * @param string $process The name of the process to run.
+     * @param array  $config  Config to override default process config.
+     * @param string $name    Optional. Set a name for the process. IF no name
+     *                        is set, the pid is used as name.
      *
-     * @return void
+     * @return integer|boolean The pid of the new process. False if it failed.
      */
-    public function spawnProcess($strategy, array $config = array())
+    public function spawnProcess($process, array $config = array(), $name = null)
     {
-        $this->_log->info('Spawning new process...');
+        $this->_log('Spawning new process...');
 
         // This assumes the application entry point is the launcher
         // Which is, I hope, a fairly good guess.
@@ -167,9 +153,8 @@ class ZendExt_Cron_Manager
         foreach ($config as $key => $value) {
             $exec .= $key.'='.$value.' ';
         }
-        $exec .= $strategy;
+        $exec .= $process;
 
-        $this->_forked++;
         $pid = pcntl_fork();
         if ($pid == 0) {
 
@@ -178,9 +163,18 @@ class ZendExt_Cron_Manager
         } else if ( $pid == -1 ) {
 
             $log = 'Trying to execute new process failed!'.PHP_EOL
-                .'Strategy: '.$strategy.PHP_EOL
+                .'Strategy: '.$process.PHP_EOL
                 .'Exec: '.$exec.PHP_EOL;
-            $this->_log->crit($log);
+            $this->_log($log, 'crit');
+            return false;
+        } else {
+
+            if (null === $name) {
+
+                $name = $pid;
+            }
+            $this->_forked[$name] = $pid;
+            return $pid;
         }
     }
 
@@ -189,33 +183,55 @@ class ZendExt_Cron_Manager
      *
      * @return void
      */
-    private function _waitForChildren()
+    public function waitForChildren()
     {
-        while ($this->_forked) {
-            $ret = pcntl_wait($status);
-            $this->_forked--;
+        foreach ($this->_forked as $name => $pid) {
 
-            if ( $ret == -1 ) {
-
-                $this->_log->crit(
-                    'An error ocurred while waiting for the processes to end '
-                );
-                return;
-            } else if ( $ret != 0 ) {
-
-                $this->_log->info(
-                    'Process '.$ret.' exited with status '.$status
-                );
-            }
+            $this->waitForChild($name);
         }
     }
 
     /**
-     * Load a strategy.
+     * Wait for a given child process to end.
      *
-     * @param string $name The name of the strategy.
+     * @param string $name The name of the process to wait for.
+     *
+     * @return boolean True on success, false if it exited with an error.
+     */
+    public function waitForChild($name)
+    {
+        if (isset($this->_forked[$name])) {
+
+            $ret = pcntl_waitpid($this->_forked[$name], $status);
+            unset($this->_forked[$name]);
+
+            if ($ret == -1) {
+
+                $this->_log(
+                    'An error ocurred while waiting for the processes to end',
+                    'crit'
+                );
+
+                return false;
+            } else if ($ret != 0) {
+
+                $this->_log(
+                    'Process '.$ret.' exited with status '.$status
+                );
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Load a process.
+     *
+     * @param string $name The name of the process.
      *
      * @return void
+     *
+     * @throws Exception
      */
     private function _loadStrategy($name)
     {
@@ -223,18 +239,20 @@ class ZendExt_Cron_Manager
 
         if ( !$loaded ) {
 
-            $strategyPath = $this->_strategyDir.'/'.$name.'.php';
-            if ( !file_exists($strategyPath) ) {
+            $processPath = $this->_processDir.'/'.$name.'.php';
+            if ( !file_exists($processPath) ) {
 
-                $this->_log->crit('The specified strategy was not found.');
-                return;
+                $err = 'The specified process was not found.';
+                $this->_log($err, 'crit');
+                throw new Exception($err);
             } else {
 
-                require_once($strategyPath);
+                require_once($processPath);
                 if (!class_exists($name)) {
 
-                    $this->_log->crit('The specified strategy was not found.');
-                    return;
+                    $err = 'The specified process was not found.';
+                    $this->_log($err, 'crit');
+                    throw new Exception($err);
                 }
 
             }
@@ -244,45 +262,36 @@ class ZendExt_Cron_Manager
     /**
      * Spawn a new process.
      *
-     * @param string $strategyName The name of the strategy for the process.
-     * @param array  $extraConfig  Extra config to override the strategy config.
+     * @param string $processName The name of the process for the process.
+     * @param array  $extraConfig  Extra config to override the process config.
      *
      * @return void
      */
-    public function process($strategyName, array $extraConfig = array())
+    public function process($processName, array $extraConfig = array())
     {
-        $this->_loadStrategy($strategyName);
-        ZendExt_Cron_Persistance::setCurrentProcess($strategyName);
+        $this->_loadStrategy($processName);
 
-        $cleanup = false;
         try {
 
-            $strategy = new $strategyName();
-            $strategy->setManager($this);
-
-            $process = new ZendExt_Cron_Process(
-                $strategy,
+            $process = new $processName(
+                $this,
                 $this->_config->process,
                 $extraConfig
             );
             $process->execute();
-            $cleanup = true;
         } catch ( ZendExt_Cron_LockException $e ) {
 
-            $this->_log->crit($e->getMessage());
+            $this->_log($e->getMessage(), 'crit');
         } catch ( ZendExt_Cron_ErrorException $e ) {
 
-            $this->_log->crit($e->getMessage());
+            $this->_log($e->getMessage(), 'crit');
         } catch ( Exception $e ) {
 
-            $this->_log->crit($e->__toString());
+            $this->_log($e->__toString(), 'crit');
         }
 
-        $this->_waitForChildren();
-        if ($cleanup) {
-
-            $process->cleanup();
-        }
+        $this->waitForChildren();
+        $process->cleanup();
     }
 
     /**
@@ -294,27 +303,54 @@ class ZendExt_Cron_Manager
      */
     private function _loadConfig($configFile)
     {
-        if ( !$configFile ) {
+        $this->_config = new Zend_Config(self::$_defaultOptions, true);
 
+        if (!$configFile) {
             $configFile = self::CONFIG_FILE;
         }
 
         if (!file_exists($configFile)) {
-            error_log('Cant find the config file!! Crashing hard.');
-            die(1);
-        }
+            $this->_log('Cant find the config file!! Crashing hard.', 'warn');
+        } else {
 
-        try {
+            try {
+                $config = new Zend_Config_Xml($configFile);
+            } catch ( Zend_Config_Exception $e ) {
 
-            $this->_config = new Zend_Config_Xml($configFile);
-        } catch ( Zend_Config_Exception $e ) {
+                $this->_log('Config file parsing failed, crashing hard.', 'warn');
+                $this->_log($e->__toString(), 'crit');
 
-            error_log('Config file parsing failed, crashing hard.');
-            error_log($e->__toString());
+                die(1);
+            }
 
-            die(1);
+            $this->_config->merge($config);
         }
     }
+
+    /**
+     * Log a message.
+     *
+     * @param string $output The output to log.
+     * @param string $level  The output level.
+     *
+     * @return void
+     */
+    protected function _log($output, $level = 'info')
+    {
+        if ($this->_logger) {
+
+            try {
+                $this->_logger->$level($output);
+            } catch (Exception $e) {
+                error_log($output);
+                error_log($e->__toString());
+            }
+        } else {
+
+            error_log($output);
+        }
+    }
+
 
     /**
      * Custom error handler for errors triggered by PHP itself.
@@ -351,19 +387,7 @@ class ZendExt_Cron_Manager
             $level = 'err';
         }
 
-        if ($this->_log) {
-
-            try {
-                $this->_log->$level($output);
-            } catch (Exception $e) {
-                error_log($output);
-                error_log($e->__toString());
-            }
-        } else {
-
-            error_log($output);
-        }
-
+        $this->_log($output, $level);
         return false;
     }
 
@@ -386,22 +410,22 @@ class ZendExt_Cron_Manager
     /**
      * Run a number of strategies.
      *
-     * @param string|array $strategy   The strategies to run.
+     * @param string|array $process   The strategies to run.
      * @param string       $configFile The path to the config file.
-     * @param array        $extra      Override default strategy config.
+     * @param array        $extra      Override default process config.
      *
      * @return void
      */
-    public static function run($strategy, $configFile, array $extra = array())
+    public static function run($process, $configFile, array $extra = array())
     {
         $manager = new ZendExt_Cron_Manager($configFile);
-        if (!is_array($strategy)) {
+        if (!is_array($process)) {
 
-            $strategy = array($strategy);
+            $process = array($process);
         }
 
-        $last = array_shift($strategy);
-        foreach ($strategy as $name) {
+        $last = array_shift($process);
+        foreach ($process as $name) {
 
             $manager->spawnProcess($name, $extra);
         }

@@ -23,60 +23,102 @@
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
-final class ZendExt_Cron_Process
+abstract class ZendExt_Cron_Process
 {
     private static $_defaultOptions = array(
                                           'configDir' => 'config/strategies',
                                           'outputFile' => 'php://stdout',
-                                          'log' => array(
-                                              'path' => 'log/'
-                                          ),
                                           'pid' => array(
                                               'path' => 'pid/'
+                                          ),
+                                          'strategy' => array(
+                                              'stub' => 'bar'
                                           )
                                       );
-
-    /**
-     * The strategy being used.
-     *
-     * @var ZendExt_Cron_Strategy_Interface
-     */
-    private $_strategy;
 
     /**
      * The config being used.
      *
      * @var Zend_Config
      */
-    private $_config;
+    protected $_config;
 
     /**
      * The log being used.
      *
      * @var Zend_Log
      */
-    private $_logger;
+    protected $_logger;
 
-    private $_pidFile;
+    /**
+     * @var ZendExt_Cron_Persistance
+     */
+    protected $_persistance;
+
+    private $_pidFile = false;
+
+    protected $_allowProgress = false;
+
+    protected $_hasRun = false;
+
+    /**
+     * @var ZendExt_Cron_Manager
+     */
+    protected $_manager;
 
     /**
      * Creates a new offline process.
      *
-     * @param ZendExt_Cron_Strategy_Interface $strategy The strategy to apply
-     *                                                  during execution.
-     * @param Zend_Config                     $config   The config data to use.
-     * @param array                           $extra    Override config.
+     * @param ZendExt_Cron_Manager $manager The manager instance.
+     * @param Zend_Config          $config  The config data to use.
+     * @param array                $extra   Override config.
+     *
+     * @throws ZendExt_Cron_ErrorException
      */
-    public function __construct(ZendExt_Cron_Strategy_Interface $strategy,
+    public final function __construct(ZendExt_Cron_Manager $manager,
         Zend_Config $config, array $extra = array())
     {
-
-        $this->_strategy = $strategy;
-
+        $this->_manager = $manager;
         $this->_loadConfig($config, $extra);
         $this->_setupLogger();
+
+        $this->_lock();
+
+        $this->_logger->info('Initializing process...');
+        $this->_bootstrap();
+
+        if ($this->_config->data->dir) {
+
+            $dataDir = $this->_config->data->dir.'/';
+            $this->_persistance = new ZendExt_Cron_Persistance(get_class($this), $dataDir);
+        }
+
+        try {
+
+            $this->_init();
+        } catch (Exception $e) {
+
+            $this->_logger->crit('An error ocurred during init!');
+            $this->_logger->crit($e->__toString());
+
+            $this->_unlock();
+            throw new ZendExt_Cron_ErrorException(
+                'An error ocurred during init. Execution aborted.'
+            );
+        }
+    }
+
+    /**
+     * Get the path to the pid file.
+     *
+     * If this returns a falsy value, locking will be disabled.
+     *
+     * @return string
+     */
+    protected function _getPidFileName()
+    {
         $configPath = $this->_config->pid->path;
-        $this->_pidFile = $configPath.'/'.$this->_config->pid->file;
+        return $configPath.'/'.$this->_config->pid->file;
     }
 
     /**
@@ -92,35 +134,34 @@ final class ZendExt_Cron_Process
         $this->_config = new Zend_Config(self::$_defaultOptions, true);
         $this->_config->merge($config);
 
-        $strategyReflector = new ReflectionClass($this->_strategy);
-        $fileName = $strategyReflector->getConstant('CONFIG_FILE');
+        $configFile = $this->_config->configDir.'/'
+            .$this->_configFileName.'.xml';
 
-        $configFile = $this->_config->configDir.'/'.$fileName.'.xml';
         $this->_config->merge(new Zend_Config_Xml($configFile, 'process'));
-
         $this->_config->merge(new Zend_Config($extra));
     }
 
+
     /**
-     * Init everything needed for execution.
+     * Lock the process so that no other instance can run.
      *
      * @return void
      */
-    private function _init()
+    private function _lock()
     {
-        $this->_logger->info('Initializing process...');
-        $bootstrap = $this->_bootstrap();
+        $this->_pidFile = $this->_getPidFileName();
 
+        $this->_checkLock();
+        if ($this->_pidFile) {
 
-        if (!file_exists($this->_config->pid->path)) {
+            $pidPath = dirname($this->_pidFile);
+            if (!file_exists($pidPath)) {
 
-            mkdir($this->_config->pid->path, 0744, true);
+                mkdir($pidPath, 0744, true);
+            }
+
+            file_put_contents($this->_pidFile, getmypid());
         }
-        file_put_contents($this->_pidFile, getmypid());
-        $this->_strategy->init($this->_config->strategy, $bootstrap);
-
-        $this->_allowsProgress = $this->_strategy
-            instanceOf ZendExt_Cron_Strategy_MeasurableInterface;
     }
 
     /**
@@ -133,7 +174,7 @@ final class ZendExt_Cron_Process
     private function _bootstrap()
     {
         $this->_logger->info('Bootstraping...');
-        $appConfig = $this->_config->strategy->app;
+        $appConfig = $this->_config->app;
         if ($appConfig) {
 
             try {
@@ -156,13 +197,10 @@ final class ZendExt_Cron_Process
                 throw new ZendExt_Cron_ErrorException(
                     'An unexpected error caused the process to stop running.'
                 );
-
             }
 
-            return $app->getBootstrap();
+            $this->_bootstrap = $app->getBootstrap();
         }
-
-        return null;
     }
 
     /**
@@ -172,65 +210,82 @@ final class ZendExt_Cron_Process
      */
     private function _setupLogger()
     {
-
         $logConfig = $this->_config->log;
-        if (!file_exists($logConfig->path)) {
+        if (!$logConfig) {
 
-            mkdir($logConfig->path, 0744, true);
+            $writer = new Zend_Log_Writer_Stream('php://stdout');
+
+            $this->_logger = new Zend_Log();
+            $this->_logger->addWriter($writer);
+            return;
         }
 
-        $this->_logger = new Zend_Log();
-        $writer = new Zend_Log_Writer_Stream(
-            $logConfig->path.'/'.$logConfig->file
-        );
+        $logConfig = $logConfig->toArray();
+        if ($this->_config->logPath) {
 
-        if ($logConfig->mail) {
+            $path = $this->_config->logPath;
+            foreach ($logConfig as $key => $value) {
 
-            $transport = null;
-            if ($logConfig->mail->transport == 'smtp') {
+                if (isset($value['writerName'])
+                    && $value['writerName'] == 'Stream'
+                    && isset($value['writerParams']['stream'])
+                    && !is_resource($value['writerParams']['stream'])) {
 
-                $transport = new Zend_Mail_Transport_Smtp(
-                    $logConfig->mail->host,
-                    $logConfig->mail->config->toArray()
-                );
+                    $logConfig[$key]['writerParams']['stream'] = $path.'/'.
+                        $value['writerParams']['stream'];
+                }
             }
 
-            $mail = new Zend_Mail('UTF-8');
-            if (is_string($logConfig->mail->to)) {
-                $to = $logConfig->mail->to;
-            } else {
-                $to = $logConfig->mail->to->toArray();
+            if (!file_exists($path)) {
+
+                mkdir($path, 0744, true);
             }
-            $mail->addTo($to);
-            $mail->setFrom($logConfig->mail->from);
-            $mail->setSubject($logConfig->mail->subject);
-
-            $filter = new Zend_Log_Filter_Priority(Zend_Log::CRIT);
-
-            $mailWriter = new ZendExt_Log_Writer_Mail($mail, null, $transport);
-            $mailWriter->addFilter($filter);
-
-            $this->_logger->addWriter($mailWriter);
         }
 
-        $this->_logger->addWriter($writer);
-
-        ZendExt_Cron_Log::setProcessLog($this->_logger);
+        $this->_logger = Zend_Log::factory($logConfig);
     }
 
     /**
-     * Perform cleanup after the process is done.
+     * Destructor.
      *
      * @return void
      */
-    public function cleanup()
+    public final function cleanup()
     {
-
         $this->_logger->info('Cleaning up...');
 
-        $this->_strategy->shutdown();
+        try {
 
-        unlink($this->_pidFile);
+            $this->_shutdown();
+        } catch (Exception $e) {
+
+            $this->_logger->crit('An exception was thrown while cleaning up...');
+            $this->_logger->crit($e->__toString());
+        }
+
+        $this->_unlock();
+    }
+
+    /**
+     * Unlock the process to allow for new instances to be executed.
+     *
+     * @return void
+     *
+     * @throws ZendExt_Cron_ErrorException
+     */
+    private function _unlock()
+    {
+        if ($this->_pidFile) {
+
+            if (!file_exists($this->_pidFile)) {
+
+                $err = 'No lock file was found when trying to erase it!';
+                $this->_logger->err($err);
+                throw new ZendExt_Cron_ErrorException($err);
+            }
+
+            unlink($this->_pidFile);
+        }
     }
 
     /**
@@ -238,39 +293,32 @@ final class ZendExt_Cron_Process
      *
      * @return void
      *
-     * @throws ZendExt_Cron_LockException  Another process is locking execution.
      * @throws ZendExt_Cron_ErrorException The proces has failed due to an
      *                                     internal error.
      */
     public function execute()
     {
-        if ( file_exists($this->_pidFile) ) {
+        if ($this->_hasRun) {
 
-            $strategyReflector = new ReflectionClass($this->_strategy);
-            $msg = 'A lock file was found when trying to execute '
-                .$strategyReflector->getName();
-
-            $this->_logger->info($msg);
-            throw new ZendExt_Cron_LockException($msg);
+            throw new ZendExt_Cron_ErrorException(
+                'This instance has already been executed before'
+            );
         }
 
-        $this->_init();
+        $this->_hasRun = true;
+        $start = microtime(true);
 
         try {
 
-            $x = 0;
-            $start = microtime(true);
-            while ( !$this->_strategy->isDone() ) {
+            for ($bulk = 0; !$this->_isDone(); $bulk++) {
 
-                $this->_logger->info('Processing bulk #'.$x);
-                $this->_strategy->processBulk();
+                $this->_logger->info('Processing bulk #'.$bulk);
+                $this->_processBulk();
 
-                $this->showStats($start);
+                $this->_showStats($start);
 
                 $this->_logger->info('Bulk processing done, sleeping...');
                 sleep($this->_config->sleepTime);
-
-                $x++;
             }
 
             $end = microtime(true);
@@ -285,7 +333,7 @@ final class ZendExt_Cron_Process
         }
 
         $info = 'Total execution time:'.($end - $start).' with '
-            .($x * $this->_config->sleepTime).'s spent sleeping';
+            .($bulk * $this->_config->sleepTime).'s spent sleeping';
         $this->_logger->info($info);
 
         $info = 'Peak memory usage during execution: '
@@ -294,15 +342,22 @@ final class ZendExt_Cron_Process
     }
 
     /**
-     * Force a cleanup. To be used only when the process crashed.
+     * Check whether we been locked out!
      *
      * @return void
+     *
+     * @throws ZendExt_Cron_LockException
      */
-    public function forceCleanup()
+    private function _checkLock()
     {
+        if ($this->_pidFile && file_exists($this->_pidFile)) {
 
-        $this->_logger->info('Something happend and cleanup was forced.');
-        $this->cleanup();
+            $msg = 'A lock file was found when trying to execute '
+                .get_class($this);
+
+            $this->_logger->info($msg);
+            throw new ZendExt_Cron_LockException($msg);
+        }
     }
 
     /**
@@ -312,22 +367,28 @@ final class ZendExt_Cron_Process
      *
      * @return void
      */
-    public function showStats($startTime)
+    private function _showStats($startTime)
     {
 
         $stats = '';
 
-        if ( $this->_allowsProgress ) {
+        if ($this->_allowProgress) {
 
             $delta = microtime(true) - $startTime + $this->_config->sleepTime;
-            $total = $this->_strategy->getTotalRecords();
-            $processed = $this->_strategy->getProcessedRecords();
+            $total = $this->_getTotalRecords();
+            $processed = $this->_getProcessedRecords();
 
-            $eta = ( $total * ( $delta / $processed ) ) - $delta;
-            $progress = ($processed / $total) * 100;
+            if ($total && $processed) {
 
-            $stats .= 'Progress: '.round($progress, 2).'% ETA '
-                .round($eta, 2).PHP_EOL;
+                $eta = ( $total * ( $delta / $processed ) ) - $delta;
+                $progress = ($processed / $total) * 100;
+
+                $stats .= 'Progress: '.round($progress, 2).'% ETA '
+                    .round($eta, 2).PHP_EOL;
+            } else {
+
+                $stats .= 'Not enough information to produce ETA.'.PHP_EOL;
+            }
         }
 
         $memoryUse = memory_get_usage();
@@ -340,4 +401,61 @@ final class ZendExt_Cron_Process
         file_put_contents($this->_config->outputFile, $stats);
     }
 
+    /** Everything from here on down is meant for overriding **/
+
+    /**
+     * Process a bulk of data.
+     *
+     * @return void
+     */
+    protected abstract function _processBulk();
+
+    /**
+     * Returns whether the strategy is done.
+     *
+     * @return boolean
+     */
+    protected abstract function _isDone();
+
+    /**
+     * Get the total number of records to be processed.
+     *
+     * @return integer
+     */
+    protected function _getTotalRecords()
+    {
+        return null;
+    }
+
+    /**
+     * Get the number of already processed records.
+     *
+     * @return integer
+     */
+    protected function _getProcessedRecords()
+    {
+        return null;
+    }
+
+    /**
+     * Init everything needed for execution.
+     *
+     * This method will be called just before execution starts.
+     *
+     * @return void
+     */
+    protected function _init()
+    {
+    }
+
+    /**
+     * Clean up after execution.
+     *
+     * This method is called after execution.
+     *
+     * @return void
+     */
+    protected function _shutdown()
+    {
+    }
 }
