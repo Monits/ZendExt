@@ -291,7 +291,9 @@ final class ZendExt_Cron_Manager
         }
 
         $this->waitForChildren();
-        $process->cleanup();
+        if (isset($process)) {
+            $process->cleanup();
+        }
     }
 
     /**

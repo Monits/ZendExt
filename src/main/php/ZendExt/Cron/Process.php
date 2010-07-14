@@ -137,7 +137,7 @@ abstract class ZendExt_Cron_Process
         $this->_config->merge($config);
 
         $configFile = $this->_config->configDir.'/'
-            .$this->_configFileName.'.xml';
+            .$this->_configFileName;
 
         $this->_config->merge(new Zend_Config_Xml($configFile, 'process'));
         $this->_config->merge(new Zend_Config($extra));
@@ -373,30 +373,53 @@ abstract class ZendExt_Cron_Process
     {
         $stats = '';
 
-        if ($this->_allowProgress) {
+        $total = $this->_getTotalRecords();
+        $processed = $this->_getProcessedRecords();
+
+        if ($total && $processed) {
 
             $delta = microtime(true) - $startTime + $this->_config->sleepTime;
-            $total = $this->_getTotalRecords();
-            $processed = $this->_getProcessedRecords();
 
-            if ($total && $processed) {
+            $eta = ( $total * ( $delta / $processed ) ) - $delta;
+            $progress = ($processed / $total) * 100;
 
-                $eta = ( $total * ( $delta / $processed ) ) - $delta;
-                $progress = ($processed / $total) * 100;
-
-                $stats .= 'Progress: '.round($progress, 2).'% ETA '
-                    .round($eta, 2).PHP_EOL;
-            } else {
-
-                $stats .= 'Not enough information to produce ETA.'.PHP_EOL;
-            }
+            $stats .= 'Progress: '.round($progress, 2).'% ETA '
+                .round($eta, 2).PHP_EOL;
         }
 
         $memoryUse = memory_get_usage();
-        // TODO : Complete this!
-        $cpuUse = 0;
 
-        $stats .= 'CPU use: '.$cpuUse.'%'.PHP_EOL;
+        $cpuUse = 0;
+        switch(PHP_OS) {
+
+        case 'Linux':
+
+            $res = file_get_contents('/proc/loadavg');
+            $values = explode(' ', $res);
+
+            if (count($values) > 0) {
+                $cpuUse = $values[0];
+            }
+            break;
+
+        case 'FreeBSD':
+        case 'Darwin':
+        case 'NetBSD':
+        case 'OpenBSD':
+
+            $res = exec('sysctl -n vm.loadavg');
+            $values = explode(' ', $res);
+
+            if (isset($values[1]) && is_numeric($values[1])) {
+                $cpuUse = $values[1];
+            }
+            break;
+        default:
+            $cpuUse = 0;
+            break;
+        }
+
+        $stats .= 'CPU use: '.$cpuUse.PHP_EOL;
         $stats .= 'Memory usage: '.$memoryUse.' bytes'.PHP_EOL;
 
         file_put_contents($this->_config->outputFile, $stats);
