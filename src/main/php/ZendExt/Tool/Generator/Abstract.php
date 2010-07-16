@@ -116,7 +116,7 @@ abstract class ZendExt_Tool_Generator_Abstract
      *
      * @return string
      */
-    protected function getCamelCased($column, $separator = '_')
+    protected function _getCamelCased($column, $separator = '_')
     {
         $parts = explode($separator, $column);
         $partCount = count($parts);
