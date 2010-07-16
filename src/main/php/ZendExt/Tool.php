@@ -56,7 +56,7 @@ class ZendExt_Tool
     {
         return $this->getOptions()->getUsageMessage()
            . "\nAvailable generators: "
-           . strtolower(implode(', ', $this->getGenerators())) . "\n";
+           . strtolower(implode(', ', $this->getGenerators())) . PHP_EOL;
     }
 
     /**
@@ -75,7 +75,7 @@ class ZendExt_Tool
         } else if ($opts->help !== null) {
 
             // Help asked for a specific generator.
-            $gen = $tool->getGenerator($opts->help, '');
+            $gen = $tool->getGenerator($opts->help);
 
             return $tool->getOptions($gen->getOptions())
                         ->getUsageMessage();
@@ -101,14 +101,14 @@ class ZendExt_Tool
      *
      * @return ZendExt_Tool_Generator_Abstract
      */
-    public function getGenerator($generator, $outputDir) {
+    public function getGenerator($generator, $outputDir = null) {
         $generator = ucfirst(strtolower($generator));
         $class = 'ZendExt_Tool_Generator_' . $generator;
 
         if (!file_exists(
             dirname(__FILE__)
             . self::GENERATORS_PATH
-            . '/' . $generator . '.php'
+            . DIRECTORY_SEPARATOR . $generator . '.php'
         )) {
             throw new ZendExt_Tool_Exception(
                 'The generator file doesn\'t exists (' . $generator . ')'
@@ -138,7 +138,11 @@ class ZendExt_Tool
      */
     public function getGenerators()
     {
-        $files = glob(dirname(__FILE__) . self::GENERATORS_PATH . '/*.php');
+        $files = glob(
+            dirname(__FILE__) . self::GENERATORS_PATH
+            . DIRECTORY_SEPARATOR . '*.php'
+        );
+
         $ret = array();
 
         foreach ($files as $file) {
