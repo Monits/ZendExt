@@ -109,6 +109,43 @@ abstract class ZendExt_Tool_Generator_Abstract
     }
 
     /**
+     * Formats the column name in camel case.
+     *
+     * @param string $column The column's name.
+     *
+     * @return string
+     */
+    protected function getCamelCased($column)
+    {
+        $arr = str_split($column);
+        $ret = '';
+
+        for($i = 0; $i < strlen($column); $i++) {
+            if ($arr[$i] == '_') {
+                if (isset($arr[$i + 1])) {
+                    $arr[$i + 1] = strtoupper($arr[$i + 1]);
+                }
+            } else {
+                $ret .= $arr[$i];
+            }
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Formats a column's name in field's name format.
+     *
+     * @param string $columnName The column's name.
+     *
+     * @return string
+     */
+    protected function getFieldByColumn($columnName)
+    {
+        return substr($columnName, strpos($columnName, '_') + 1);
+    }
+
+    /**
      * Generates the code.
      *
      * @return void
