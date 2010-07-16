@@ -1,3 +1,5 @@
+#!/usr/bin/php
+<?php
 /**
  * Code generation tool launcher.
  *
@@ -10,8 +12,6 @@
  * @since     1.0.0
  */
 
-#!/usr/bin/php
-<?php
 require_once 'Zend/Loader/Autoloader.php';
 
 Zend_Loader_Autoloader::getInstance()

@@ -144,7 +144,10 @@ abstract class ZendExt_Tool_Generator_Abstract
      */
     protected final function _saveFile($content, $fileName)
     {
-        file_put_contents($this->_outputDir . '/'. $fileName, $content);
+        file_put_contents(
+            $this->_outputDir . DIRECTORY_SEPARATOR . $fileName,
+            $content
+        );
     }
 
     /**
