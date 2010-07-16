@@ -129,15 +129,22 @@ abstract class ZendExt_Tool_Generator_Abstract
     }
 
     /**
-     * Formats a column's name in field's name format.
+     * Removes the prefix of a column's name.
      *
      * @param string $columnName The column's name.
+     * @param string $separator  The character indicating the end of the prefix
      *
      * @return string
      */
-    protected function getFieldByColumn($columnName)
+    protected function _removeColumnPrefix($columnName, $separator = '_')
     {
-        return substr($columnName, strpos($columnName, '_') + 1);
+        $pos = strpos($columnName, $separator);
+
+        if (false === $pos) {
+            return $columnName;
+        }
+
+        return substr($columnName, $pos + 1);
     }
 
     /**
