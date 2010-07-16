@@ -124,7 +124,7 @@ class ZendExt_Tool
              class_parents($class)
         ) === false) {
             throw new ZendExt_Tool_Exception(
-            	'The generator must implement ZendExt_Tool_Generator_Abstract'
+            	'The generator must extend ZendExt_Tool_Generator_Abstract'
             );
         }
 
