@@ -389,34 +389,13 @@ abstract class ZendExt_Cron_Process
 
         $memoryUse = memory_get_usage();
 
-        $cpuUse = 0;
-        switch(PHP_OS) {
+        if (function_exists('sys_getloadavg')) {
 
-        case 'Linux':
+            $sysLoad = sys_getloadavg();
+            $cpuUse = $sysLoad[0];
+        } else {
 
-            $res = file_get_contents('/proc/loadavg');
-            $values = explode(' ', $res);
-
-            if (count($values) > 0) {
-                $cpuUse = $values[0];
-            }
-            break;
-
-        case 'FreeBSD':
-        case 'Darwin':
-        case 'NetBSD':
-        case 'OpenBSD':
-
-            $res = exec('sysctl -n vm.loadavg');
-            $values = explode(' ', $res);
-
-            if (isset($values[1]) && is_numeric($values[1])) {
-                $cpuUse = $values[1];
-            }
-            break;
-        default:
             $cpuUse = 0;
-            break;
         }
 
         $stats .= 'CPU use: '.$cpuUse.PHP_EOL;
