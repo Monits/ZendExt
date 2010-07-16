@@ -111,26 +111,21 @@ abstract class ZendExt_Tool_Generator_Abstract
     /**
      * Formats the column name in camel case.
      *
-     * @param string $column The column's name.
+     * @param string $column    The column's name.
+     * @param string $separator The character that separates words.
      *
      * @return string
      */
-    protected function getCamelCased($column)
+    protected function getCamelCased($column, $separator = '_')
     {
-        $arr = str_split($column);
-        $ret = '';
+        $parts = explode($separator, $column);
+        $partCount = count($parts);
 
-        for($i = 0; $i < strlen($column); $i++) {
-            if ($arr[$i] == '_') {
-                if (isset($arr[$i + 1])) {
-                    $arr[$i + 1] = strtoupper($arr[$i + 1]);
-                }
-            } else {
-                $ret .= $arr[$i];
-            }
+        for ($i = 1; $i < $partCount; $i++) {
+            $parts[$i] = ucfirst($parts[$i]);
         }
 
-        return $ret;
+        return implode('', $parts);
     }
 
     /**
