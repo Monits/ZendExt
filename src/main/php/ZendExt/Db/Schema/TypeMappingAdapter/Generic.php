@@ -32,7 +32,7 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
     /**
      * Attempts to retrieve a more standard type.
      *
-     * @param string $type The original type.
+     * @param string $type     The original type.
      * @param string $unsigned Whether the type is unsigned or not.
      *
      * @return array
@@ -44,7 +44,7 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
                 return array('name' => 'boolean');
             case 'tinyint':
                 return array(
-                	'name' => 'integer',
+                    'name' => 'integer',
                     'min' => $unsigned ? 0 : -128,
                     'max' => $unsigned ? 255 : 127
                 );

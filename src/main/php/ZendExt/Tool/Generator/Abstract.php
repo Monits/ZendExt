@@ -54,8 +54,9 @@ abstract class ZendExt_Tool_Generator_Abstract
 
         if ($this->_requiresSchema) {
             $opts = array(
-                'host|h-s'      => 'The database server host, default to localhost',
-                'db|D=s'          => 'The name of the database to use',
+                'host|h-s'      => 'The database server host, default '
+                    . 'to localhost',
+                'dbname|D=s'          => 'The name of the database to use',
                 'username|u=s'  => 'Connect to the database as this user',
                 'password|p=s'  => 'The password for the database user',
                 'adapter|a=s'   => 'Which Zend_Db adapter to use',
@@ -78,10 +79,10 @@ abstract class ZendExt_Tool_Generator_Abstract
     public final function setOptions(Zend_Console_Getopt $opts)
     {
         if ($this->_requiresSchema) {
-            if ($opts->db === null || $opts->username === null
+            if ($opts->dbname === null || $opts->username === null
                 || $opts->adapter === null || $opts->password === null) {
 
-                throw new ZendExt_Tool_Generator_Exception(
+                    throw new ZendExt_Tool_Generator_Exception(
                 	'All database options are required.'
                 );
             }
@@ -92,9 +93,9 @@ abstract class ZendExt_Tool_Generator_Abstract
 
         if ($this->_requiresSchema) {
             $desc = new ZendExt_Db_Schema(array(
-                'host' => $this->_opts->host,
-                'db' => $this->_opts->db === null ?
-                	'localhost' : $this->_opts->db,
+                'host' => $this->_opts->host === null ?
+                	'localhost' : $this->_opts->host,
+                'dbname' => $this->_opts->dbname,
                 'username' => $this->_opts->username,
                 'password' => $this->_opts->password,
                 'adapter' => $this->_opts->adapter
@@ -136,14 +137,14 @@ abstract class ZendExt_Tool_Generator_Abstract
     /**
      * Saves the given content in the given filename.
      *
-     * @param string $content The file content.
+     * @param string $content  The file content.
      * @param string $fileName The file name.
      *
      * @return void
      */
     protected final function _saveFile($content, $fileName)
     {
-        file_put_contents($this->_outputDir . '/'. $filename, $data);
+        file_put_contents($this->_outputDir . '/'. $fileName, $content);
     }
 
     /**

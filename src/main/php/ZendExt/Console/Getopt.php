@@ -23,23 +23,23 @@
  * @license   Copyright 2010. All rights reserved.
  * @version   Release: 1.0.0
  * @link      http://www.zendext.com/
- * @since     1.0.0
  * @see Zend_Console_Getopt
+ * @since     1.0.0
  */
 class ZendExt_Console_Getopt extends Zend_Console_Getopt
 {
 
     /**
      * Parse command-line arguments for a single option.
-     * 
+     *
      * Extended so not defined options are ignored instead
      * of make everything explode.
      *
-     * @param  string $flag
-     * @param  mixed  $argv
-     * 
+     * @param string $flag The option to parse.
+     * @param mixed  &$argv The array of received options.
+     *
      * @throws Zend_Console_Getopt_Exception
-     * 
+     *
      * @return void
      */
     protected function _parseSingleOption($flag, &$argv)
@@ -47,10 +47,10 @@ class ZendExt_Console_Getopt extends Zend_Console_Getopt
         if ($this->_getoptConfig[self::CONFIG_IGNORECASE]) {
             $flag = strtolower($flag);
         }
-        
+
         if (isset($this->_ruleMap[$flag])) {
                 parent::_parseSingleOption($flag, $argv);
         }
     }
-    
+
 }
