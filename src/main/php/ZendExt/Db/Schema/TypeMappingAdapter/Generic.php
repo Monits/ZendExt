@@ -37,6 +37,8 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
 	const TYPE_BLOB = 'blob';
     const TYPE_TEXT = 'text';
 	const TYPE_BINARY_VARYING = 'binary varying';
+    const TYPE_VARCHAR = 'varchar';
+    const TYPE_ENUM = 'enum';
 
     /**
      * Attempts to retrieve a more standard type.
@@ -95,10 +97,48 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
                 return array('name' => self::TYPE_TEXT);
             case 'varbinary':
                 return array('name' => self::TYPE_BINARY_VARYING);
+                
+            case (strtolower(substr($type, 0, 4)) == 'enum'):
+                return array(
+                    'name' => 'enum',
+                    'options' => $this->_parseEnum($type)
+                );
             default:
                 // For types that max and min is not necessary.
                 return array('name' => $type);
         }
+    }
+
+    /**
+     * Retrieves a parsed enum.
+     *
+     * This parsing implementation works for enums defined in this format:
+     * enum('a', 'b', 'c')
+     *  
+     * @param string $enum The enum definition.
+     *
+     * @return array
+     */
+    protected function _parseEnum($enum)
+    {
+    	/*
+    	 *  I chose this implementation over regexp because is easier
+    	 *  to mantain and understand.
+    	 */
+		$enum = str_replace('enum', '', $enum);
+		    
+		// Remove first and last parenthesis.
+		$enum = substr($enum, 1, -1);
+		    
+		$expl = explode(',', $enum);
+		$ret = array();
+		
+		foreach ($expl as $i) {
+		    // Remove whitespaces and quotes.
+		    $ret[] = substr(trim($i), 1, -1);
+		}
+    	
+		return $ret;
     }
 
     /**

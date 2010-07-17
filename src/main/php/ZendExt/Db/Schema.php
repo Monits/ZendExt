@@ -82,18 +82,23 @@ class ZendExt_Db_Schema
 
             $col['type'] = $type['name'];
 
-            if (isset($type['min'])) {
+            // Enum.
+            if (isset($type['options'])) {
+            	$col['extra']['options'] = $type['options'];
+            } else if (isset($type['min'])) { // Numeric.
                 $col['extra']['min'] = $type['min'];
                 $col['extra']['max'] = $type['max'];
             }
 
             $col['extra']['length'] = $column['LENGTH'];
 
-            $col['extra']['precision'] =
-                $column['PRECISION'] ===  null ? false : $column['PRECISION'];
+            if ($column['PRECISION'] !==  null) {
+            	$col['extra']['precision'] = $column['PRECISION'];
+            }
 
-            $col['extra']['scale'] =
-                $column['SCALE'] === null ? false : $column['SCALE'];
+            if ($column['SCALE'] !== null) {
+	            $col['extra']['scale'] = $column['SCALE'];
+            }
 
             $col['nullable'] = $column['NULLABLE'] == 1;
             $col['primary'] = $column['PRIMARY'] == 1;
