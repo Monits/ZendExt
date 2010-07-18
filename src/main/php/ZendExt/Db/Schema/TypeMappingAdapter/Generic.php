@@ -100,7 +100,7 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
                 
             case (strtolower(substr($type, 0, 4)) == 'enum'):
                 return array(
-                    'name' => 'enum',
+                    'name' => self::TYPE_ENUM,
                     'options' => $this->_parseEnum($type)
                 );
             default:
