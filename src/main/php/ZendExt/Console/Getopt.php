@@ -53,4 +53,22 @@ class ZendExt_Console_Getopt extends Zend_Console_Getopt
         }
     }
 
+    /**
+     * Retrieves an array from a list of values delimited by commas.
+     *
+     * @param string $flag The option to parse.
+     *
+     * @return array
+     */
+    public function getAsArray($flag)
+    {
+        $str = $this->$flag;
+
+        if (null === $str) {
+            return null;
+        }
+
+        return explode(',', $str);
+    }
+
 }
