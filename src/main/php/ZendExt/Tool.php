@@ -6,9 +6,9 @@
  * @package   ZendExt
  * @copyright 2010 Monits
  * @license   Copyright (C) 2010. All rights reserved.
- * @version   Release: 1.0.0
+ * @version   Release: 1.3.0
  * @link      http://www.zendext.com/
- * @since     1.0.0
+ * @since     1.3.0
  */
 
 /**
@@ -19,9 +19,9 @@
  * @author    Franco Zeoli <fzeoli@monits.com>
  * @copyright 2010 Monits
  * @license   Copyright 2010. All rights reserved.
- * @version   Release: 1.0.0
+ * @version   Release: 1.3.0
  * @link      http://www.zendext.com
- * @since     1.0.0
+ * @since     1.3.0
  */
 class ZendExt_Tool
 {
@@ -83,10 +83,14 @@ class ZendExt_Tool
 
        // No help asked.
        if ($opts->generator !== null) {
-            $gen = $tool->getGenerator($opts->generator, $opts->outputDir);
 
-            $gen->setOptions($tool->getOptions($gen->getOptions()));
-            $gen->generate();
+           foreach ($opts->getAsArray('generator') as $generator) {
+               $gen = $tool->getGenerator($generator, $opts->outputDir);
+
+               $gen->setOptions($tool->getOptions($gen->getOptions()));
+               $gen->generate();
+           }
+
        } else {
            // No required arg given.
            return $tool->getUsageMessage();
