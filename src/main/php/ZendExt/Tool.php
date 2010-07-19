@@ -39,7 +39,7 @@ class ZendExt_Tool
     public function getOptions(array $opts = array())
     {
         $opts['outputDir|o=s'] = 'The dir where to create the generated files';
-        $opts['generator|g=s'] = 'Which generator to use';
+        $opts['generator|g=s'] = 'Which generator to use. Case sensitive.';
         $opts['help-s']        = 'Displays help message for the given '
                                    . 'generator if any given, otherwise '
                                    . 'renders this message';
@@ -56,7 +56,7 @@ class ZendExt_Tool
     {
         return $this->getOptions()->getUsageMessage()
            . "\nAvailable generators: "
-           . strtolower(implode(', ', $this->getGenerators())) . PHP_EOL;
+           . implode(', ', $this->getGenerators()) . PHP_EOL;
     }
 
     /**
@@ -102,7 +102,6 @@ class ZendExt_Tool
      * @return ZendExt_Tool_Generator_Abstract
      */
     public function getGenerator($generator, $outputDir = null) {
-        $generator = ucfirst(strtolower($generator));
         $class = 'ZendExt_Tool_Generator_' . $generator;
 
         if (!file_exists(
