@@ -348,6 +348,7 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
                 return self::PHP_TYPE_INTEGER;
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_BLOB:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_TEXT:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_CHAR:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::
                 TYPE_BINARY_VARYING:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_VARCHAR:
