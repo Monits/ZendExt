@@ -8,7 +8,7 @@
  * @license   Copyright (C) 2010. All rights reserved.
  * @version   Release: 1.0.0
  * @link      http://www.zendext.com/
- * @since     1.0.0
+ * @since     1.3.0
  */
 
 /**
@@ -19,9 +19,9 @@
  * @author    Franco Zeoli <fzeoli@monits.com>
  * @copyright 2010 Monits
  * @license   Copyright 2010. All rights reserved.
- * @version   Release: 1.0.0
+ * @version   Release: 1.3.0
  * @link      http://www.zendext.com/
- * @since     1.0.0
+ * @since     1.3.0
  */
 abstract class ZendExt_Tool_Generator_Abstract
 {
@@ -174,15 +174,29 @@ abstract class ZendExt_Tool_Generator_Abstract
     }
 
     /**
-     * Saves the given content in the given filename.
+     * Saves the given content in a file.
+     *
+     * The file name and path is generated based on the class name and
+     * following the Zend naming conventions.
      *
      * @param string $content  The file content.
-     * @param string $fileName The file name.
+     * @param string $className The class name.
      *
      * @return void
      */
-    protected final function _saveFile($content, $fileName)
+    protected final function _saveFile($content, $className)
     {
+        $fileName = str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+        $dir = dirname($fileName);
+
+        if (!file_exists($dir)) {
+            mkdir($dir, 0755, true);
+        } else if (!is_writable($dir)) {
+            throw new ZendExt_Tool_Generator_Exception(
+            	'The output dir is not writable'
+            );
+        }
+
         file_put_contents(
             $this->_outputDir . DIRECTORY_SEPARATOR . $fileName,
             $content
