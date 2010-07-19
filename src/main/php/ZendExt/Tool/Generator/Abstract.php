@@ -63,6 +63,11 @@ abstract class ZendExt_Tool_Generator_Abstract
                 'password|p=s'  => 'The password for the database user',
                 'adapter|a=s'   => 'Which Zend_Db adapter to use',
 
+                'namespace|n-s' => 'The namespace.',
+                'company|c-s' 	=> 'The company name.',
+                'version|v-s'	=> 'The file version.',
+                'link|l-s' 		=> 'The link.',
+                'email|e-s'     => 'The mail',
             );
         }
 
@@ -135,7 +140,7 @@ abstract class ZendExt_Tool_Generator_Abstract
      *
      * @param string $columnName The column's name.
      * @param string $separator  The character indicating the end of the prefix
-     *
+     * tabs are not allowed
      * @return string
      */
     protected function _removeColumnPrefix($columnName, $separator = '_')
@@ -165,29 +170,51 @@ abstract class ZendExt_Tool_Generator_Abstract
         $this->_doGenerate();
     }
 
+    /**
+     * Retrieves the file docblock.
+     *
+     * @param string $description The short description.
+     * @param string $className	  The class name.
+     * @param string $separator	  The classname separator.
+     *
+     * @return Zend_CodeGenerator_Php_Docblock
+     */
+
     protected function _generateFileDocblock($description, $className,
-        $companyName = null, $version = null,
-        $link = null, $email = null,
-        $separator = '_')
+            $separator = '_')
     {
-        $tags = $this->_getGenericDocblockArray($className, $companyName,
-                $version, $link, $email, null, $separator);
+        $tags = $this->_getGenericDocblockArray($className, false, $separator);
 
         return $this->_generateDocblock($description, $tags);
     }
 
+    /**
+     * Retrieves the class docblock.
+     *
+     * @param string $description The short description.
+     * @param string $className	  The class name.
+     * @param boolean $author     True if the author have to be added.
+     * @param string $separator	  The classname separator.
+     *
+     * @return Zend_CodeGenerator_Php_Docblock
+     */
     protected function _generateClassDocblock($description, $className,
-        $companyName = null, $version = null,
-        $link = null, $email = null,
-        $author = null,
+        $author = false,
         $separator = '_')
     {
-        $tags = $this->_getGenericDocblockArray($className, $companyName,
-                $version, $link, $email, $author, $separator);
+        $tags = $this->_getGenericDocblockArray($className, true, $separator);
 
         return $this->_generateDocblock($description, $tags);
     }
 
+    /**
+     * Retrieves the docblock for the given args.
+     *
+     * @param string $description The docblock description.
+     * @param array  $tags        The docblock tags.
+     *
+     * @return Zend_CodeGenerator_Php_Docblock
+     */
     private function _generateDocblock($description, array $tags)
     {
         $docblock = new Zend_CodeGenerator_Php_Docblock();
@@ -211,23 +238,34 @@ abstract class ZendExt_Tool_Generator_Abstract
         return $docblock;
     }
 
+    /**
+     * Retrieves an array with docblock tags.
+     *
+     * @param string $className	  The class name.
+     * @param boolean $author     True if the author have to be added.
+     * @param string $separator	  The classname separator.
+     *
+     * @return array
+     */
     private function _getGenericDocblockArray($className,
-        $companyName = null, $version = null,
-        $link = null, $email = null,
-        $author = null,
-        $separator = '_')
+        $author = false, $separator = '_')
     {
         $className = explode($separator, $className);
         $category = $className[0];
         $namespace = implode($separator,
             array_splice($className, 0, count($className) -1));
-        $copyright = $companyName ?
-            date('Y') . ' ' . $companyName : 'Copyright';
+        $copyright = $this->_opts->company ?
+            date('Y') . ' ' . $this->_opts->company : 'Copyright';
+
         $license = 'Copyright (C) ' . date('Y') . '. All rights reserved';
-        $since = $version;
-        $version = $version ? $version : 'Realease: ' . $version;
-        $link = $link ? $link : 'www.example.com';
-        $since = $version ? $version : 'File version';
+
+        $version = $this->_opts->version ?
+            $this->_opts->version : 'Realease: ' . $this->_opts->version;
+
+        $link = $this->_opts->link ? $this->_opts->link : 'www.example.com';
+
+        $since = $this->_opts->version
+            ? $this->_opts->version : 'File version';
 
         $ret = array(
             array(
@@ -259,12 +297,14 @@ abstract class ZendExt_Tool_Generator_Abstract
                 'description' => $since
             )
         );
-        if ($author)
-        {
+
+        if ($author) {
             $ret[] = array(
             	'name'        => 'author',
                 'description' => $this->_getUsername()
-                    . ' <' . ($email ? $email : 'email') . '>'
+                    . ' <'
+                    . ($this->_opts->email ? $this->_opts->email : 'email')
+                    . '>'
             );
         }
 

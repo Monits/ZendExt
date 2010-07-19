@@ -10,8 +10,6 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
 
     private $_modelName = null;
 
-    private $_tableSquema = null;
-
     const CONSTRUCT_PARAM = 'data';
 
     /**
@@ -22,13 +20,8 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
     protected function _getExtraOptions()
     {
         $opts = array(
-    			'table|t=s'     => 'The model\'s name.',
+                'table|t=s'     => 'The model\'s name.',
                 'prefix|P-s'    => 'The column prefix.',
-                'namespace|n-s' => 'The namespace.',
-                'company|c-s' 	=> 'The company name.',
-                'version|v-s'	=> 'The file version.',
-                'link|l-s' 		=> 'The link.',
-                'email|e-s'     => 'The mail',
                 'setters|s-s'	=> 'The setter method.'
             );
 
@@ -42,7 +35,7 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
      *
      * @return string
      */
-    private function ident($amount = 1)
+    private function _indent($amount = 1)
     {
         return str_repeat('    ', $amount);
     }
@@ -62,7 +55,6 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
                 'The table doesn\'t exist'
             );
         }
-        $this->_tableSquema = $this->_schema[$this->_opts->table];
 
         if (null !== $this->_opts->setters) {
             if (strtoupper($this->_opts->setters) == 'ALL') {
@@ -78,23 +70,19 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
             )
         );
 
-        foreach ($this->_tableSquema as $k => $column) {
+        foreach ($this->_schema[$this->_opts->table] as $k => $column) {
             $class->setProperty(
                 array(
                     'name' 		 => '_' . $this->_getCamelCased($k),
                     'visibility' => 'protected'
                 )
             );
-        };
+        }
 
         $class->setDocblock(
             $this->_generateClassDocblock(
                 $this->_modelName . ' model.',
                 $className,
-                $this->_opts->company,
-                $this->_opts->version,
-                $this->_opts->link,
-                $this->_opts->email,
                 true
             )
         );
@@ -102,7 +90,7 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
         $methods = array();
         $methods[] = $this->_generateConstruct($className);
 
-        foreach ($this->_tableSquema as $k => $column) {
+        foreach ($this->_schema[$this->_opts->table] as $k => $column) {
 
             $paramName = $this->_getCamelCased($this->_removeColumnPrefix($k));
 
@@ -128,11 +116,7 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
         $file->setDocblock(
             $this->_generateFileDocblock(
                 $this->_modelName . ' model.',
-                $className,
-                $this->_opts->company,
-                $this->_opts->version,
-                $this->_opts->link,
-                $this->_opts->email
+                $className
             )
         );
 
@@ -194,9 +178,9 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
         $body = '';
         $body .= 'if (is_array($' . self::CONSTRUCT_PARAM . ')) {' . PHP_EOL;
 
-        foreach ($this->_tableSquema as $k => $column) {
+        foreach ($this->_schema[$this->_opts->table] as $k => $column) {
             $name = $this->_getCamelCased($this->_removeColumnPrefix($k));
-            $body .= $this->ident()
+            $body .= $this->_indent()
             		. "\$this->_{$name} = "
                     . '$' . self::CONSTRUCT_PARAM . "['{$name}'];"
                     . PHP_EOL;
@@ -206,19 +190,19 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
         $body .= '} else if ($' . self::CONSTRUCT_PARAM
                 . ' instanceof Zend_Db_Table_Row) {' . PHP_EOL;
 
-        foreach ($this->_tableSquema as $k => $column) {
+        foreach ($this->_schema[$this->_opts->table] as $k => $column) {
             $name = $this->_getCamelCased($this->_removeColumnPrefix($k));
-            $body .= $this->ident()
+            $body .= $this->_indent()
             		. "\$this->_{$name} = "
                     . '$' . self::CONSTRUCT_PARAM . "->{$k};" . PHP_EOL;
         };
 
         $body .= '} else {' . PHP_EOL;
-        $body .= $this->ident() . 'throw new Exception(' . PHP_EOL;
-        $body .= $this->ident(2)
+        $body .= $this->_indent() . 'throw new Exception(' . PHP_EOL;
+        $body .= $this->_indent(2)
                 . "'Can not create model instance from the given value.'"
                 . PHP_EOL;
-        $body .= $this->ident() . ');' . PHP_EOL;
+        $body .= $this->_indent() . ');' . PHP_EOL;
         $body .= '}' . PHP_EOL;
 
         $constructBody->setContent($body);
