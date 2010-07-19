@@ -66,6 +66,8 @@ abstract class ZendExt_Tool_Generator_Abstract
                 'namespace|n-s' => 'The namespace.',
                 'company|c-s' 	=> 'The company name.',
                 'version|v-s'	=> 'The file version.',
+                'since|s-s'	    => 'Since which version the generated '
+                                 . 'file exists',
                 'link|l-s' 		=> 'The link.',
                 'email|e-s'     => 'The mail',
             );
@@ -255,17 +257,17 @@ abstract class ZendExt_Tool_Generator_Abstract
         $namespace = implode($separator,
             array_splice($className, 0, count($className) -1));
         $copyright = $this->_opts->company ?
-            date('Y') . ' ' . $this->_opts->company : 'Copyright';
+            date('Y') . ' ' . $this->_opts->company : date('Y') . ' Company';
 
         $license = 'Copyright (C) ' . date('Y') . '. All rights reserved';
 
         $version = $this->_opts->version ?
-            $this->_opts->version : 'Release: ' . $this->_opts->version;
+            'Release: 1.0.0' : 'Release: ' . $this->_opts->version;
 
         $link = $this->_opts->link ? $this->_opts->link : 'www.example.com';
 
-        $since = $this->_opts->version
-            ? $this->_opts->version : 'File version';
+        $since = $this->_opts->since
+            ? $this->_opts->since : '1.0.0';
 
         $ret = array(
             array(
