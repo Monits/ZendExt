@@ -277,7 +277,21 @@ abstract class ZendExt_Tool_Generator_Abstract
             array(
                 'name'        => 'package',
                 'description' => $namespace
-            ),
+            )
+        );
+
+        if ($author) {
+            $ret[] = array(
+            	'name'        => 'author',
+                'description' => $this->_getUsername()
+                    . ' <'
+                    . ($this->_opts->email ? $this->_opts->email : 'email@host.com')
+                    . '>'
+            );
+        }
+
+        // This is ugly. But needed to get the author in the correct position.
+        $ret = array_merge($ret, array(
             array(
                 'name'        => 'copyright',
                 'description' => $copyright
@@ -298,17 +312,7 @@ abstract class ZendExt_Tool_Generator_Abstract
                 'name'        => 'since',
                 'description' => $since
             )
-        );
-
-        if ($author) {
-            $ret[] = array(
-            	'name'        => 'author',
-                'description' => $this->_getUsername()
-                    . ' <'
-                    . ($this->_opts->email ? $this->_opts->email : 'email')
-                    . '>'
-            );
-        }
+        ));
 
         return $ret;
     }
