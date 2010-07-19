@@ -31,6 +31,8 @@ abstract class ZendExt_Tool_Generator_Abstract
     protected $_outputDir;
     protected $_opts;
 
+    private $_docIdentation = 0;
+
     /**
      * Creates a new generator.
      *
@@ -161,6 +163,142 @@ abstract class ZendExt_Tool_Generator_Abstract
         }
 
         $this->_doGenerate();
+    }
+
+    protected function _generateFileDocblock($description, $className,
+        $companyName = null, $version = null,
+        $link = null, $email = null,
+        $separator = '_')
+    {
+        $tags = $this->_getGenericDocblockArray($className, $companyName,
+                $version, $link, $email, null, $separator);
+
+        return $this->_generateDocblock($description, $tags);
+    }
+
+    protected function _generateClassDocblock($description, $className,
+        $companyName = null, $version = null,
+        $link = null, $email = null,
+        $author = null,
+        $separator = '_')
+    {
+        $tags = $this->_getGenericDocblockArray($className, $companyName,
+                $version, $link, $email, $author, $separator);
+
+        return $this->_generateDocblock($description, $tags);
+    }
+
+    private function _generateDocblock($description, array $tags)
+    {
+        $docblock = new Zend_CodeGenerator_Php_Docblock();
+        $docblock->setShortDescription($description);
+
+        foreach ($tags as $tag) {
+            $length = strlen($tag['name']);
+            if ($length > $this->_docIdentation) {
+                $this->_docIdentation = $length;
+            }
+        }
+
+        $docTags = array();
+        foreach ($tags as $tag) {
+            $docTags[] = $this->_generateTag(
+                $tag['name'], $tag['description']
+            );
+        }
+        $docblock->setTags($docTags);
+
+        return $docblock;
+    }
+
+    private function _getGenericDocblockArray($className,
+        $companyName = null, $version = null,
+        $link = null, $email = null,
+        $author = null,
+        $separator = '_')
+    {
+        $className = explode($separator, $className);
+        $category = $className[0];
+        $namespace = implode($separator,
+            array_splice($className, 0, count($className) -1));
+        $copyright = $companyName ?
+            date('Y') . ' ' . $companyName : 'Copyright';
+        $license = 'Copyright (C) ' . date('Y') . '. All rights reserved';
+        $since = $version;
+        $version = $version ? $version : 'Realease: ' . $version;
+        $link = $link ? $link : 'www.example.com';
+        $since = $version ? $version : 'File version';
+
+        $ret = array(
+            array(
+                'name'        => 'category',
+                'description' => $category
+            ),
+            array(
+                'name'        => 'package',
+                'description' => $namespace
+            ),
+            array(
+                'name'        => 'copyright',
+                'description' => $copyright
+            ),
+            array(
+                'name'        => 'license',
+                'description' => $license
+            ),
+            array(
+                'name'        => 'version',
+                'description' => $version
+            ),
+            array(
+                'name'        => 'link',
+                'description' => $link
+            ),
+            array(
+                'name'        => 'since',
+                'description' => $since
+            )
+        );
+        if ($author)
+        {
+            $ret[] = array(
+            	'name'        => 'author',
+                'description' => $this->_getUsername()
+                    . ' <' . ($email ? $email : 'email') . '>'
+            );
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Retrieves a docblock tag.
+     *
+     * @param string $name 		  The tag's name.
+     * @param string $description The tag's description.
+     *
+     * @return Zend_CodeGenerator_Php_Docblock_Tag
+     */
+    protected function _generateTag($name, $description)
+    {
+        $desc = str_repeat(' ', $this->_docIdentation - strlen($name));
+        $desc .= $description ? $description : 'Description';
+        return new Zend_CodeGenerator_Php_Docblock_Tag(
+            array(
+                'name'        => $name ? $name : 'unknown',
+                'description' => $desc
+            )
+        );
+    }
+
+    /**
+     * Retrieves the username.
+     *
+     * @return string
+     */
+    private function _getUsername()
+    {
+        return $_SERVER['USER'];
     }
 
     /**
