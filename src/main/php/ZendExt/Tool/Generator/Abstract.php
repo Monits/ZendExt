@@ -260,7 +260,7 @@ abstract class ZendExt_Tool_Generator_Abstract
         $license = 'Copyright (C) ' . date('Y') . '. All rights reserved';
 
         $version = $this->_opts->version ?
-            $this->_opts->version : 'Realease: ' . $this->_opts->version;
+            $this->_opts->version : 'Release: ' . $this->_opts->version;
 
         $link = $this->_opts->link ? $this->_opts->link : 'www.example.com';
 
