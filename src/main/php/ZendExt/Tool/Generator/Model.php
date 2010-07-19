@@ -1,12 +1,32 @@
 <?php
+/**
+ * Models code generator.
+ *
+ * @category  ZendExt
+ * @package   ZendExt_Tool_Generator
+ * @copyright 2010 Monits
+ * @license   Copyright (C) 2010. All rights reserved.
+ * @version   Release: 1.3.0
+ * @link      http://www.zendext.com/
+ * @since     1.3.0
+ */
 
+/**
+ * Models code generator.
+ *
+ * @category  ZendExt
+ * @package   ZendExt_Tool_Generator
+ * @author    itirabasso <itirabasso@monits.com>
+ * @copyright 2010 Monits
+ * @license   Copyright 2010. All rights reserved.
+ * @version   Release: 1.0.0
+ * @link      http://www.zendext.com/
+ * @since     1.3.0
+ */
 class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
 {
 
     protected $_requiresSchema = true;
-
-    private $_setters = array();
-    private $_allSetters = false;
 
     private $_modelName = null;
 
@@ -20,9 +40,9 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
     protected function _getExtraOptions()
     {
         $opts = array(
-                'table|t=s'     => 'The model\'s name.',
+                'table|t-s'     => 'The table\'s name.',
                 'prefix|P-s'    => 'The column prefix.',
-                'setters|s-s'	=> 'The setter method.'
+                'setters|S-s'	=> 'The setter method.'
             );
 
         return $opts;
@@ -31,7 +51,7 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
     /**
      * Retrives the identation for the given amount.
      *
-     * @param int $amount
+     * @param int $amount The amount of indentations.
      *
      * @return string
      */
@@ -42,27 +62,35 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
 
     /** Generates the code.
      *
+     * @throws Exception
+     *
      * @return void
      */
     protected function _doGenerate()
     {
+        if (null === $this->_opts->table || $this->_opts->table === true) {
+            foreach ($this->_schema as $k => $table) {
+                $this->_generateModel($k);
+            }
+        } else {
+            $tables = $this->_opts->getAsArray('table');
+            foreach ($tables as $table) {
+                $this->_generateModel($table);
+            }
+        }
+    }
 
-        $this->_modelName = ucfirst($this->_opts->table);
-        $className = $this->_opts->namespace . '_' . $this->_modelName;
+    private function _generateModel($table)
+    {
 
-        if (!isset($this->_schema[$this->_opts->table])) {
+        if (!isset($this->_schema[$table])) {
             throw new Exception(
                 'The table doesn\'t exist'
             );
         }
 
-        if (null !== $this->_opts->setters) {
-            if (strtoupper($this->_opts->setters) == 'ALL') {
-                $this->_allSetters = true;
-            } else {
-                $this->_setters = $this->_opts->getAsArray('setters');
-            }
-        }
+        $this->_modelName = ucfirst($table);
+        $className = $this->_opts->namespace . '_' . $this->_modelName;
 
         $class = new Zend_CodeGenerator_Php_Class(
             array(
@@ -70,10 +98,13 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
             )
         );
 
-        foreach ($this->_schema[$this->_opts->table] as $k => $column) {
+        foreach ($this->_schema[$table] as $k => $column) {
+            $varName = $this->_getCamelCased(
+                $this->_removeColumnPrefix($k, $this->_opts->prefix)
+            );
             $class->setProperty(
                 array(
-                    'name' 		 => '_' . $this->_getCamelCased($k),
+                    'name' 		 => '_' . $varName,
                     'visibility' => 'protected'
                 )
             );
@@ -86,19 +117,19 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
                 true
             )
         );
-
         $methods = array();
-        $methods[] = $this->_generateConstruct($className);
+        $methods[] = $this->_generateConstruct($table, $className);
 
-        foreach ($this->_schema[$this->_opts->table] as $k => $column) {
-
-            $paramName = $this->_getCamelCased($this->_removeColumnPrefix($k));
+        foreach ($this->_schema[$table] as $k => $column) {
+            $paramName = $this->_getCamelCased(
+                $this->_removeColumnPrefix($k, $this->_opts->prefix)
+            );
 
             $getMethod = $this->_generateGetter($paramName, $column);
 
             $setMethod = null;
 
-            if (in_array($k, $this->_setters) || $this->_allSetters) {
+            if ($this->_opts->setters) {
                 $setMethod = $this->_generateSetter($paramName, $column);
             }
 
@@ -131,11 +162,11 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
      *
      * @return Zend_CodeGenerator_Php_Method
      */
-    private function _generateConstruct($returnType)
+    private function _generateConstruct($table, $returnType)
     {
         $docReturnTag = new Zend_CodeGenerator_Php_Docblock_Tag_Return(
             array(
-            	'datatype' => $returnType
+                'datatype' => $returnType
             )
         );
 
@@ -156,20 +187,21 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
 
         $constructDoc = new Zend_CodeGenerator_Php_Docblock(
             array(
-                'shortDescription' => 'Creates a new ' . $this->_modelName . ' model.',
+                'shortDescription' =>
+                    'Creates a new ' . $this->_modelName . ' model.',
                 'tags' => array($docParams, $docReturnTag, $docTags)
             )
         );
 
         $params = new Zend_CodeGenerator_Php_Parameter(
             array(
-            	'name' => self::CONSTRUCT_PARAM
+                'name' => self::CONSTRUCT_PARAM
             )
         );
 
         $construct = new Zend_CodeGenerator_Php_Method(
             array(
-            	'name'     => '__constructor',
+                'name'     => '__constructor',
                 'parameters'   => array($params)
             )
         );
@@ -178,10 +210,12 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
         $body = '';
         $body .= 'if (is_array($' . self::CONSTRUCT_PARAM . ')) {' . PHP_EOL;
 
-        foreach ($this->_schema[$this->_opts->table] as $k => $column) {
-            $name = $this->_getCamelCased($this->_removeColumnPrefix($k));
+        foreach ($this->_schema[$table] as $k => $column) {
+            $name = $this->_getCamelCased(
+                $this->_removeColumnPrefix($k, $this->_opts->prefix)
+            );
             $body .= $this->_indent()
-            		. "\$this->_{$name} = "
+                    . "\$this->_{$name} = "
                     . '$' . self::CONSTRUCT_PARAM . "['{$name}'];"
                     . PHP_EOL;
 
@@ -190,10 +224,12 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
         $body .= '} else if ($' . self::CONSTRUCT_PARAM
                 . ' instanceof Zend_Db_Table_Row) {' . PHP_EOL;
 
-        foreach ($this->_schema[$this->_opts->table] as $k => $column) {
-            $name = $this->_getCamelCased($this->_removeColumnPrefix($k));
+        foreach ($this->_schema[$table] as $k => $column) {
+            $name = $this->_getCamelCased(
+                $this->_removeColumnPrefix($k, $this->_opts->prefix)
+            );
             $body .= $this->_indent()
-            		. "\$this->_{$name} = "
+                    . "\$this->_{$name} = "
                     . '$' . self::CONSTRUCT_PARAM . "->{$k};" . PHP_EOL;
         };
 
@@ -228,7 +264,7 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
 
         $docReturnTag = new Zend_CodeGenerator_Php_Docblock_Tag_Return(
              array(
-             	'datatype' => $this->_transformType($column['type'])
+                'datatype' => $this->_transformType($column['type'])
              )
         );
 
@@ -267,15 +303,15 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
 
         $docReturnTag = new Zend_CodeGenerator_Php_Docblock_Tag_Return(
             array(
-            	'datatype' => 'void'
+                'datatype' => 'void'
             )
         );
 
         $docParamTag = new Zend_CodeGenerator_Php_Docblock_Tag_Param(
             array(
-            	'name'    		   => $columnName,
-              	'description'	   => 'Description.',
-				'datatype'         => $this->_transformType($column['type'])
+                'name'    		   => $columnName,
+                'description'	   => 'Description.',
+                'datatype'         => $this->_transformType($column['type'])
             )
         );
 
@@ -292,7 +328,7 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
     }
 
     /**
-     * attempts to convert the given type into a php one.
+     * Attempts to convert the given type into a php one.
      *
      * @param string $dataType The data type.
      *
@@ -301,24 +337,30 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
     private function _transformType($dataType)
     {
         switch ($dataType) {
-            case 'boolean':
-                return 'boolean';
-        	case 'integer':
-        	case 'smallint':
-    		case 'integer':
-            case 'double':
-            case 'double precision':
-                return 'int';
-            case 'blob':
-            case 'text':
-            case 'binary varying':
-            case 'varchar':
-            case 'char':
-            case 'datetime':
-            case strpos($dataType, 'enum'):
-                return 'string';
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_BOOLEAN:
+                return self::PHP_TYPE_BOOLEAN;
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_INTEGER:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_SMALLINT:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_BIGINT:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::
+                TYPE_DOUBLE_PRECISION:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_DECIMAL:
+                return self::PHP_TYPE_INTEGER;
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_BLOB:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_TEXT:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::
+                TYPE_BINARY_VARYING:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_VARCHAR:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_ENUM:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::
+                CURRENT_TIMESTAMP:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_DATE:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_TIME:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_TIMESTAMP:
+                return self::PHP_TYPE_STRING;
             default:
                 return "unknown ({$dataType})";
+                break;
         }
     }
 }

@@ -33,6 +33,10 @@ abstract class ZendExt_Tool_Generator_Abstract
 
     private $_docIdentation = 0;
 
+    const PHP_TYPE_BOOLEAN = 'boolean';
+    const PHP_TYPE_INTEGER = 'int';
+    const PHP_TYPE_STRING = 'string';
+
     /**
      * Creates a new generator.
      *
@@ -52,25 +56,26 @@ abstract class ZendExt_Tool_Generator_Abstract
      */
     public final function getOptions()
     {
-        $opts = array();
+        $opts = array(
+            'namespace|n-s' => 'The namespace.',
+            'company|c-s' 	=> 'The company name.',
+            'version|v-s'	=> 'The file version.',
+            'since|s-s'	    => 'Since which version the generated '
+                . 'file exists',
+            'link|l-s' 		=> 'The link.',
+            'email|e-s'     => 'The mail'
+        );
 
         if ($this->_requiresSchema) {
-            $opts = array(
+            $arr = array(
                 'host|h-s'      => 'The database server host, default '
                     . 'to localhost',
-                'dbname|D=s'          => 'The name of the database to use',
+                'dbname|D=s'    => 'The name of the database to use',
                 'username|u=s'  => 'Connect to the database as this user',
                 'password|p=s'  => 'The password for the database user',
-                'adapter|a=s'   => 'Which Zend_Db adapter to use',
-
-                'namespace|n-s' => 'The namespace.',
-                'company|c-s' 	=> 'The company name.',
-                'version|v-s'	=> 'The file version.',
-                'since|s-s'	    => 'Since which version the generated '
-                                 . 'file exists',
-                'link|l-s' 		=> 'The link.',
-                'email|e-s'     => 'The mail',
+                'adapter|a=s'   => 'Which Zend_Db adapter to use'
             );
+            $opts = array_merge($opts, $arr);
         }
 
         return array_merge($opts, $this->_getExtraOptions());
@@ -92,7 +97,7 @@ abstract class ZendExt_Tool_Generator_Abstract
                 || $opts->adapter === null || $opts->password === null) {
 
                     throw new ZendExt_Tool_Generator_Exception(
-                	'All database options are required.'
+                        'All database options are required.'
                 );
             }
         }
@@ -103,7 +108,7 @@ abstract class ZendExt_Tool_Generator_Abstract
         if ($this->_requiresSchema) {
             $desc = new ZendExt_Db_Schema(array(
                 'host' => $this->_opts->host === null ?
-                	'localhost' : $this->_opts->host,
+                    'localhost' : $this->_opts->host,
                 'dbname' => $this->_opts->dbname,
                 'username' => $this->_opts->username,
                 'password' => $this->_opts->password,
@@ -141,8 +146,8 @@ abstract class ZendExt_Tool_Generator_Abstract
      * Removes the prefix of a column's name.
      *
      * @param string $columnName The column's name.
-     * @param string $separator  The character indicating the end of the prefix
-     * tabs are not allowed
+     * @param string $separator  The character indicating the end of the prefix.
+     *
      * @return string
      */
     protected function _removeColumnPrefix($columnName, $separator = '_')
@@ -153,11 +158,13 @@ abstract class ZendExt_Tool_Generator_Abstract
             return $columnName;
         }
 
-        return substr($columnName, $pos + 1);
+        return substr($columnName, $pos + strlen($separator));
     }
 
     /**
      * Generates the code.
+     *
+     * @throws ZendExt_Tool_Generator_Exception
      *
      * @return void
      */
@@ -165,7 +172,7 @@ abstract class ZendExt_Tool_Generator_Abstract
     {
         if (false === $this->_initialized) {
             throw new ZendExt_Tool_Generator_Exception(
-            	'Options must be set before generating code'
+                'Options must be set before generating code'
             );
         }
 
@@ -181,7 +188,6 @@ abstract class ZendExt_Tool_Generator_Abstract
      *
      * @return Zend_CodeGenerator_Php_Docblock
      */
-
     protected function _generateFileDocblock($description, $className,
             $separator = '_')
     {
@@ -193,10 +199,10 @@ abstract class ZendExt_Tool_Generator_Abstract
     /**
      * Retrieves the class docblock.
      *
-     * @param string $description The short description.
-     * @param string $className	  The class name.
-     * @param boolean $author     True if the author have to be added.
-     * @param string $separator	  The classname separator.
+     * @param string  $description The short description.
+     * @param string  $className   The class name.
+     * @param boolean $author      True if the author have to be added.
+     * @param string  $separator   The classname separator.
      *
      * @return Zend_CodeGenerator_Php_Docblock
      */
@@ -243,9 +249,9 @@ abstract class ZendExt_Tool_Generator_Abstract
     /**
      * Retrieves an array with docblock tags.
      *
-     * @param string $className	  The class name.
+     * @param string  $className  The class name.
      * @param boolean $author     True if the author have to be added.
-     * @param string $separator	  The classname separator.
+     * @param string  $separator  The classname separator.
      *
      * @return array
      */
@@ -254,8 +260,10 @@ abstract class ZendExt_Tool_Generator_Abstract
     {
         $className = explode($separator, $className);
         $category = $className[0];
-        $namespace = implode($separator,
-            array_splice($className, 0, count($className) -1));
+        $namespace = implode(
+            $separator,
+            array_splice($className, 0, count($className) -1)
+        );
         $copyright = $this->_opts->company ?
             date('Y') . ' ' . $this->_opts->company : date('Y') . ' Company';
 
@@ -282,37 +290,51 @@ abstract class ZendExt_Tool_Generator_Abstract
 
         if ($author) {
             $ret[] = array(
-            	'name'        => 'author',
+                'name'        => 'author',
                 'description' => $this->_getUsername()
                     . ' <'
-                    . ($this->_opts->email ? $this->_opts->email : 'email@host.com')
+                    . ($this->_opts->email ?
+                        $this->_opts->email : 'email@host.com')
                     . '>'
             );
         }
 
         // This is ugly. But needed to get the author in the correct position.
-        $ret = array_merge($ret, array(
+        $ret = array_merge(
+            $ret,
             array(
-                'name'        => 'copyright',
-                'description' => $copyright
-            ),
-            array(
-                'name'        => 'license',
-                'description' => $license
-            ),
-            array(
-                'name'        => 'version',
-                'description' => $version
-            ),
-            array(
-                'name'        => 'link',
-                'description' => $link
-            ),
-            array(
-                'name'        => 'since',
-                'description' => $since
+                array(
+                    'name'        => 'copyright',
+                    'description' => $copyright
+                ),
+                array(
+                    'name'        => 'license',
+                    'description' => $license
+                ),
+                array(
+                    'name'        => 'version',
+                    'description' => $version
+                ),
+                array(
+                    'name'        => 'link',
+                    'description' => $link
+                ),
+                array(
+                    'name'        => 'since',
+                    'description' => $since
+                )
             )
-        ));
+        );
+
+        if ($author) {
+            $ret[] = array(
+                'name'        => 'author',
+                'description' => $this->_getUsername()
+                    . ' <'
+                    . ($this->_opts->email ? $this->_opts->email : 'email')
+                    . '>'
+            );
+        }
 
         return $ret;
     }
@@ -320,7 +342,7 @@ abstract class ZendExt_Tool_Generator_Abstract
     /**
      * Retrieves a docblock tag.
      *
-     * @param string $name 		  The tag's name.
+     * @param string $name        The tag's name.
      * @param string $description The tag's description.
      *
      * @return Zend_CodeGenerator_Php_Docblock_Tag
@@ -363,11 +385,14 @@ abstract class ZendExt_Tool_Generator_Abstract
      * The file name and path is generated based on the class name and
      * following the Zend naming conventions.
      *
-     * @param string $content  The file content.
+     * @param string $content   The file content.
      * @param string $className The class name.
+     *
+     * @throws ZendExt_Tool_Generator_Exception
      *
      * @return void
      */
+
     protected final function _saveFile($content, $className)
     {
         $fileName = str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
@@ -377,7 +402,7 @@ abstract class ZendExt_Tool_Generator_Abstract
             mkdir($dir, 0755, true);
         } else if (!is_writable($dir)) {
             throw new ZendExt_Tool_Generator_Exception(
-            	'The output dir is not writable'
+                'The output dir is not writable'
             );
         }
 
