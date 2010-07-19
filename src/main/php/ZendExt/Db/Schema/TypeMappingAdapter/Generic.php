@@ -6,9 +6,9 @@
  * @package   ZendExt_Db_Schema_TypeMappingAdapter
  * @copyright 2010 Monits
  * @license   Copyright (C) 2010. All rights reserved.
- * @version   Release: 1.0.0
+ * @version   Release: 1.3.0
  * @link      http://www.zendext.com/
- * @since     1.0.0
+ * @since     1.3.0
  */
 
 /**
@@ -19,9 +19,9 @@
  * @author    Franco Zeoli <fzeoli@monits.com>
  * @copyright 2010 Monits
  * @license   Copyright 2010. All rights reserved.
- * @version   Release: 1.0.0
+ * @version   Release: 1.3.0
  * @link      http://www.zendext.com/
- * @since     1.0.0
+ * @since     1.3.0
  */
 class ZendExt_Db_Schema_TypeMappingAdapter_Generic
 {
@@ -39,6 +39,8 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
 	const TYPE_BINARY_VARYING = 'binary varying';
     const TYPE_VARCHAR = 'varchar';
     const TYPE_ENUM = 'enum';
+    const TYPE_DECIMAL = 'decimal';
+    const TYPE_TIMESTAMP = 'timestamp';
 
     /**
      * Attempts to retrieve a more standard type.
@@ -97,7 +99,7 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
                 return array('name' => self::TYPE_TEXT);
             case 'varbinary':
                 return array('name' => self::TYPE_BINARY_VARYING);
-                
+
             case (strtolower(substr($type, 0, 4)) == 'enum'):
                 return array(
                     'name' => self::TYPE_ENUM,
@@ -114,7 +116,7 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
      *
      * This parsing implementation works for enums defined in this format:
      * enum('a', 'b', 'c')
-     *  
+     *
      * @param string $enum The enum definition.
      *
      * @return array
@@ -126,18 +128,18 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
     	 *  to mantain and understand.
     	 */
 		$enum = str_replace('enum', '', $enum);
-		    
+
 		// Remove first and last parenthesis.
 		$enum = substr($enum, 1, -1);
-		    
+
 		$expl = explode(',', $enum);
 		$ret = array();
-		
+
 		foreach ($expl as $i) {
 		    // Remove whitespaces and quotes.
 		    $ret[] = substr(trim($i), 1, -1);
 		}
-    	
+
 		return $ret;
     }
 
