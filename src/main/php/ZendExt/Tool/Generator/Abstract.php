@@ -346,16 +346,6 @@ abstract class ZendExt_Tool_Generator_Abstract
             )
         );
 
-        if ($author) {
-            $ret[] = array(
-                'name'        => 'author',
-                'description' => $this->_getUsername()
-                    . ' <'
-                    . ($this->_opts->email ? $this->_opts->email : 'email')
-                    . '>'
-            );
-        }
-
         return $ret;
     }
 
