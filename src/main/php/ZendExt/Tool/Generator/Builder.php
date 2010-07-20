@@ -38,9 +38,8 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
     protected function _getExtraOptions()
     {
         return array(
-        	'table|t=s' => 'Which table to generate its builder.',
-            'namespace|n-s' => 'The class namespace.',
-            'modelclass|m-s' => 'The model class that the builder will build.'
+        	'table|t-s'        => 'Which table to generate its builder.',
+            'modelnamespace=s' => 'The model namespace'
         );
     }
 
@@ -51,13 +50,38 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
      */
     protected function _doGenerate()
     {
-        if (!isset($this->_schema[$this->_opts->table])) {
+
+        if (null === $this->_opts->table) {
+            $tables = array_keys($this->_schema);
+        } else {
+            $tables = $this->_opts->getAsArray('table');
+        }
+
+        foreach ($tables as $table) {
+            $this->_generateBuilder($table);
+        }
+
+    }
+
+    /**
+     * Generates a builder for the given table.
+     *
+     * @param string $table The table name.
+     *
+     * @throws ZendExt_Tool_Generator_Exception
+     *
+     * @return void
+     */
+    private function _generateBuilder($table)
+    {
+
+        if (!isset($this->_schema[$table])) {
             throw new ZendExt_Tool_Generator_Exception(
-            	'The asked table does not exists (' . $this->_opts->table . ')'
+            	'The asked table does not exists (' . $table . ')'
 			);
         }
 
-        $name = $this->_opts->namespace . ucfirst($this->_opts->table);
+        $name = $this->_opts->namespace . ucfirst($table);
 
         $class = new Zend_CodeGenerator_Php_Class();
         $class->setName($name)
@@ -65,7 +89,8 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
             ->setProperty(array(
                 'name' => '_class',
 		        'visibility' => 'protected',
-			    'defaultValue' => $this->_opts->modelclass
+			    'defaultValue' => $this->_opts->modelnamespace
+                    . ucfirst($table)
              ))
             ->setMethod(array(
                 'name' => '__construct',
@@ -78,10 +103,10 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
                     )
                 )),
                 'body' => '$this->_fields = '
-                  . $this->_getTableFields($this->_opts->table) . ';'
+                  . $this->_getTableFields($table) . ';'
         ));
 
-        $desc = ucfirst($this->_opts->table) . ' model builder.';
+        $desc = ucfirst($table) . ' model builder.';
 
         $class->setDocblock($this->_generateClassDocblock($desc, $name));
         $file = new Zend_CodeGenerator_Php_File();
@@ -90,7 +115,6 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
         $file->setDocblock($this->_generateFileDocblock($desc, $name));
 
         $this->_saveFile($file->generate(), $name);
-
     }
 
     /**
