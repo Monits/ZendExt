@@ -25,6 +25,8 @@
  */
 abstract class ZendExt_Tool_Generator_Abstract
 {
+    private static $_logger;
+
     private $_initialized = false;
     protected $_requiresSchema = false;
     protected $_schema;
@@ -50,6 +52,24 @@ abstract class ZendExt_Tool_Generator_Abstract
     }
 
     /**
+     * Retrieves the generator logger.
+     *
+     * @return Zend_Log
+     */
+    protected function _getLogger()
+    {
+        if (null === self::$_logger) {
+            self::$_logger = new Zend_Log();
+
+            self::$_logger->addWriter(
+                new Zend_Log_Writer_Stream('php://output')
+            );
+        }
+
+        return self::$_logger;
+    }
+
+    /**
      * Retrieves the options that the generator needs.
      *
      * @return array
@@ -59,7 +79,6 @@ abstract class ZendExt_Tool_Generator_Abstract
         $opts = array(
             'namespace|n-s' => 'The namespace.',
             'company|c-s' 	=> 'The company name.',
-            'version|v-s'	=> 'The file version.',
             'since|s-s'	    => 'Since which version the generated '
                 . 'file exists',
             'link|l-s' 		=> 'The link.',
@@ -82,7 +101,7 @@ abstract class ZendExt_Tool_Generator_Abstract
     }
 
     /**
-     * Sets the generator optionsl.
+     * Sets the generator options.
      *
      * @param Zend_Console_Getopt $opts The options.
      *
@@ -106,6 +125,8 @@ abstract class ZendExt_Tool_Generator_Abstract
         $this->_initialized = true;
 
         if ($this->_requiresSchema) {
+            $this->_getLogger()->debug('Schema required, getting it');
+
             $desc = new ZendExt_Db_Schema(array(
                 'host' => $this->_opts->host === null ?
                     'localhost' : $this->_opts->host,
@@ -269,8 +290,7 @@ abstract class ZendExt_Tool_Generator_Abstract
 
         $license = 'Copyright (C) ' . date('Y') . '. All rights reserved';
 
-        $version = $this->_opts->version ?
-            'Release: 1.0.0' : 'Release: ' . $this->_opts->version;
+        $version = 'Release: 1.0.0';
 
         $link = $this->_opts->link ? $this->_opts->link : 'www.example.com';
 
@@ -392,7 +412,6 @@ abstract class ZendExt_Tool_Generator_Abstract
      *
      * @return void
      */
-
     protected final function _saveFile($content, $className)
     {
         $fileName = str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
@@ -400,16 +419,19 @@ abstract class ZendExt_Tool_Generator_Abstract
 
         if (!file_exists($dir)) {
             mkdir($dir, 0755, true);
+
+            $this->_getLogger()->debug('Created ' . $dir . ' dir');
         } else if (!is_writable($dir)) {
             throw new ZendExt_Tool_Generator_Exception(
                 'The output dir is not writable'
             );
         }
 
-        file_put_contents(
-            $this->_outputDir . DIRECTORY_SEPARATOR . $fileName,
-            $content
-        );
+        $file = $this->_outputDir . DIRECTORY_SEPARATOR . $fileName;
+
+        $this->_getLogger()->debug('Saving file ' . $file);
+
+        file_put_contents($file, $content);
     }
 
     /**

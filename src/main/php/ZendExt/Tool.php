@@ -81,20 +81,20 @@ class ZendExt_Tool
                         ->getUsageMessage();
         }
 
-       // No help asked.
-       if ($opts->generator !== null) {
+        // No help asked.
+        if ($opts->generator !== null) {
 
-           foreach ($opts->getAsArray('generator') as $generator) {
-               $gen = $tool->getGenerator($generator, $opts->outputDir);
+            foreach ($opts->getAsArray('generator') as $generator) {
+                $gen = $tool->getGenerator($generator, $opts->outputDir);
 
-               $gen->setOptions($tool->getOptions($gen->getOptions()));
-               $gen->generate();
-           }
+                $gen->setOptions($tool->getOptions($gen->getOptions()));
+                $gen->generate();
+            }
 
-       } else {
-           // No required arg given.
-           return $tool->getUsageMessage();
-       }
+        } else {
+            // No required arg given.
+            return $tool->getUsageMessage();
+        }
     }
 
     /**

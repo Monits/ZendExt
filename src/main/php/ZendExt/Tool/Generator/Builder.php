@@ -52,12 +52,17 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
     {
 
         if (null === $this->_opts->table) {
+            $this->_getLogger()->info(
+            	'No table option given, generating all tables'
+            );
+
             $tables = array_keys($this->_schema);
         } else {
             $tables = $this->_opts->getAsArray('table');
         }
 
         foreach ($tables as $table) {
+            $this->_getLogger()->info('Generating ' . $table . ' builder');
             $this->_generateBuilder($table);
         }
 
@@ -240,6 +245,11 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
                     . str_repeat(self::TAB, 3) . '))';
 
             default:
+                $this->_getLogger()->notice(
+                	'Couldn\'t generate validator for '
+                    . $column['type'] . ' datatype'
+                );
+
                 return null;
 
         }

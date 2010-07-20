@@ -19,7 +19,7 @@ Zend_Loader_Autoloader::getInstance()
   ->registerNamespace('ZendExt_');
 
 try {
-    echo ZendExt_Tool::execute();
+    ZendExt_Tool::execute();
 } catch (ZendExt_Tool_Exception $e) {
-    echo 'An error ocurred: ' . $e->getMessage() . "\n";
+    echo 'An unexpected error ocurred: ' . $e->getMessage() . "\n";
 }
