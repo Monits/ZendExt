@@ -188,7 +188,9 @@ class ZendExt_Session_SaveHandler_Memcached extends Zend_Cache_Backend_Memcached
      */
     public function write($id, $data)
     {
-        return $this->save($data, $this->_prefix . $id);
+        return $this->save(
+            $data, $this->_prefix . $id, array(), $this->_lifetime
+        );
     }
 
     /**
