@@ -113,17 +113,17 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
 
         $desc = ucfirst($table) . ' model builder.';
         $doc = $this->_generateClassDocblock($desc, $name);
-        
+
         foreach ($this->_schema[$table] as $column => $def) {
             $f = $this->_getCamelCased($this->_removeColumnPrefix($column));
             $n = 'with' . ucfirst($f);
-            
+
             $doc->setTag(array(
                 'name' => 'method',
-                'description' => "{$name} {$n}() $n(\$value) Sets the {$f} value."  
+                'description' => "{$name} {$n}() $n(\$value)"
             ));
         }
-        
+
         $class->setDocblock($doc);
         $file = new Zend_CodeGenerator_Php_File();
 
