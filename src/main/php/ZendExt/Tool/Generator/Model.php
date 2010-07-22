@@ -270,7 +270,7 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
 
         $method->setName(
             $prefix
-            . ucfirst($this->_removeColumnPrefix($name))
+            . ucfirst($name)
         );
 
         $method->setBody('return $this->_' . $name . ';');
