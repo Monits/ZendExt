@@ -27,6 +27,7 @@ class ZendExt_Session_SaveHandler_Memcached extends Zend_Cache_Backend_Memcached
     implements Zend_Session_SaveHandler_Interface
 {
     const PREFIX = 'prefix';
+    const LIFETIME = 'lifetime';
 
     /**
      * The prefix to be used for session's names.
@@ -34,6 +35,13 @@ class ZendExt_Session_SaveHandler_Memcached extends Zend_Cache_Backend_Memcached
      * @var string
      */
     protected $_prefix = 'mcsession';
+
+    /**
+     * The lifetime of sessions.
+     *
+     * @var int
+     */
+    protected $_lifetime = false;
 
     /**
      * Constructor
@@ -46,9 +54,8 @@ class ZendExt_Session_SaveHandler_Memcached extends Zend_Cache_Backend_Memcached
      * prefix          => (string) The prefix to be used when storing
      *                    sessions in memcache (optional; default: 'mcsession')
      *
-     * overrideLifetime  => (boolean) Whether or not an existing session's
-     *                   lifetime should be overridden
-     *                   (optional; default: false)
+     * lifetime        => (integer) Session lifetime
+     *                   (optional; default: ini_get('session.gc_maxlifetime'))
      *
      * @param  Zend_Config|array $config      User-provided configuration
      *
@@ -73,12 +80,19 @@ class ZendExt_Session_SaveHandler_Memcached extends Zend_Cache_Backend_Memcached
                     $this->_prefix = $value;
                     break;
 
+                case self::LIFETIME:
+                    $this->setLifetime($value);
+                    break;
+
                 default:
                     // unrecognized options passed to parent::__construct()
                     $parentConfig[$key] = $value;
                     break;
             }
         }
+
+        // Make sure lifetime is set
+        $this->setLifetime($this->_lifetime);
 
         parent::__construct($parentConfig);
     }
@@ -91,6 +105,40 @@ class ZendExt_Session_SaveHandler_Memcached extends Zend_Cache_Backend_Memcached
     public function __destruct()
     {
         Zend_Session::writeClose();
+    }
+
+    /**
+     * Set session lifetime
+     *
+     * $lifetime === false|null|0 resets lifetime to session.gc_maxlifetime
+     *
+     * @param int $lifetime
+     *
+     * @return Zend_Session_SaveHandler_Memcached
+     */
+    public function setLifetime($lifetime)
+    {
+        if ($lifetime < 0) {
+            throw new Zend_Session_SaveHandler_Exception(
+                'Session lifetime must be positive'
+            );
+        } else if (empty($lifetime)) {
+            $this->_lifetime = (int) ini_get('session.gc_maxlifetime');
+        } else {
+            $this->_lifetime = (int) $lifetime;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Retrieve session lifetime
+     *
+     * @return int
+     */
+    public function getLifetime()
+    {
+        return $this->_lifetime;
     }
 
     /**
