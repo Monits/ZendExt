@@ -259,12 +259,25 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
     private function _generateGetter($name, array $column)
     {
         $method = new Zend_CodeGenerator_Php_Method();
-        $method->setName('get' . ucfirst($name));
+
+        $type = $this->_transformType($column['type']);
+
+        if ($type == ZendExt_Tool_Generator_Abstract::PHP_TYPE_BOOLEAN) {
+            $prefix = 'is';
+        } else {
+            $prefix = 'get';
+        }
+
+        $method->setName(
+            $prefix
+            . ucfirst($this->_removeColumnPrefix($name))
+        );
+
         $method->setBody('return $this->_' . $name . ';');
 
         $docReturnTag = new Zend_CodeGenerator_Php_Docblock_Tag_Return(
              array(
-                'datatype' => $this->_transformType($column['type'])
+                'datatype' => $type
              )
         );
 
