@@ -151,12 +151,16 @@ abstract class ZendExt_Tool_Generator_Abstract
      *
      * @return string
      */
-    protected function _getCamelCased($column, $separator = '_')
+    protected function _getCamelCased(
+        $column, $separator = '_', $pascalCase = false
+    )
     {
         $parts = explode($separator, $column);
         $partCount = count($parts);
 
-        for ($i = 1; $i < $partCount; $i++) {
+        $start = $pascalCase ? 0  : 1;
+
+        for ($i = $start; $i < $partCount; $i++) {
             $parts[$i] = ucfirst($parts[$i]);
         }
 
@@ -431,4 +435,8 @@ abstract class ZendExt_Tool_Generator_Abstract
      */
     protected abstract function _doGenerate();
 
+    public function _getPascalCase($column, $separator = '_')
+    {
+        return $this->_getCamelCased($column, $separator, true);
+    }
 }

@@ -89,7 +89,8 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
             );
         }
 
-        $this->_modelName = ucfirst($table);
+        $this->_modelName = $this->_getPascalCase($table);
+
         $className = $this->_opts->namespace . '_' . $this->_modelName;
 
         $class = new Zend_CodeGenerator_Php_Class(
