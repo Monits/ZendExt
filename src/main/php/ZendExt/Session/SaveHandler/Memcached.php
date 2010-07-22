@@ -23,7 +23,7 @@
  * @link      http://www.monits.com/
  * @since     1.3.0
  */
-class ZendExt_Session_SaveHandler_Memcache extends Zend_Cache_Backend_Memcached
+class ZendExt_Session_SaveHandler_Memcached extends Zend_Cache_Backend_Memcached
     implements Zend_Session_SaveHandler_Interface
 {
     const PREFIX = 'prefix';
