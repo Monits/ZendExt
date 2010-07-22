@@ -37,13 +37,6 @@ class ZendExt_Session_SaveHandler_Memcached extends Zend_Cache_Backend_Memcached
     protected $_prefix = 'mcsession';
 
     /**
-     * The lifetime of sessions.
-     *
-     * @var int
-     */
-    protected $_lifetime = false;
-
-    /**
      * Constructor
      *
      * $config is an instance of Zend_Config or an array of key/value pairs
@@ -73,6 +66,7 @@ class ZendExt_Session_SaveHandler_Memcached extends Zend_Cache_Backend_Memcached
         }
 
         $parentConfig = array();
+        $lifetime = null;
 
         foreach ($config as $key => $value) {
             switch ($key) {
@@ -81,7 +75,7 @@ class ZendExt_Session_SaveHandler_Memcached extends Zend_Cache_Backend_Memcached
                     break;
 
                 case self::LIFETIME:
-                    $this->setLifetime($value);
+                    $lifetime = $value;
                     break;
 
                 default:
@@ -92,7 +86,7 @@ class ZendExt_Session_SaveHandler_Memcached extends Zend_Cache_Backend_Memcached
         }
 
         // Make sure lifetime is set
-        $this->setLifetime($this->_lifetime);
+        $this->setLifetime($lifetime);
 
         parent::__construct($parentConfig);
     }
@@ -123,22 +117,14 @@ class ZendExt_Session_SaveHandler_Memcached extends Zend_Cache_Backend_Memcached
                 'Session lifetime must be positive'
             );
         } else if (empty($lifetime)) {
-            $this->_lifetime = (int) ini_get('session.gc_maxlifetime');
+            $lifetime = (int) ini_get('session.gc_maxlifetime');
         } else {
-            $this->_lifetime = (int) $lifetime;
+            $lifetime = (int) $lifetime;
         }
 
-        return $this;
-    }
+        $this->setDirectives(array('lifetime' => $lifetime));
 
-    /**
-     * Retrieve session lifetime
-     *
-     * @return int
-     */
-    public function getLifetime()
-    {
-        return $this->_lifetime;
+        return $this;
     }
 
     /**
@@ -188,9 +174,7 @@ class ZendExt_Session_SaveHandler_Memcached extends Zend_Cache_Backend_Memcached
      */
     public function write($id, $data)
     {
-        return $this->save(
-            $data, $this->_prefix . $id, array(), $this->_lifetime
-        );
+        return $this->save($data, $this->_prefix . $id);
     }
 
     /**
