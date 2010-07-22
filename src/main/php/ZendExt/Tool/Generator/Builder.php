@@ -120,7 +120,7 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
             
             $doc->setTag(array(
                 'name' => 'method',
-                'description' => "void {$n}() $n(\$value) Sets the {$f} value."  
+                'description' => "{$name} {$n}() $n(\$value) Sets the {$f} value."  
             ));
         }
         
