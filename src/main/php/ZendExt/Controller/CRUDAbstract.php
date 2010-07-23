@@ -657,7 +657,7 @@ abstract class ZendExt_Controller_CRUDAbstract
     {
         $module = $this->getRequest()->getModuleName();
 
-        if ('default' !== $module) {
+        if ('default' === $module) {
             $url = '/' . $this->getRequest()->getControllerName() . '/'
                     . $action;
         } else {
