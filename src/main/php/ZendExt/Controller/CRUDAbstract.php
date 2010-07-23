@@ -104,6 +104,12 @@ abstract class ZendExt_Controller_CRUDAbstract
         $this->view->controllerName = $request->getControllerName();
         $this->view->defaultIpp = $this->_itemsPerPage;
 
+        if ('default' !== $request->getModuleName()) {
+            $this->view->moduleUrl = $request->getModuleName() . '/';
+        } else {
+            $this->view->moduleUrl = '';
+        }
+
         if (null == $this->_templateList) {
             $title = 'List';
             if (null !== $this->_listTitle) {

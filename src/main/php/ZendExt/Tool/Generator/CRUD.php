@@ -40,38 +40,40 @@ class ZendExt_Tool_Generator_CRUD extends ZendExt_Tool_Generator_Abstract
 
         $crudN = explode('_', $builder);
         $crudN = array_reverse($crudN);
-        $crudName = $crudN[0] ;
+        $crudName = $crudN[0];
 
         $crud = new Zend_CodeGenerator_Php_Class();
 
         $classDoc = $this->_generateClassDocblock(
-        	'CRUD for '.$crudName, $namespace
+            'CRUD for '.$crudName, $namespace
         );
         $crud->setDocblock($classDoc);
 
         $crud->setName($crudName.'Controller')
              ->setExtendedClass('ZendExt_Controller_CRUDAbstract')
-             ->setProperties(array(
+             ->setProperties(
                  array(
-                     'name'         => '_builderClass',
-                     'visibility'   => 'protected',
-                     'defaultValue' => $builder,
-                 ),
-                 array(
-                     'name'	        => '_listTitle',
-                     'visibility'   => 'protected',
-                 ),
-                 array(
-                     'name'	        => '_newTitle',
-                     'visibility'   => 'protected',
-                 ),
-                 array(
-                     'name'	        => '_updateTitle',
-                     'visibility'   => 'protected',
-                 ),
-        ));
+                     array(
+                         'name'         => '_builderClass',
+                         'visibility'   => 'protected',
+                         'defaultValue' => $builder,
+                     ),
+                     array(
+                         'name'	        => '_listTitle',
+                         'visibility'   => 'protected',
+                     ),
+                     array(
+                         'name'	        => '_newTitle',
+                         'visibility'   => 'protected',
+                     ),
+                     array(
+                         'name'	        => '_updateTitle',
+                         'visibility'   => 'protected',
+                     ),
+                 )
+             );
 
-        $crud->setMethod($this->getInitMethod());
+        $crud->setMethod($this->_getInitMethod());
 
         $file = new Zend_CodeGenerator_Php_File();
 
@@ -91,7 +93,7 @@ class ZendExt_Tool_Generator_CRUD extends ZendExt_Tool_Generator_Abstract
      *
      * @return array
      */
-    private function getInitMethod()
+    private function _getInitMethod()
     {
         $table = $this->_opts->dbtable;
 
@@ -125,7 +127,7 @@ class ZendExt_Tool_Generator_CRUD extends ZendExt_Tool_Generator_Abstract
         }
 
         $body = '$repository = new '.$repository.'();' ."\n".
-        		'$this->_dataSource = new ZendExt_DataSource_Adapter_'.
+                '$this->_dataSource = new ZendExt_DataSource_Adapter_'.
                 $adapterType .'($repository);' ."\n\n".
                 '$map = array();' ."\n";
 

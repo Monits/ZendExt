@@ -50,9 +50,10 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
 
         $items = $this->_view->paginator->getCurrentItems();
         $controllerName = $this->_view->controllerName;
+        $moduleUrl = $this->_view->moduleUrl;
 
         echo '<div class="newButton">';
-        echo     '<a href="/' . $controllerName . '/new">';
+        echo     '<a href="/' . $moduleUrl . $controllerName . '/new">';
         echo         '<button>New '. $controllerName .' </button>';
         echo     '</a>';
         echo '</div>';
@@ -70,7 +71,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
 
         foreach ($this->_view->fieldsMap as $field => $col) {
             echo '<th class="row">';
-            echo '<a  class ="cols" href="/' . $controllerName . '/list/';
+            echo '<a  class ="cols" href="/' . $moduleUrl . $controllerName . '/list/';
             echo 'page/' . $currentPage . '/';
             echo 'order' . '/';
             if (in_array($col, $orderField)) {
@@ -110,7 +111,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
                 echo '<span class="colValue">';
                 $isPk = in_array($col, $this->_view->pk);
                 if ($isPk) {
-                    echo '<a href="/' . $controllerName . '/update/';
+                    echo '<a href="/' . $moduleUrl. $controllerName . '/update/';
                     foreach ($this->_view->pk as $k) {
                         $field = array_search($k, $this->_view->fieldsMap);
                         echo $field . '/'. $arrCols[$k] . '/';
@@ -122,7 +123,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             }
 
             echo '<td>';
-            echo '<a href="/' . $controllerName . '/update/';
+            echo '<a href="/' . $moduleUrl . $controllerName . '/update/';
             foreach ($this->_view->pk as $k) {
                 $field = array_search($k, $this->_view->fieldsMap);
                 echo $field . '/'. $arrCols[$k] . '/';
@@ -133,7 +134,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             echo '</td>';
 
             echo '<td>';
-            echo '<form action="/' . $controllerName . '/delete"',
+            echo '<form action="/' . $moduleUrl . $controllerName . '/delete"',
                     ' method="post">',
                     '<input class="button_delete" type="submit"',
                     ' name="delete" value="Delete">';
@@ -158,7 +159,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         $this->_renderPageBar();
 
         echo '<div class="newButton">';
-        echo     '<a href="/' . $controllerName . '/new">';
+        echo     '<a href="/' . $moduleUrl . $controllerName . '/new">';
         echo         '<button>New '. $controllerName .' </button>';
         echo     '</a>';
         echo '</div>';
@@ -178,6 +179,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         $order = $this->_view->order;
         $orderField = $this->_view->orderField;
         $controllerName = $this->_view->controllerName;
+        $moduleUrl = $this->_view->moduleUrl;
         $first =  1;
         $previous = $this->_view->paginator->getCurrentPageNumber() - 1;
         $current = $this->_view->paginator->getCurrentPageNumber();
@@ -190,14 +192,14 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
 
         if ($first != $current) {
             echo '<span class="page">';
-            echo "<a href=\"/{$controllerName}/list/page/{$first}",
+            echo "<a href=\"/{$moduleUrl}{$controllerName}/list/page/{$first}",
                     "/order/{$order}/by/",
                     implode(',', $orderField),
                     ($defaultIpp == $ipp ? '' : "/ipp/{$ipp}"),
                     '">First',
                     '</a></span>';
             echo '<span class="page">';
-            echo"<a href=\"/{$controllerName}/list/page/{$previous}",
+            echo"<a href=\"/{$moduleUrl}{$controllerName}/list/page/{$previous}",
                     "/order/{$order}/by/",
                     implode(',', $orderField),
                     ($defaultIpp == $ipp ? '' : "/ipp/{$ipp}"),
@@ -209,14 +211,14 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
 
         if ($last != $current) {
             echo '<span class="page">';
-            echo "<a href=\"/{$controllerName}/list/page/{$next}",
+            echo "<a href=\"/{$moduleUrl}{$controllerName}/list/page/{$next}",
                     "/order/{$order}/by/",
                     implode(',', $orderField),
                     ($defaultIpp == $ipp ? '' : "/ipp/{$ipp}"),
                     '">Next',
                     '</a></span>';
             echo '<span class=\"page\">';
-            echo '<a href="/' . $controllerName . '/list/page/' . $last,
+            echo '<a href="/' . $moduleUrl . $controllerName . '/list/page/' . $last,
                     "/order/{$order}/by/",
                     implode(',', $orderField),
                     ($defaultIpp == $ipp ? '' : "/ipp/{$ipp}"),
