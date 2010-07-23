@@ -170,14 +170,18 @@ class ZendExt_Service_MercadoPago_BuyNow
 
     /**
      * Render the form.
+     * 
+     * @param string $id    Optional. An id to set to the form.
+     * @param array  $class Optional. CSS classes to apply to the form.
      *
      * @return void
      */
-    public function renderForm()
+    public function renderForm($id = 'buynow', array $class = array())
     {
         echo '<form target="MercadoPago"'
             .' action="https://www.mercadopago.com/mla/buybutton"'
-            .' method="POST">'.PHP_EOL;
+            .' method="POST" id="'.htmlentities($id).'" class="'
+            .htmlentities(implode(' ', $class)).'">'.PHP_EOL;
         echo '<input type="image" src="'.htmlentities($this->_image)
             .'" border="0" alt="'.htmlentities($this->_altText).'">'.PHP_EOL;
 
