@@ -35,17 +35,23 @@ class ZendExt_Service_Mailing
     /**
      * Creates a new mailing service.
      *
-     * @param Zend_View $view       The view object to render the templates.
-     * @param array     $smtpConfig The smpt server configuration.
-     * @param string    $mail       Which mail to send, NOT the address
-     *                              to send the e-mail.
-     * @param string    $subject    The mails' subject.
-     * @param string    $from       The mails' from address.
-     * @param string    $fromName   The mails' sender.
+     * @param Zend_View                          $view      The view object to 
+     *                                                      render the 
+     *                                                      templates.
+     * @param array|Zend_Mail_Transport_Abstract $transport An instance of a 
+     *                                                      transport or the 
+     *                                                      configuration.
+     * @param string                             $mail      Which mail to send,
+     *                                                      NOT the address to
+     *                                                      send the e-mail.
+     * @param string                             $subject   The mails' subject.
+     * @param string                             $from      The mails' from 
+     *                                                      address.
+     * @param string                             $fromName  The mails' sender.
      *
      * @return void
      */
-    public function __construct(Zend_View $view, array $smtpConfig,
+    public function __construct(Zend_View $view, $transport,
         $mail = null, $subject = null, $from = null, $fromName = null)
     {
         $this->_view = $view;
@@ -54,9 +60,15 @@ class ZendExt_Service_Mailing
         $this->_from = $from;
         $this->_fromName = $fromName;
 
-        $this->_transport = new Zend_Mail_Transport_Smtp(
-            $smtpConfig['host'], $smtpConfig
-        );
+        if ($transport instanceof Zend_Mail_Transport_Abstract) {
+
+            $this->_transport = $transport;
+        } else {
+
+            $this->_transport = new Zend_Mail_Transport_Smtp(
+                $transport['host'], $transport
+            );
+        }
     }
 
     /**
@@ -180,6 +192,7 @@ class ZendExt_Service_Mailing
         $mail->setSubject($this->_subject);
         $mail->setFrom($this->_from, $this->_fromName);
         $mail->setBodyHtml($content);
+        $mail->setBodyText(strip_tags($content));
 
         // TODO : Prepare plain text version of mail to be set!!!
 
