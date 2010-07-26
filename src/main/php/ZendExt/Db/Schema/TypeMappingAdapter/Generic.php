@@ -41,8 +41,11 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
     const TYPE_ENUM = 'enum';
     const TYPE_DECIMAL = 'decimal';
     const TYPE_TIMESTAMP = 'timestamp';
+    const TYPE_DATE = 'date';
+    const TYPE_TIME = 'time';
+    const TYPE_DATETIME = 'datetime';
     const TYPE_CHAR = 'char';
-
+    const TYPE_FLOAT = 'float';
 
     /**
      * Attempts to retrieve a more standard type.
