@@ -55,6 +55,11 @@ abstract class ZendExt_Cron_Process
      */
     protected $_persistance;
 
+    /**
+     * @var Zend_Application_Bootstrap_Bootstrap
+     */
+    protected $_bootstrap;
+
     private $_pidFile = false;
 
     protected $_allowProgress = false;
@@ -169,7 +174,7 @@ abstract class ZendExt_Cron_Process
     /**
      * Bootstrap whatever the strategy needs.
      *
-     * @return Zend_Application_Bootstrap_BootstrapAbstract|NULL
+     * @return void
      *
      * @throws ZendExt_Cron_ErrorException
      */
