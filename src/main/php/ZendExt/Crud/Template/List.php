@@ -192,9 +192,13 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             $this->_view->paginator->getTotalItemCount() / $ipp
         );
 
+        if ($last < 2) {
+            return;
+        }
+
         echo '<div class="pageBar">';
 
-        if ($first != $current) {
+        if ($first < $current) {
             echo '<span class="page">';
             echo "<a href=\"/{$moduleUrl}{$controllerName}/list/page/{$first}",
                     "/order/{$order}/by/",
@@ -213,7 +217,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
 
         echo '<span class="page">Current</span>';
 
-        if ($last != $current) {
+        if ($last > $current) {
             echo '<span class="page">';
             echo "<a href=\"/{$moduleUrl}{$controllerName}/list/page/{$next}",
                     "/order/{$order}/by/",
