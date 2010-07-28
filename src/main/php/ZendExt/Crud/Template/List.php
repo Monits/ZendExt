@@ -52,11 +52,12 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         $controllerName = $this->_view->controllerName;
         $moduleUrl = $this->_view->moduleUrl;
 
-        echo '<div class="newButton">';
-        echo     '<a href="/' . $moduleUrl . $controllerName . '/new">';
-        echo         '<button>New '. $controllerName .' </button>';
-        echo     '</a>';
-        echo '</div>';
+        echo '<div class="crudContent">';
+        echo     '<div class="newButton">';
+        echo         '<a href="/' . $moduleUrl . $controllerName . '/new">';
+        echo             '<button>New '. $controllerName .' </button>';
+        echo         '</a>';
+        echo     '</div>';
 
         $this->_renderPageBar();
 
@@ -163,6 +164,9 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         echo         '<button>New '. $controllerName .' </button>';
         echo     '</a>';
         echo '</div>';
+
+        // Close .crudContent
+        echo '</div>';
     }
 
     /**
@@ -237,22 +241,21 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
     protected function _style()
     {
 
-        echo '.field {font-size: 14px}' .
-            '.colValue{padding:3px}' .
-            '.delete {float: right}' .
-            'table {border-collapse:collapse;}' .
-            'table, th, td {border: 1px solid black;}' .
-            'td {text-align:center;}' .
-            '.colValue {font-size: 12px}' .
-            'th {padding:3px;background-color:#A7C942;color:#ffffff;}' .
-            'tr.altColor td {color:#000000;background-color:#EAF2D3;heigth}' .
-            'div.pageBar {margin-left:auto;margin-right:auto;',
+        echo '.crudContent .field {font-size: 14px}' .
+            '.crudContent .colValue{padding:3px; font-size: 12px}' .
+            '.crudContent .delete {float: right}' .
+            '.crudContent table {border-collapse:collapse;}' .
+            '.crudContent table, .crudContent th, .crudContent td {border: 1px solid black;}' .
+            '.crudContent td {text-align:center;}' .
+            '.crudContent th {padding:3px;background-color:#A7C942;color:#ffffff;}' .
+            '.crudContent tr.altColor td {color:#000000;background-color:#EAF2D3;heigth}' .
+            '.crudContent div.pageBar {margin-left:auto;margin-right:auto;',
                    'width:300px;text-align:center;}' .
-            'span.page a{padding:4px;}' .
-            'a:link{text-decoration:none;}' .
-            'a:visited{color:blue;text-decoration:none;}' .
-            'a.cols:link{color:#ffffff;}' .
-            'a.cols:hover{color:#ffffff}' .
-            'a.cols:visited{color:#ffffff;}';
+            '.crudContent span.page a{padding:4px;}' .
+            '.crudContent a:link{text-decoration:none;}' .
+            '.crudContent a:visited{color:blue;text-decoration:none;}' .
+            '.crudContent a.cols:link{color:#ffffff;}' .
+            '.crudContent a.cols:hover{color:#ffffff}' .
+            '.crudContent a.cols:visited{color:#ffffff;}';
     }
 }
