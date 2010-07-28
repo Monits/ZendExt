@@ -30,9 +30,6 @@ abstract class ZendExt_Cron_Process
                                           'outputFile' => 'php://stdout',
                                           'pid' => array(
                                               'path' => 'pid/'
-                                          ),
-                                          'strategy' => array(
-                                              'stub' => 'bar'
                                           )
                                       );
 
@@ -61,8 +58,6 @@ abstract class ZendExt_Cron_Process
     protected $_bootstrap;
 
     private $_pidFile = false;
-
-    protected $_allowProgress = false;
 
     protected $_hasRun = false;
 
@@ -141,8 +136,10 @@ abstract class ZendExt_Cron_Process
         $this->_config = new Zend_Config(self::$_defaultOptions, true);
         $this->_config->merge($config);
 
-        $configFile = $this->_config->configDir.'/'
-            .$this->_configFileName;
+        $className = get_class($this);
+        $fileName = substr($className, strrpos($className, '_') + 1);
+
+        $configFile = $this->_config->configDir.'/'.$fileName;
 
         $this->_config->merge(new Zend_Config_Xml($configFile, 'process'));
         $this->_config->merge(new Zend_Config($extra));
