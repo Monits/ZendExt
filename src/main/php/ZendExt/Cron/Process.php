@@ -137,7 +137,7 @@ abstract class ZendExt_Cron_Process
         $this->_config->merge($config);
 
         $className = get_class($this);
-        $fileName = substr($className, strrpos($className, '_') + 1);
+        $fileName = substr($className, strrpos($className, '_') + 1) . '.xml';
 
         $configFile = $this->_config->configDir.'/'.$fileName;
 
