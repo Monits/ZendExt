@@ -37,7 +37,7 @@ final class ZendExt_Cron_Manager
     /**
      * @var Zend_Log
      */
-    private $_log;
+    private $_logger;
 
     /**
      * @var Zend_Config
