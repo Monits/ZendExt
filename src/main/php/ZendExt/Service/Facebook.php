@@ -112,6 +112,8 @@ class ZendExt_Service_Facebook
     /**
      * Get the user uid.
      *
+     * Warning: This method only works with canvas pages.
+     *
      * @return integer
      */
     public function getUserId()
@@ -310,5 +312,18 @@ class ZendExt_Service_Facebook
         }
         $sig = $requestStr . $this->_apiSecret;
         return md5($sig);
+    }
+
+
+    /**
+     * Generate the profile pic url. 
+     * 
+     * @param string $uid The facebook uid.
+     *
+     * @return string
+     */
+    public function generateProfilePicUrl($uid)
+    {
+        return 'http://graph.facebook.com/'.$uid.'/picture';
     }
 }
