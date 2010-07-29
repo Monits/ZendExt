@@ -32,6 +32,12 @@ class ZendExt_Service_Facebook
 {
     const API_URL = 'https://api.facebook.com/restserver.php';
 
+    const PHOTO_SQUARE = 'square';
+
+    const PHOTO_SMALL = 'small';
+
+    const PHOTO_LARGE = 'large';
+
     private static $_params = array(
                                   'locale'  => 'fb_sig_locale',
                                   'friends' => 'fb_sig_friends',
@@ -318,12 +324,16 @@ class ZendExt_Service_Facebook
     /**
      * Generate the profile pic url. 
      * 
-     * @param string $uid The facebook uid.
+     * @param string $uid  The facebook uid.
+     * @param string $type The size of the image to ask for. Has to be one of:
+     *                     {@see ZendExt_Service_Facebook::SMALL},
+     *                     {@see ZendExt_Service_Facebook::SQUARE} or
+     *                     {@see ZendExt_Service_Facebook::LARGE}.
      *
      * @return string
      */
-    public function generateProfilePicUrl($uid)
+    public function generateProfilePicUrl($uid, $type = self::SMALL)
     {
-        return 'http://graph.facebook.com/'.$uid.'/picture';
+        return 'http://graph.facebook.com/'.$uid.'/picture?type='.$type;
     }
 }
