@@ -183,13 +183,15 @@ abstract class ZendExt_Controller_CRUDAbstract
 
             $this->_redirectTo('list');
 
-        } catch (ZendExt_Builder_ValidationException $e) {
+        } catch (Exception $e) {
+            if ($e instanceof Zend_Db_Exception) {
+                $this->view->errorDb = 'Duplicate entry';
+            }
             $this->view->failedField = $e->getField();
             $this->view->errors = $e->getErrors();
 
             $data = $this->_getData($fields);
             $checks = $this->_getCheckboxValue($fields);
-
             // Assign the form
             $this->view->form = $this->_newForm(null, $data, $checks);
 
@@ -205,7 +207,7 @@ abstract class ZendExt_Controller_CRUDAbstract
                 $template = $this->_templateNew;
                 $this->_helper->viewRenderer->renderScript($template);
             }
-            // TODO : Re-render form with error messages
+
         }
     }
 
@@ -262,7 +264,11 @@ abstract class ZendExt_Controller_CRUDAbstract
             $table->update($data, $where);
 
             $this->_redirectTo('list');
-        } catch (ZendExt_Builder_ValidationException $e) {
+        } catch (Exception $e) {
+            if ($e instanceof Zend_Db_Exception) {
+                $this->view->errorDb = 'Duplicate entry';
+            }
+
             $this->view->failedField = $e->getField();
             $this->view->errors = $e->getErrors();
 
@@ -283,7 +289,6 @@ abstract class ZendExt_Controller_CRUDAbstract
                 $template = $this->_templateUpdate;
                 $this->_helper->viewRenderer->renderScript($template);
             }
-            // TODO : Re-render form with error messages
         }
 
 
@@ -494,6 +499,10 @@ abstract class ZendExt_Controller_CRUDAbstract
              ->setMethod('post')
              ->addDecorator('HtmlTag', array('tag' => 'dl','class' => ''));
 
+        if (null !== $this->view->errorDb) {
+            //TODO : mostrar error de la db.
+        }
+
         $checkbox = array();
         $elements = array();
         foreach ($fields as $field) {
@@ -526,6 +535,9 @@ abstract class ZendExt_Controller_CRUDAbstract
 
                     $elements[$field]->setRequired($required);
 
+                } else {
+                    $elements[$field]->removeDecorator('label')
+                                     ->removeDecorator('HtmlTag');
                 }
             }
 
