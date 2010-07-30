@@ -25,13 +25,20 @@
  */
 class ZendExt_Service_MercadoPago_Request
 {
-    const PAID = 'A';
+    const PAID = 'paid';
 
-    const PENDING = 'P';
+    const PENDING = 'pending';
 
-    const CANCELLED = 'C';
+    const CANCELLED = 'cancelled';
 
-    const REJECTED = 'R';
+    const REJECTED = 'rejected';
+
+    protected $_states = array(
+        'A' => self::PAID,
+        'P' => self::PENDING,
+        'C' => self::CANCELLED,
+        'R' => self::REJECTED
+    );
 
     protected $_request;
 
@@ -82,7 +89,7 @@ class ZendExt_Service_MercadoPago_Request
      */
     public function getStatus()
     {
-        return $this->_request->getParam('status');
+        return self::$_states[$this->_request->getParam('status')];
     }
 
     /**

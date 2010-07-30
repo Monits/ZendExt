@@ -169,6 +169,18 @@ class ZendExt_Service_MercadoPago_BuyNow
     }
 
     /**
+     * Set the extra part.
+     * 
+     * @param string $extra The value to set.
+     *
+     * @return void
+     */
+    public function setExtra($extra)
+    {
+        $this->_extra = $extra;
+    }
+
+    /**
      * Render the form.
      * 
      * @param string $id    Optional. An id to set to the form.
