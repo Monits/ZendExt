@@ -500,7 +500,11 @@ abstract class ZendExt_Controller_CRUDAbstract
              ->addDecorator('HtmlTag', array('tag' => 'dl','class' => ''));
 
         if (null !== $this->view->errorDb) {
-            //TODO : mostrar error de la db.
+            //FIXME : cambiar esta forma de mostrar el error de la db!!!
+            $hiddenElement = new Zend_Form_Element_Hidden('errorDb');
+            $hiddenElement->addError($this->view->errorDb)
+                          ->removeDecorator('label');
+            $form->addElement($hiddenElement);
         }
 
         $checkbox = array();
