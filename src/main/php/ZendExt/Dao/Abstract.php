@@ -37,7 +37,7 @@ abstract class ZendExt_Dao_Abstract
      *
      * @var string
      */
-    const OPERATION_WRITE = 
+    const OPERATION_WRITE =
         ZendExt_Application_Resource_Multidb::OPERATION_WRITE;
 
     const DATA_KEY_TABLE = 'table';
@@ -183,6 +183,11 @@ abstract class ZendExt_Dao_Abstract
     {
         self::$_config = $config;
 
+        // Make sure all previous connections are closed
+        foreach (self::$_tables as $t) {
+            $t->getAdapter()->closeConnection();
+        }
+
         // Reset all local caches
         self::$_tables = array();
         self::$_shardingStrategies = array();
@@ -211,12 +216,12 @@ abstract class ZendExt_Dao_Abstract
      * @param array  $shardingArgs Array with values
      *                             on which to perform sharding.
      * @param array  $extra        Extra where conditions. If any needs quoting
-     *                             set the where string as key with the 
+     *                             set the where string as key with the
      *                             corresponding value. Optional.
      *
      * @return array
      */
-    protected function _selectForShard($where, array $shardingArgs, 
+    protected function _selectForShard($where, array $shardingArgs,
         array $extra = array())
     {
         $shards = self::$_config->getShardsForValues(
@@ -240,14 +245,14 @@ abstract class ZendExt_Dao_Abstract
     }
 
     /**
-     * Execute an update for an array of values in the correspoding shard. 
-     * 
+     * Execute an update for an array of values in the correspoding shard.
+     *
      * @param array  $data         The data to update.
      * @param string $where        SQL where clause.
-     * @param array  $shardingArgs Array with values on which 
+     * @param array  $shardingArgs Array with values on which
      *                             to perform sharding.
      * @param array  $extra        Extra where conditions. If any needs quoting
-     *                             set the where string as key with the 
+     *                             set the where string as key with the
      *                             corresponding value. Optional.
      *
      * @return void
@@ -279,14 +284,14 @@ abstract class ZendExt_Dao_Abstract
      * @param Zend_Db_Adapter_Abstract $adapter The adapter to use to quote.
      * @param string                   $where   The base where clause.
      * @param mixed                    $value   The value to quote into  $where.
-     * @param array                    $extra   Extra where conditions. If any 
-     *                                          needs quoting set the where 
-     *                                          string as key with the 
+     * @param array                    $extra   Extra where conditions. If any
+     *                                          needs quoting set the where
+     *                                          string as key with the
      *                                          corresponding value. Optional.
      *
-     * @return string the prepared where clause. 
+     * @return string the prepared where clause.
      */
-    protected function _quoteWhere(Zend_Db_Adapter_Abstract $adapter, $where, 
+    protected function _quoteWhere(Zend_Db_Adapter_Abstract $adapter, $where,
         $value, array $extra = array())
     {
         $where = $adapter->quoteInto($where, $value);
