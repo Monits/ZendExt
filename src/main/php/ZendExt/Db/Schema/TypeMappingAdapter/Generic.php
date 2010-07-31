@@ -33,10 +33,10 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
     const TYPE_INTEGER = 'integer';
     const TYPE_SMALLINT = 'smallint';
     const TYPE_BIGINT = 'bigint';
-	const TYPE_DOUBLE_PRECISION = 'double precision';
-	const TYPE_BLOB = 'blob';
+    const TYPE_DOUBLE_PRECISION = 'double precision';
+    const TYPE_BLOB = 'blob';
     const TYPE_TEXT = 'text';
-	const TYPE_BINARY_VARYING = 'binary varying';
+    const TYPE_BINARY_VARYING = 'binary varying';
     const TYPE_VARCHAR = 'varchar';
     const TYPE_ENUM = 'enum';
     const TYPE_DECIMAL = 'decimal';
@@ -111,9 +111,11 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
                     'options' => $this->_parseEnum($type)
                 );
             default:
-                // For types that max and min is not necessary.
-                return array('name' => $type);
+                break;
         }
+
+        // For types that max and min is not necessary.
+        return array('name' => $type);
     }
 
     /**
@@ -128,24 +130,24 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
      */
     protected function _parseEnum($enum)
     {
-    	/*
-    	 *  I chose this implementation over regexp because is easier
-    	 *  to mantain and understand.
-    	 */
-		$enum = str_replace('enum', '', $enum);
+        /*
+         *  I chose this implementation over regexp because is easier
+         *  to mantain and understand.
+         */
+        $enum = str_replace('enum', '', $enum);
 
-		// Remove first and last parenthesis.
-		$enum = substr($enum, 1, -1);
+        // Remove first and last parenthesis.
+        $enum = substr($enum, 1, -1);
 
-		$expl = explode(',', $enum);
-		$ret = array();
+        $expl = explode(',', $enum);
+        $ret = array();
 
-		foreach ($expl as $i) {
-		    // Remove whitespaces and quotes.
-		    $ret[] = substr(trim($i), 1, -1);
-		}
+        foreach ($expl as $i) {
+            // Remove whitespaces and quotes.
+            $ret[] = substr(trim($i), 1, -1);
+        }
 
-		return $ret;
+        return $ret;
     }
 
     /**
@@ -161,15 +163,20 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
             case 'CURRENT_TIMESTAMP()':
             case 'NOW()':
                 return self::CURRENT_TIMESTAMP;
+
             case 'CURRENT_DATE()':
             case 'CURDATE()':
                 return self::CURRENT_DATE;
+
             case 'CURRENT_TIME()':
             case 'CURTIME()':
                 return self::CURRENT_TIME;
+
             default:
-                return $value;
+                break;
         }
+
+        return $value;
     }
 
 }
