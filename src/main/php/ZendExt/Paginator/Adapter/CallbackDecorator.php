@@ -63,7 +63,7 @@ class ZendExt_Paginator_Adapter_CallbackDecorator
                 $this->_callbackIsConstructor = true;
             } else {
                 throw new ZendExt_Exception(
-                	'Invalid callback supplied. '
+                    'Invalid callback supplied. '
                     . 'Provide either a function or a class name'
                 );
             }
@@ -76,8 +76,8 @@ class ZendExt_Paginator_Adapter_CallbackDecorator
     /**
      * Returns an collection of items for a page.
      *
-     * @param  integer $offset Page offset
-     * @param  integer $itemCountPerPage Number of items per page
+     * @param integer $offset           Page offset
+     * @param integer $itemCountPerPage Number of items per page
      *
      * @return array
      */
