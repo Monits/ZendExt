@@ -38,7 +38,7 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
     protected function _getExtraOptions()
     {
         return array(
-        	'table|t-s'        => 'Which table to generate its builder.',
+            'table|t-s'        => 'Which table to generate its builder.',
             'modelnamespace=s' => 'The model namespace'
         );
     }
@@ -53,7 +53,7 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
 
         if (null === $this->_opts->table) {
             $this->_getLogger()->info(
-            	'No table option given, generating all tables'
+                'No table option given, generating all tables'
             );
 
             $tables = array_keys($this->_schema);
@@ -82,8 +82,8 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
 
         if (!isset($this->_schema[$table])) {
             throw new ZendExt_Tool_Generator_Exception(
-            	'The asked table does not exists (' . $table . ')'
-			);
+                'The asked table does not exists (' . $table . ')'
+            );
         }
 
         $name = $this->_opts->namespace . ucfirst($table);
@@ -91,25 +91,31 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
         $class = new Zend_CodeGenerator_Php_Class();
         $class->setName($name)
             ->setExtendedClass('ZendExt_Builder_Generic')
-            ->setProperty(array(
-                'name' => '_class',
-		        'visibility' => 'protected',
-			    'defaultValue' => $this->_opts->modelnamespace
-                    . ucfirst($table)
-             ))
-            ->setMethod(array(
-                'name' => '__construct',
-                'docblock' => new Zend_CodeGenerator_Php_Docblock(array(
-               	    'shortDescription' => 'Creates a new builder',
-            	    'tags' => array(
-                        new Zend_CodeGenerator_Php_Docblock_Tag_Return(
-                            array('datatype' => $name)
+            ->setProperty(
+                array(
+                    'name' => '_class',
+                    'visibility' => 'protected',
+                    'defaultValue' => $this->_opts->modelnamespace
+                        . ucfirst($table)
+                 )
+            )
+            ->setMethod(
+                array(
+                    'name' => '__construct',
+                    'docblock' => new Zend_CodeGenerator_Php_Docblock(
+                        array(
+                           'shortDescription' => 'Creates a new builder',
+                           'tags' => array(
+                                new Zend_CodeGenerator_Php_Docblock_Tag_Return(
+                                    array('datatype' => $name)
+                                )
+                            )
                         )
-                    )
-                )),
-                'body' => '$this->_fields = '
-                  . $this->_getTableFields($table) . ';'
-        ));
+                    ),
+                    'body' => '$this->_fields = '
+                      . $this->_getTableFields($table) . ';'
+                )
+            );
 
         $desc = ucfirst($table) . ' model builder.';
         $doc = $this->_generateClassDocblock($desc, $name);
@@ -163,7 +169,7 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
      */
     private function _getColumnField(array $desc, $name) {
         $ret =
-        	"'"
+            "'"
             . $this->_getCamelCased($this->_removeColumnPrefix($name))
             . "' => array("
             . PHP_EOL;
@@ -241,35 +247,35 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
                     . str_repeat(self::TAB, 4)
                     . "'format' => 'Y-m-d h:i:s'" . PHP_EOL
                     . str_repeat(self::TAB, 3) . '))';
-                    
+
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_TIME:
                 return 'new Zend_Validate_Date(array(' . PHP_EOL
                     . str_repeat(self::TAB, 4)
                     . "'format' => 'h:i:s'" . PHP_EOL
                     . str_repeat(self::TAB, 3) . '))';
-                    
+
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_DATE:
                 return 'new Zend_Validate_Date(array(' . PHP_EOL
                     . str_repeat(self::TAB, 4)
                     . "'format' => 'Y-m-d'" . PHP_EOL
                     . str_repeat(self::TAB, 3) . '))';
-                
+
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_TIMESTAMP:
                 return 'new Zend_Validate_Date(array(' . PHP_EOL
                     . str_repeat(self::TAB, 4)
                     . "'format' => Zend_Date::ISO_8601" . PHP_EOL
                     . str_repeat(self::TAB, 3) . '))';
-                    
+
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_ENUM:
 
                 for ($i = 0; $i < count($column['extra']['options']); $i++) {
                     $column['extra']['options'][$i] =
-                    	"'" . $column['extra']['options'][$i] . "'";
+                        "'" . $column['extra']['options'][$i] . "'";
                 }
 
                 return 'new Zend_Validate_InArray(array(' . PHP_EOL
-                	. str_repeat(self::TAB, 4)
-                	. implode(
+                    . str_repeat(self::TAB, 4)
+                    . implode(
                         $column['extra']['options'],
                         ',' . PHP_EOL . str_repeat(self::TAB, 4)
                       ) . PHP_EOL
@@ -277,7 +283,7 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
 
             default:
                 $this->_getLogger()->notice(
-                	'Couldn\'t generate validator for '
+                    'Couldn\'t generate validator for '
                     . $column['type'] . ' datatype'
                 );
 
