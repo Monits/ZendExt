@@ -35,7 +35,7 @@ class ZendExt_Console_Getopt extends Zend_Console_Getopt
      * Extended so not defined options are ignored instead
      * of make everything explode.
      *
-     * @param string $flag The option to parse.
+     * @param string $flag  The option to parse.
      * @param mixed  &$argv The array of received options.
      *
      * @throws Zend_Console_Getopt_Exception

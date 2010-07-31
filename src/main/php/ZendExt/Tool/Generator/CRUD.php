@@ -92,6 +92,8 @@ class ZendExt_Tool_Generator_CRUD extends ZendExt_Tool_Generator_Abstract
      * Retrieve the init method for the CRUD.
      *
      * @return array
+     *
+     * @throws ZendExt_Exception
      */
     private function _getInitMethod()
     {
@@ -121,7 +123,7 @@ class ZendExt_Tool_Generator_CRUD extends ZendExt_Tool_Generator_Abstract
             $repository = $this->_opts->table;
             $adapterType = 'Table';
         } else {
-            throw new Exception(
+            throw new ZendExt_Exception(
                 'The table or dao doesn\'t exist'
             );
         }

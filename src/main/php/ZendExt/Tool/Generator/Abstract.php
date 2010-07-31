@@ -146,8 +146,9 @@ abstract class ZendExt_Tool_Generator_Abstract
     /**
      * Formats the column name in camel case.
      *
-     * @param string $column    The column's name.
-     * @param string $separator The character that separates words.
+     * @param string  $column     The column's name.
+     * @param string  $separator  The character that separates words.
+     * @param boolean $pascalCase Wether to use PascalCase isntead of camelCase
      *
      * @return string
      */
@@ -274,9 +275,9 @@ abstract class ZendExt_Tool_Generator_Abstract
     /**
      * Retrieves an array with docblock tags.
      *
-     * @param string  $className  The class name.
-     * @param boolean $author     True if the author have to be added.
-     * @param string  $separator  The classname separator.
+     * @param string  $className The class name.
+     * @param boolean $author    True if the author have to be added.
+     * @param string  $separator The classname separator.
      *
      * @return array
      */
@@ -435,6 +436,14 @@ abstract class ZendExt_Tool_Generator_Abstract
      */
     protected abstract function _doGenerate();
 
+    /**
+     * Formats the column name in pascal case.
+     *
+     * @param string  $column     The column's name.
+     * @param string  $separator  The character that separates words.
+     *
+     * @return string
+     */
     public function _getPascalCase($column, $separator = '_')
     {
         return $this->_getCamelCased($column, $separator, true);

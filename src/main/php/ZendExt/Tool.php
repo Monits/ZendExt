@@ -125,9 +125,9 @@ class ZendExt_Tool
             throw new ZendExt_Tool_Exception(
                 'The generator class doesn\'t exists (' . $generator . ')'
             );
-        } elseif (array_search(
+        } else if (array_search(
             'ZendExt_Tool_Generator_Abstract',
-             class_parents($class)
+            class_parents($class)
         ) === false) {
             throw new ZendExt_Tool_Exception(
                 'The generator must extend ZendExt_Tool_Generator_Abstract'

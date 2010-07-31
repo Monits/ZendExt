@@ -263,7 +263,9 @@ abstract class ZendExt_Cron_Process
             $this->_shutdown();
         } catch (Exception $e) {
 
-            $this->_logger->crit('An exception was thrown while cleaning up...');
+            $this->_logger->crit(
+                'An exception was thrown while cleaning up...'
+            );
             $this->_logger->crit($e->__toString());
         }
 

@@ -111,10 +111,10 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
                     'options' => $this->_parseEnum($type)
                 );
             default:
+                // For types that max and min is not necessary.
                 break;
         }
 
-        // For types that max and min is not necessary.
         return array('name' => $type);
     }
 
@@ -173,6 +173,7 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
                 return self::CURRENT_TIME;
 
             default:
+                // No special default found
                 break;
         }
 

@@ -114,7 +114,7 @@ class ZendExt_Log_Writer_LazyStream extends Zend_Log_Writer_Stream
     /**
      * Create a new instance of Zend_Log_Writer_LazyStream
      *
-     * @param  array|Zend_Config $config The config of the writer.
+     * @param array|Zend_Config $config The config of the writer.
      *
      * @return Zend_Log_Writer_LazyStream
      *
@@ -123,10 +123,12 @@ class ZendExt_Log_Writer_LazyStream extends Zend_Log_Writer_Stream
     static public function factory($config)
     {
         $config = self::_parseConfig($config);
-        $config = array_merge(array(
-            'stream' => null,
-            'mode'   => null,
-        ), $config);
+        $config = array_merge(
+            array(
+                'stream' => null,
+                'mode'   => null,
+            ), $config
+        );
 
         $streamOrUrl = isset($config['url']) ?
             $config['url'] : $config['stream'];

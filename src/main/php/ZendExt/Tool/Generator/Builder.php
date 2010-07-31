@@ -124,10 +124,12 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
             $f = $this->_getCamelCased($this->_removeColumnPrefix($column));
             $n = 'with' . ucfirst($f);
 
-            $doc->setTag(array(
-                'name' => 'method',
-                'description' => "{$name} {$n}() $n(\$value)"
-            ));
+            $doc->setTag(
+                array(
+                    'name' => 'method',
+                    'description' => "{$name} {$n}() $n(\$value)"
+                )
+            );
         }
 
         $class->setDocblock($doc);
@@ -162,12 +164,13 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
     /**
      * Retrieves the php code representing the given column.
      *
-     * @param array $desc The table description.
+     * @param array  $desc The table description.
      * @param string $name Which column to use.
      *
      * @return string
      */
-    private function _getColumnField(array $desc, $name) {
+    private function _getColumnField(array $desc, $name)
+    {
         $ret =
             "'"
             . $this->_getCamelCased($this->_removeColumnPrefix($name))
@@ -181,7 +184,7 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
         $default = null;
 
         if ($desc['default'] === null) {
-           if ($desc['nullable']) {
+            if ($desc['nullable']) {
                 $default = 'null';
             }
         } else {
@@ -210,7 +213,9 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
     /**
      * Retrieves the php code to validate the given column.
      *
-     * @param array $column
+     * @param array $column A column's definition, as provided by the db schema
+     *
+     * @return string
      */
     private function _getValidatorForColumn($column)
     {
@@ -267,7 +272,6 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
                     . str_repeat(self::TAB, 3) . '))';
 
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_ENUM:
-
                 for ($i = 0; $i < count($column['extra']['options']); $i++) {
                     $column['extra']['options'][$i] =
                         "'" . $column['extra']['options'][$i] . "'";
@@ -286,11 +290,10 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
                     'Couldn\'t generate validator for '
                     . $column['type'] . ' datatype'
                 );
-
-                return null;
-
+                break;
         }
 
+        return null;
     }
 
     /**
@@ -303,18 +306,15 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
     private function _transformDefaultToPhp($default)
     {
         switch ($default) {
-            case
-                ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_TIMESTAMP:
-
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_TIMESTAMP:
                 return 'date(\'c\')';
-            case
-                ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_DATE:
 
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_DATE:
                 return 'date(\'Y-m-d\')';
-            case
-                ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_TIME:
 
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_TIME:
                 return 'date(\'h:i:s\')';
+
             default:
                 return $default;
                 break;

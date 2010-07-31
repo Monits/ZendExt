@@ -104,7 +104,8 @@ class ZendExt_Db_Schema
             $col['primary'] = $column['PRIMARY'] == 1;
             $col['sequence'] = $column['IDENTITY'] == 1;
 
-            $col['default'] = $this->getTypeMappingAdapter()->getDefault($column['DEFAULT']);
+            $mapper = $this->getTypeMappingAdapter();
+            $col['default'] = $mapper->getDefault($column['DEFAULT']);
 
             $ret[$column['COLUMN_NAME']] = $col;
         }
@@ -121,7 +122,8 @@ class ZendExt_Db_Schema
     public function getTypeMappingAdapter()
     {
         if (!isset($this->_typeMappingAdapter)) {
-            $this->_typeMappingAdapter = new ZendExt_Db_Schema_TypeMappingAdapter_Generic();
+            $this->_typeMappingAdapter
+                = new ZendExt_Db_Schema_TypeMappingAdapter_Generic();
         }
 
         return $this->_typeMappingAdapter;

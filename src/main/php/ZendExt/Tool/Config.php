@@ -1,6 +1,6 @@
 <?php
 /**
- * ZendExt_Tool_Config handles all access to configuration & user interaction for ZendExt_Tool.
+ * Configuration & user interaction handler for ZendExt_Tool.
  *
  * @category  ZendExt
  * @package   ZendExt_Tool
@@ -12,7 +12,7 @@
  */
 
 /**
- * ZendExt_Tool_Config handles all access to configuration & user interaction for ZendExt_Tool.
+ * Configuration & user interaction handler for ZendExt_Tool.
  *
  * @category  ZendExt
  * @package   ZendExt_Tool
@@ -85,6 +85,7 @@ class ZendExt_Tool_Config
      *
      * @param string $table The name of the table.
      * @param string $key   The name of the option to get.
+     *
      * @return mixed
      */
     public function getTableOption($table, $key)
@@ -162,8 +163,8 @@ class ZendExt_Tool_Config
     /**
      * Get a value from the config file.
      *
-     * @param string $namespace The configuration namespace.
      * @param string $key       The key of the value to get.
+     * @param string $namespace The configuration namespace.
      * @param string $section   The section under which to get the value.
      *                          Optional.
      *
@@ -211,9 +212,11 @@ class ZendExt_Tool_Config
      * @param string $namespace The configuration namespace.
      * @param string $section   The section under which to set the value.
      *                          Optional.
+     *
      * @return void
      */
-    protected function _setConfig($key, $value, $namespace = null, $section = null)
+    protected function _setConfig($key, $value,
+                                    $namespace = null, $section = null)
     {
         $keys = array();
         $keys[] = $namespace;

@@ -86,12 +86,14 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
      * @param string $table The name of the table whose model to generate.
      *
      * @return void
+     *
+     * @throws ZendExt_Exception
      */
     private function _generateModel($table)
     {
 
         if (!isset($this->_schema[$table])) {
-            throw new Exception(
+            throw new ZendExt_Exception(
                 'The table doesn\'t exist'
             );
         }
@@ -365,20 +367,17 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_INTEGER:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_SMALLINT:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_BIGINT:
-            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::
-                TYPE_DOUBLE_PRECISION:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_DOUBLE_PRECISION:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_DECIMAL:
                 return self::PHP_TYPE_INTEGER;
 
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_BLOB:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_TEXT:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_CHAR:
-            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::
-                TYPE_BINARY_VARYING:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_BINARY_VARYING:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_VARCHAR:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_ENUM:
-            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::
-                CURRENT_TIMESTAMP:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_TIMESTAMP:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_DATE:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_TIME:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_TIMESTAMP:

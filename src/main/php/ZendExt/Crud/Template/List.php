@@ -72,7 +72,8 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
 
         foreach ($this->_view->fieldsMap as $field => $col) {
             echo '<th class="row">';
-            echo '<a  class ="cols" href="/' . $moduleUrl . $controllerName . '/list/';
+            echo '<a  class ="cols" href="/',
+                    $moduleUrl, $controllerName, '/list/';
             echo 'page/' . $currentPage . '/';
             echo 'order' . '/';
             if (in_array($col, $orderField)) {
@@ -112,7 +113,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
                 echo '<span class="colValue">';
                 $isPk = in_array($col, $this->_view->pk);
                 if ($isPk) {
-                    echo '<a href="/' . $moduleUrl. $controllerName . '/update/';
+                    echo '<a href="/', $moduleUrl, $controllerName, '/update/';
                     foreach ($this->_view->pk as $k) {
                         $field = array_search($k, $this->_view->fieldsMap);
                         echo $field . '/'. $arrCols[$k] . '/';
@@ -207,7 +208,8 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
                     '">First',
                     '</a></span>';
             echo '<span class="page">';
-            echo"<a href=\"/{$moduleUrl}{$controllerName}/list/page/{$previous}",
+            echo"<a href=\"/{$moduleUrl}",
+                    "{$controllerName}/list/page/{$previous}",
                     "/order/{$order}/by/",
                     implode(',', $orderField),
                     ($defaultIpp == $ipp ? '' : "/ipp/{$ipp}"),
@@ -226,7 +228,8 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
                     '">Next',
                     '</a></span>';
             echo '<span class=\"page\">';
-            echo '<a href="/' . $moduleUrl . $controllerName . '/list/page/' . $last,
+            echo '<a href="/', $moduleUrl, $controllerName,
+                    '/list/page/', $last,
                     "/order/{$order}/by/",
                     implode(',', $orderField),
                     ($defaultIpp == $ipp ? '' : "/ipp/{$ipp}"),
@@ -249,12 +252,15 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             '.crudContent .colValue{padding:3px; font-size: 12px}' .
             '.crudContent .delete {float: right}' .
             '.crudContent table {border-collapse:collapse;}' .
-            '.crudContent table, .crudContent th, .crudContent td {border: 1px solid black;}' .
+            '.crudContent table, .crudContent th, .crudContent td ' .
+                    '{border: 1px solid black;}' .
             '.crudContent td {text-align:center;}' .
-            '.crudContent th {padding:3px;background-color:#A7C942;color:#ffffff;}' .
-            '.crudContent tr.altColor td {color:#000000;background-color:#EAF2D3;heigth}' .
+            '.crudContent th ' .
+                    '{padding:3px;background-color:#A7C942;color:#ffffff;}' .
+            '.crudContent tr.altColor td ' .
+                    '{color:#000000;background-color:#EAF2D3;heigth}' .
             '.crudContent div.pageBar {margin-left:auto;margin-right:auto;',
-                   'width:300px;text-align:center;}' .
+                    'width:300px;text-align:center;}' .
             '.crudContent span.page a{padding:4px;}' .
             '.crudContent a:link{text-decoration:none;}' .
             '.crudContent a:visited{color:blue;text-decoration:none;}' .

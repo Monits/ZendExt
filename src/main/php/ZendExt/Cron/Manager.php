@@ -140,7 +140,8 @@ final class ZendExt_Cron_Manager
      *
      * @return integer|boolean The pid of the new process. False if it failed.
      */
-    public function spawnProcess($process, array $config = array(), $name = null)
+    public function spawnProcess($process, array $config = array(),
+                                $name = null)
     {
         $this->_log('Spawning new process...');
 
@@ -263,7 +264,7 @@ final class ZendExt_Cron_Manager
      * Spawn a new process.
      *
      * @param string $processName The name of the process for the process.
-     * @param array  $extraConfig  Extra config to override the process config.
+     * @param array  $extraConfig Extra config to override the process config.
      *
      * @return void
      */
@@ -319,7 +320,9 @@ final class ZendExt_Cron_Manager
                 $config = new Zend_Config_Xml($configFile);
             } catch ( Zend_Config_Exception $e ) {
 
-                $this->_log('Config file parsing failed, crashing hard.', 'warn');
+                $this->_log(
+                    'Config file parsing failed, crashing hard.', 'warn'
+                );
                 $this->_log($e->__toString(), 'crit');
 
                 die(1);
@@ -412,7 +415,7 @@ final class ZendExt_Cron_Manager
     /**
      * Run a number of strategies.
      *
-     * @param string|array $process   The strategies to run.
+     * @param string|array $process    The strategies to run.
      * @param string       $configFile The path to the config file.
      * @param array        $extra      Override default process config.
      *

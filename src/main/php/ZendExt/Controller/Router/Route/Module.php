@@ -23,7 +23,8 @@
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
-class ZendExt_Controller_Router_Route_Module extends Zend_Controller_Router_Route_Module
+class ZendExt_Controller_Router_Route_Module
+    extends Zend_Controller_Router_Route_Module
 {
     /**
      * Matches a user submitted path. Assigns and returns an array of variables
@@ -132,7 +133,8 @@ class ZendExt_Controller_Router_Route_Module extends Zend_Controller_Router_Rout
     {
         $frontController = Zend_Controller_Front::getInstance();
 
-        $defs       = ($config->defaults instanceof Zend_Config) ? $config->defaults->toArray() : array();
+        $defs       = ($config->defaults instanceof Zend_Config)
+                ? $config->defaults->toArray() : array();
         $dispatcher = $frontController->getDispatcher();
         $request    = $frontController->getRequest();
 
