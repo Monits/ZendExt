@@ -49,7 +49,7 @@ class ZendExt_Tool
 
     /**
      * Retrieves the basic usage message.
-	 *
+     *
      * @return string
      */
     public function getUsageMessage()
@@ -104,8 +104,11 @@ class ZendExt_Tool
      * @param string $outputDir Where the generated files will be stored.
      *
      * @return ZendExt_Tool_Generator_Abstract
+     *
+     * @throws ZendExt_Tool_Exception
      */
-    public function getGenerator($generator, $outputDir = null) {
+    public function getGenerator($generator, $outputDir = null)
+    {
         $class = 'ZendExt_Tool_Generator_' . $generator;
 
         if (!file_exists(
@@ -120,14 +123,14 @@ class ZendExt_Tool
 
         if (!class_exists($class)) {
             throw new ZendExt_Tool_Exception(
-            	'The generator class doesn\'t exists (' . $generator . ')'
+                'The generator class doesn\'t exists (' . $generator . ')'
             );
         } elseif (array_search(
-        	'ZendExt_Tool_Generator_Abstract',
+            'ZendExt_Tool_Generator_Abstract',
              class_parents($class)
         ) === false) {
             throw new ZendExt_Tool_Exception(
-            	'The generator must extend ZendExt_Tool_Generator_Abstract'
+                'The generator must extend ZendExt_Tool_Generator_Abstract'
             );
         }
 
@@ -155,8 +158,8 @@ class ZendExt_Tool
             require_once $file;
             if (class_exists('ZendExt_Tool_Generator_' . $generator)
                 && is_subclass_of(
-            		'ZendExt_Tool_Generator_' . $generator,
-                	'ZendExt_Tool_Generator_Abstract'
+                    'ZendExt_Tool_Generator_' . $generator,
+                    'ZendExt_Tool_Generator_Abstract'
                 )) {
                 $ret[] = $generator;
             }
