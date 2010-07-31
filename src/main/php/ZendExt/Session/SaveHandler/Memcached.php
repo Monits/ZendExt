@@ -50,7 +50,7 @@ class ZendExt_Session_SaveHandler_Memcached extends Zend_Cache_Backend_Memcached
      * lifetime        => (integer) Session lifetime
      *                   (optional; default: ini_get('session.gc_maxlifetime'))
      *
-     * @param  Zend_Config|array $config      User-provided configuration
+     * @param Zend_Config|array $config User-provided configuration
      *
      * @return void
      *
@@ -106,9 +106,11 @@ class ZendExt_Session_SaveHandler_Memcached extends Zend_Cache_Backend_Memcached
      *
      * $lifetime === false|null|0 resets lifetime to session.gc_maxlifetime
      *
-     * @param int $lifetime
+     * @param int $lifetime The lifetime of the session, in seconds.
      *
      * @return Zend_Session_SaveHandler_Memcached
+     *
+     * @throws Zend_Session_SaveHandler_Exception
      */
     public function setLifetime($lifetime)
     {
@@ -130,12 +132,12 @@ class ZendExt_Session_SaveHandler_Memcached extends Zend_Cache_Backend_Memcached
     /**
      * Open Session - retrieve resources
      *
-     * @param string $save_path The path in which to store sessions.
-     * @param string $name      The name of the session to be used.
+     * @param string $savePath The path in which to store sessions.
+     * @param string $name     The name of the session to be used.
      *
      * @return boolean
      */
-    public function open($save_path, $name)
+    public function open($savePath, $name)
     {
         return true;
     }
