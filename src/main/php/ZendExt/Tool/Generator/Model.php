@@ -80,6 +80,13 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
         }
     }
 
+    /**
+     * Generate a modle for the given table.
+     *
+     * @param string $table The name of the table whose model to generate.
+     *
+     * @return void
+     */
     private function _generateModel($table)
     {
 
@@ -159,6 +166,7 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
     /**
      * Retrieves the construct method.
      *
+     * @param string $table      The name of the table whose model to generate.
      * @param string $returnType The datatype to be returned.
      *
      * @return Zend_CodeGenerator_Php_Method
@@ -297,8 +305,8 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
     /**
      * Retrieves the setter method for the given column.
      *
-     * @param string $name 	 The column name.
-     * @param array  $column The array with the column's data.
+     * @param string $columnName The column name.
+     * @param array  $column     The array with the column's data.
      *
      * @return Zend_CodeGenerator_Php_Method
      */
@@ -353,6 +361,7 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
         switch ($dataType) {
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_BOOLEAN:
                 return self::PHP_TYPE_BOOLEAN;
+
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_INTEGER:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_SMALLINT:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_BIGINT:
@@ -360,6 +369,7 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
                 TYPE_DOUBLE_PRECISION:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_DECIMAL:
                 return self::PHP_TYPE_INTEGER;
+
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_BLOB:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_TEXT:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_CHAR:
@@ -373,6 +383,7 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_TIME:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_TIMESTAMP:
                 return self::PHP_TYPE_STRING;
+
             default:
                 return "unknown ({$dataType})";
                 break;
