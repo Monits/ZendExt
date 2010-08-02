@@ -93,7 +93,10 @@ class ZendExt_Paginator_Adapter_CallbackDecorator
             }
         } else {
             // Apply callback function
-            $ret = array_map($this->_callback, $items);
+            $ret = array();
+            foreach ($items as $item) {
+                $ret[] = call_user_func($this->_callback, $item);
+            }
         }
 
         return $ret;
