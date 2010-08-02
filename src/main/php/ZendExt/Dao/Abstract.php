@@ -233,23 +233,6 @@ abstract class ZendExt_Dao_Abstract
             $this->_tableClass, $shardingArgs
         );
 
-        return $this->_selectForShard($where, $shards, $extra);
-    }
-
-    /**
-     * Get the rows of the shards and retrieves a rowset.
-     *
-     * @param string $where  SQL where clause.
-     * @param array  $shards Array with shards to query.
-     * @param array  $extra  Extra where conditions. If any needs quoting
-     *                       set the where string as key with the
-     *                       corresponding value. Optional.
-     *
-     * @return array
-     */
-    protected function _selectForShard($where, array $shards,
-        array $extra = array())
-    {
         $rowset = array();
 
         foreach ($shards as $shard => $valuesForShard) {
@@ -259,6 +242,54 @@ abstract class ZendExt_Dao_Abstract
             $cond = $this->_quoteWhere(
                 $adapter, $where, $valuesForShard, $extra
             );
+            foreach ($table->fetchAll($cond) as $row) {
+                $rowset[] = $row;
+            }
+        }
+
+        return $rowset;
+    }
+
+    /**
+     * Execute a query on all shards. 
+     * 
+     *
+     * @param array  $extra  Extra where conditions. If any needs quoting
+     *                       set the where string as key with the
+     *                       corresponding value. Optional.
+     *
+     * @return array 
+     */
+    protected function _selectForAllShards(array $extra = array())
+    {
+        return $this->_selectForShards(
+            $this->_getShardsForTable(self::OPERATION_READ),
+            $extra
+        );
+    }
+
+    /**
+     * Get the rows of the shards and retrieves a rowset.
+     *
+     * @param array  $shards Array with shards to query.
+     * @param array  $extra  Extra where conditions. If any needs quoting
+     *                       set the where string as key with the
+     *                       corresponding value. Optional.
+     *
+     * @return array
+     */
+    protected function _selectForShards(array $shards, array $extra = array())
+    {
+        $rowset = array();
+
+        foreach ($shards as $shard) {
+            $table = $this->_getTableForShard($shard, self::OPERATION_READ);
+            $adapter = $table->getAdapter();
+
+            $cond = $this->_quoteWhere(
+                $adapter, null, null, $extra
+            );
+
             foreach ($table->fetchAll($cond) as $row) {
                 $rowset[] = $row;
             }
@@ -314,13 +345,20 @@ abstract class ZendExt_Dao_Abstract
      *
      * @return string the prepared where clause.
      */
-    protected function _quoteWhere(Zend_Db_Adapter_Abstract $adapter, $where,
-        $value, array $extra = array())
+    protected function _quoteWhere(Zend_Db_Adapter_Abstract $adapter, 
+        $where = null, $value = null, array $extra = array())
     {
-        $where = $adapter->quoteInto($where, $value);
+        if (null !== $where) {
+            $where = $adapter->quoteInto($where, $value);
+        } else {
+            $where = '';
+        }
 
         foreach ($extra as $key => $value) {
-            $where .= ' AND ';
+
+            if ('' != $where) {
+                $where .= ' AND ';
+            }
 
             if (is_string($key)) {
 
@@ -337,15 +375,16 @@ abstract class ZendExt_Dao_Abstract
     /**
      * Get all of the available shards for an operation on a given table.
      *
-     * @param string $table     The table name.
      * @param string $operation The operation to perform on the table.
      *                          See {@link #OPERATION_READ} and
      *                          {@link #OPERATION_WRITE}
      *
      * @return array
      */
-    protected function _getShardsForTable($table, $operation)
+    protected function _getShardsForTable($operation)
     {
-        return self::$_config->getShardsForTable($table, $operation);
+        return array_keys(
+            self::$_config->getShardsForTable($this->_tableClass, $operation)
+        );
     }
 }
