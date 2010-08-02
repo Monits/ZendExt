@@ -233,6 +233,7 @@ abstract class ZendExt_Dao_Abstract
             $this->_tableClass, $shardingArgs
         );
 
+        return $this->_selectForShard($where, $shards, $extra);
     }
 
     /**
