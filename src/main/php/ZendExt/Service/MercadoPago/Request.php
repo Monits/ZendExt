@@ -33,7 +33,7 @@ class ZendExt_Service_MercadoPago_Request
 
     const REJECTED = 'rejected';
 
-    protected $_states = array(
+    protected static $_states = array(
         'A' => self::PAID,
         'P' => self::PENDING,
         'C' => self::CANCELLED,
