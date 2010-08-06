@@ -251,14 +251,14 @@ abstract class ZendExt_Dao_Abstract
     }
 
     /**
-     * Execute a query on all shards. 
-     * 
+     * Execute a query on all shards.
+     *
      *
      * @param array  $extra  Extra where conditions. If any needs quoting
      *                       set the where string as key with the
      *                       corresponding value. Optional.
      *
-     * @return array 
+     * @return array
      */
     protected function _selectForAllShards(array $extra = array())
     {
@@ -345,7 +345,7 @@ abstract class ZendExt_Dao_Abstract
      *
      * @return string the prepared where clause.
      */
-    protected function _quoteWhere(Zend_Db_Adapter_Abstract $adapter, 
+    protected function _quoteWhere(Zend_Db_Adapter_Abstract $adapter,
         $where = null, $value = null, array $extra = array())
     {
         if (null !== $where) {
@@ -386,5 +386,23 @@ abstract class ZendExt_Dao_Abstract
         return array_keys(
             self::$_config->getShardsForTable($this->_tableClass, $operation)
         );
+    }
+
+    /**
+     * Retrieves the shard id for the given value.
+     *
+     * @param any $shardingArg The argument by which sharding is perfmored.
+     *
+     * @return int
+     */
+    protected function _getShardIdForValue($shardingArg)
+    {
+        $shads = self::$_config->getShardsForValues(
+            $this->_tableClass, array($shardingArg)
+        );
+
+        $shardIds = array_keys($shads);
+
+        return $shardIds[0];
     }
 }
