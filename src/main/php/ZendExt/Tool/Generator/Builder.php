@@ -221,6 +221,12 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
     {
 
         switch ($column['type']) {
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_TEXT:
+                return 'new Zend_Validate_NotEmpty(array(' . PHP_EOL
+                    . str_repeat(self::TAB, 4)
+                    . "'type' => Zend_Validate_NotEmpty::STRING" . PHP_EOL
+                    . str_repeat(self::TAB, 3) . '))';
+                
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_VARCHAR:
                 return 'new Zend_Validate_StringLength(array(' . PHP_EOL .
                     str_repeat(self::TAB, 4) . "'min' => 0, 'max' => "
