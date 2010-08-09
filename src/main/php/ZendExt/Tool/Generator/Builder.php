@@ -247,12 +247,6 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_FLOAT:
                 return 'new Zend_Validate_Float()';
 
-            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_DATETIME:
-                return 'new Zend_Validate_Date(array(' . PHP_EOL
-                    . str_repeat(self::TAB, 4)
-                    . "'format' => 'Y-m-d h:i:s'" . PHP_EOL
-                    . str_repeat(self::TAB, 3) . '))';
-
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_TIME:
                 return 'new Zend_Validate_Date(array(' . PHP_EOL
                     . str_repeat(self::TAB, 4)
@@ -265,6 +259,7 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
                     . "'format' => 'Y-m-d'" . PHP_EOL
                     . str_repeat(self::TAB, 3) . '))';
 
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_DATETIME:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_TIMESTAMP:
                 return 'new Zend_Validate_Date(array(' . PHP_EOL
                     . str_repeat(self::TAB, 4)
