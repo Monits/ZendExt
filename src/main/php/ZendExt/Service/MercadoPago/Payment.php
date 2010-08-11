@@ -23,7 +23,7 @@
  * @link      http://www.zendext.com/
  * @since     1.3.0
  */
-class ZendExt_Service_MercadoPago_Request
+class ZendExt_Service_MercadoPago_Payment
 {
     const PAID = 'paid';
 
@@ -33,6 +33,19 @@ class ZendExt_Service_MercadoPago_Request
 
     const REJECTED = 'rejected';
 
+    protected static $_comparison = array(
+        'getId',
+        'getOperationId',
+        'getAccountId',
+        'getItemId',
+        'getProductName',
+        'getProductPrice',
+        'getShippingCost',
+        'getTotalCost',
+        'getExtra',
+        'getPaymentMethod'
+    );
+
     protected static $_states = array(
         'A' => self::PAID,
         'P' => self::PENDING,
@@ -40,16 +53,16 @@ class ZendExt_Service_MercadoPago_Request
         'R' => self::REJECTED
     );
 
-    protected $_request;
+    protected $_data;
 
     /**
      * Create a new instance.
      *
-     * @param Zend_Controller_Request_Abstract $request The request object.
+     * @param array $data The payment data.
      */
-    public function __construct(Zend_Controller_Request_Abstract $request)
+    public function __construct(array $data)
     {
-        $this->_request = $request;
+        $this->_data = $data;
     }
 
     /**
@@ -59,7 +72,7 @@ class ZendExt_Service_MercadoPago_Request
      */
     public function getId()
     {
-        return $this->_request->getParam('mp_op_id');
+        return $this->_data['mp_op_id'];
     }
 
     /**
@@ -69,7 +82,7 @@ class ZendExt_Service_MercadoPago_Request
      */
     public function getOperationId()
     {
-        return $this->_request->getParam('seller_op_id');
+        return $this->_data['seller_op_id'];
     }
 
     /**
@@ -79,7 +92,7 @@ class ZendExt_Service_MercadoPago_Request
      */
     public function getAccountId()
     {
-        return $this->_request->getParam('acc_id');
+        return $this->_data['acc_id'];
     }
 
     /**
@@ -89,7 +102,7 @@ class ZendExt_Service_MercadoPago_Request
      */
     public function getStatus()
     {
-        return self::$_states[$this->_request->getParam('status')];
+        return self::$_states[$this->_data['status']];
     }
 
     /**
@@ -99,7 +112,7 @@ class ZendExt_Service_MercadoPago_Request
      */
     public function getItemId()
     {
-        return $this->_request->getParam('item_id');
+        return $this->_data['item_id'];
     }
 
     /**
@@ -109,7 +122,7 @@ class ZendExt_Service_MercadoPago_Request
      */
     public function getProductName()
     {
-        return $this->_request->getParam('name');
+        return $this->_data['name'];
     }
 
     /**
@@ -119,7 +132,7 @@ class ZendExt_Service_MercadoPago_Request
      */
     public function getProductPrice()
     {
-        return $this->_request->getParam('price');
+        return $this->_data['price'];
     }
 
     /**
@@ -129,7 +142,7 @@ class ZendExt_Service_MercadoPago_Request
      */
     public function getShippingCost()
     {
-        return $this->_request->getParam('shipping_amount');
+        return $this->_data['shipping_amount'];
     }
 
     /**
@@ -139,7 +152,7 @@ class ZendExt_Service_MercadoPago_Request
      */
     public function getTotalCost()
     {
-        return $this->_request->getParam('total_amount');
+        return $this->_data['total_amount'];
     }
 
     /**
@@ -149,7 +162,7 @@ class ZendExt_Service_MercadoPago_Request
      */
     public function getExtra()
     {
-        return $this->_request->getParam('extra_part');
+        return $this->_data['extra_part'];
     }
 
     /**
@@ -159,7 +172,7 @@ class ZendExt_Service_MercadoPago_Request
      */
     public function getPaymentMethod()
     {
-        return $this->_request->getParam('payment_method');
+        return $this->_data['payment_method'];
     }
 
     /**
@@ -200,5 +213,47 @@ class ZendExt_Service_MercadoPago_Request
     public function isRejected()
     {
         return $this->getStatus() == self::REJECTED;
+    }
+
+    /**
+     * Create a new instance from a request object.
+     *
+     * @param Zend_Controller_Request_Abstract $request The request to use.
+     *
+     * @return ZendExt_Service_MercadoPago_Payment
+     */
+    public static function createFromRequest(
+        Zend_Controller_Request_Abstract $request)
+    {
+        return new self($request->getParams());
+    }
+
+    /**
+     * Compare two payments to see if they are the same.
+     *
+     * @param ZendExt_Service_MercadoPago_Payment $p      The payment to
+     *                                                    compare.
+     * @param boolean                             $strict Whether to compare
+     *                                                    states. Default false.
+     *
+     * @return boolean
+     */
+    public function equals(ZendExt_Service_MercadoPago_Payment $p,
+        $strict = false)
+    {
+        foreach (self::$_comparison as $method) {
+
+            if ($this->$method() != $p->$method()) {
+
+                return false;
+            }
+        }
+
+        if ($strict && $this->getStatus() != $p->getStatus()) {
+
+            return false;
+        }
+
+        return true;
     }
 }
