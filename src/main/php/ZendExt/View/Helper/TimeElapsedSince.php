@@ -144,6 +144,14 @@ class ZendExt_View_Helper_TimeElapsedSince extends Zend_View_Helper_Abstract
             }
         }
 
+        // Make sure it's never empty (reads "0 minutes")
+        if (empty($parts)) {
+            $parts[] = sprintf(
+                self::$_formatStrings[self::PART_MINUTES][1],
+                $diffArr[self::PART_MINUTES]
+            );
+        }
+
         return implode(self::$_separator, $parts);
     }
 }
