@@ -47,20 +47,26 @@ class ZendExt_Service_MercadoPago_Sonda
 
     protected $_data = null;
 
+    protected $_auth;
+
     /**
      * Construct a new instance.
      *
      * @param integer $accountId   The Mercado Pago account id.
      * @param string  $token       The accounts Sonda token.
      * @param integer $mpId        The payments' mercado pago id.
-     * @param string  $operationId Optinal. The operation id set by the seller.
+     * @param string  $operationId Optional. The operation id set by the seller.
+     * @param boolean $auth        Optional. Whether to validate the connection.
      */
-    public function __construct($accountId, $token, $mpId, $operationId = null)
+    public function __construct($accountId, $token, $mpId, $operationId = null, 
+        $auth = true)
     {
         $this->_accountId = $accountId;
         $this->_token = $token;
         $this->_mpId = $mpId;
         $this->_operationId = $operationId;
+
+        $this->_auth = $auth;
     }
 
     /**
@@ -85,6 +91,22 @@ class ZendExt_Service_MercadoPago_Sonda
     protected function _makeRequest()
     {
         $client = new Zend_Http_Client(self::SONDA_URI);
+
+        if ($this->_auth) {
+
+            $adapter = new Zend_Http_Client_Adapter_Curl();
+            $adapter->setConfig(
+                array(
+                    'curloptions' => array(
+                        CURLOPT_SSL_VERIFYPEER => true,
+                        CURLOPT_SSL_VERIFYHOST => true
+                    )   
+                )   
+            );  
+
+            $client->setAdapter($adapter);
+        }
+
         $client->setMethod('POST')
             ->setParameterPost(self::MERCADOPAGO_ID, $this->_mpId)
             ->setParameterPost(self::ACCOUNT_ID, $this->_accountId)
@@ -97,7 +119,7 @@ class ZendExt_Service_MercadoPago_Sonda
         } catch (Zend_Http_Client_Exception $e) {
 
             throw new ZendExt_Service_MercadoPago_Sonda_Exception(
-                'Could not complete the request.'
+                'Could not complete the request.'.PHP_EOL.$e->__toString()
             );
         }
 
