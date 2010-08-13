@@ -82,7 +82,7 @@ class ZendExt_View_Helper_VersionedHeadScript
      *
      * @return Zend_View_Helper_VersionedHeadScript Fluid interface
      */
-    public function setVersioner(Zend_Versioner $versioner)
+    public function setVersioner(ZendExt_Versioner $versioner)
     {
         $container = $this->getContainer();
         $container['versioner'] = $versioner;
@@ -166,7 +166,7 @@ class ZendExt_View_Helper_VersionedHeadScript
         if ( $version === null ) {
 
             if ( isset($container['versioner'])
-                && ($container['versioner'] instanceof Zend_Versioner) ) {
+                && ($container['versioner'] instanceof ZendExt_Versioner) ) {
 
                 $marker = strpos($uri, '?');
                 if ( $marker !== false ) {
