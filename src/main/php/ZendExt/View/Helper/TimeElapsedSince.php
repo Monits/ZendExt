@@ -128,11 +128,11 @@ class ZendExt_View_Helper_TimeElapsedSince extends Zend_View_Helper_Abstract
     /**
      * Formats a string of elapsed time given the time difference array.
      *
-     * @param array $diffArray The array of time differences.
+     * @param array $diffArr The array of time differences.
      *
      * @return string
      */
-    protected function _formatString(array $diffArray)
+    protected function _formatString(array $diffArr)
     {
         $parts = array();
         foreach (self::$_formatParts as $part) {
