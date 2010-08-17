@@ -270,10 +270,10 @@ abstract class ZendExt_Dao_Abstract
     /**
      * Get the rows of the shards and retrieves a rowset.
      *
-     * @param array  $shards Array with shards to query.
-     * @param array  $extra  Extra where conditions. If any needs quoting
-     *                       set the where string as key with the
-     *                       corresponding value. Optional.
+     * @param array $shards Array with shards to query.
+     * @param array $extra  Extra where conditions. If any needs quoting
+     *                      set the where string as key with the
+     *                      corresponding value. Optional.
      *
      * @return array
      */

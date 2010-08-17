@@ -439,12 +439,12 @@ abstract class ZendExt_Tool_Generator_Abstract
     /**
      * Formats the column name in pascal case.
      *
-     * @param string  $column     The column's name.
-     * @param string  $separator  The character that separates words.
+     * @param string $column    The column's name.
+     * @param string $separator The character that separates words.
      *
      * @return string
      */
-    public function _getPascalCase($column, $separator = '_')
+    protected function _getPascalCase($column, $separator = '_')
     {
         return $this->_getCamelCased($column, $separator, true);
     }

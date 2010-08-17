@@ -23,7 +23,7 @@
  * @license   Copyright 2010. All rights reserved.
  * @version   Release: 1.0.0
  * @link      http://www.zendext.com/
- * @see Zend_Console_Getopt
+ * @see       Zend_Console_Getopt
  * @since     1.3.0
  */
 class ZendExt_Console_Getopt extends Zend_Console_Getopt

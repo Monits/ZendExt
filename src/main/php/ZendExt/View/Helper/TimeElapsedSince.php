@@ -69,8 +69,11 @@ class ZendExt_View_Helper_TimeElapsedSince extends Zend_View_Helper_Abstract
      * @param string $templatePlural   The template to be set for plurals.
      *
      * @return void
+     *
+     * @throws ZendExt_Exception
      */
-    public static function setTemplateForPart($part, $templateSingular, $templatePlural)
+    public static function setTemplateForPart($part, $templateSingular,
+                                            $templatePlural)
     {
         if (!in_array($part, self::$_formatParts)) {
             throw new ZendExt_Exception('Unknown part: ' . $part);
@@ -138,6 +141,7 @@ class ZendExt_View_Helper_TimeElapsedSince extends Zend_View_Helper_Abstract
         foreach (self::$_formatParts as $part) {
             switch ($diffArr[$part]) {
                 case 0:
+                    // This section should be excluded
                     break;
 
                 case 1:

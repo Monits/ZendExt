@@ -93,14 +93,14 @@ class ZendExt_Tool_Generator_CRUD extends ZendExt_Tool_Generator_Abstract
      *
      * @return array
      *
-     * @throws ZendExt_Exception
+     * @throws ZendExt_Tool_Generator_Exception
      */
     private function _getInitMethod()
     {
         $table = $this->_opts->dbtable;
 
         if (!isset($this->_schema[$table])) {
-            throw new Exception(
+            throw new ZendExt_Tool_Generator_Exception(
                 'The table doesn\'t exist'
             );
         }
@@ -123,7 +123,7 @@ class ZendExt_Tool_Generator_CRUD extends ZendExt_Tool_Generator_Abstract
             $repository = $this->_opts->table;
             $adapterType = 'Table';
         } else {
-            throw new ZendExt_Exception(
+            throw new ZendExt_Tool_Generator_Exception(
                 'The table or dao doesn\'t exist'
             );
         }
