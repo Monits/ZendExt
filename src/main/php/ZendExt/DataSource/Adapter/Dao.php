@@ -15,7 +15,7 @@
  * Datasource Dao Adapter
  *
  * @category  ZendExt
- * @package	  ZendExt_DataSource_Adapter
+ * @package   ZendExt_DataSource_Adapter
  * @author    itirabasso <itirabasso@monits.com>
  * @copyright 2010 Monits
  * @license   Copyright 2010. All rights reserved.

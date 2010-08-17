@@ -16,7 +16,8 @@
  *
  * @category  ZendExt
  * @package   ZendExt_Controller
- * @author    itirabasso <itirabasso@monits.com>, lbritez <lbritez@monits.com>
+ * @author    itirabasso <itirabasso@monits.com>
+ * @author    lbritez <lbritez@monits.com>
  * @copyright 2010 Monits
  * @license   Copyright 2010. All rights reserved.
  * @version   Release: 1.0.0

@@ -15,7 +15,7 @@
  * Datasource adapter interface.
  *
  * @category  ZendExt
- * @package	  ZendExt_DataSource
+ * @package   ZendExt_DataSource
  * @author    imtirabasso <itirabasso@monits.com>
  * @copyright 2010 Monits
  * @license   Copyright 2010. All rights reserved.

@@ -253,9 +253,9 @@ abstract class ZendExt_Dao_Abstract
     /**
      * Execute a query on all shards.
      *
-     * @param array  $extra  Extra where conditions. If any needs quoting
-     *                       set the where string as key with the
-     *                       corresponding value. Optional.
+     * @param array $extra Extra where conditions. If any needs quoting
+     *                     set the where string as key with the
+     *                     corresponding value. Optional.
      *
      * @return array
      */
