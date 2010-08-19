@@ -186,9 +186,9 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
 
         $docParams = new Zend_CodeGenerator_Php_Docblock_Tag_Param(
             array(
-                'paramName'        => self::CONSTRUCT_PARAM,
+                'paramName'   => self::CONSTRUCT_PARAM,
                 'datatype'    => 'array|Zend_Db_Table_Row',
-                'description' => 'The user data'
+                'description' => 'The user data.'
             )
         );
 
