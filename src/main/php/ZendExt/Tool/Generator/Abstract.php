@@ -93,6 +93,7 @@ abstract class ZendExt_Tool_Generator_Abstract
                 'dbname|D=s'    => 'The name of the database to use',
                 'username|u=s'  => 'Connect to the database as this user',
                 'password|p=s'  => 'The password for the database user',
+                'prefix|P-s'    => 'The columns prefix.',
                 'adapter|a=s'   => 'Which Zend_Db adapter to use'
             );
             $opts = array_merge($opts, $arr);

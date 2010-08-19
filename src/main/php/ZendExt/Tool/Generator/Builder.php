@@ -124,7 +124,10 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
         $doc = $this->_generateClassDocblock($desc, $className);
 
         foreach ($this->_schema[$table] as $column => $def) {
-            $f = $this->_getCamelCased($this->_removeColumnPrefix($column));
+            $f = $this->_getCamelCased(
+                $this->_removeColumnPrefix($column, $this->_opts->prefix)
+            );
+            
             $n = 'with' . ucfirst($f);
 
             $doc->setTag(
@@ -176,11 +179,13 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
     {
         $ret =
             "'"
-            . $this->_getCamelCased($this->_removeColumnPrefix($name))
+            . $this->_getCamelCased(
+                $this->_removeColumnPrefix($name, $this->_opts->prefix)
+            )
             . "' => array("
             . PHP_EOL;
 
-        if (!$desc['nullable']) {
+        if (!$desc['nullable'] && null === $desc['default']) {
             $ret .= str_repeat(self::TAB, 2) . "'required' => true," . PHP_EOL;
         }
 

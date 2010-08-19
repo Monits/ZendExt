@@ -41,7 +41,6 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
     {
         $opts = array(
                 'table|t-s'     => 'The table\'s name.',
-                'prefix|P-s'    => 'The column prefix.',
                 'setters|S-s'	=> 'The setter method.'
             );
 
