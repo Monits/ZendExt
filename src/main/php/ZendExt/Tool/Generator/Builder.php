@@ -86,17 +86,20 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
             );
         }
 
-        $name = $this->_opts->namespace . ucfirst($table);
-
+        $className = $this->_getClassName($this->_opts->namespace, $table);
+        $name = $this->_getPascalCase($table);
+        
         $class = new Zend_CodeGenerator_Php_Class();
-        $class->setName($name)
+        $class->setName($className)
             ->setExtendedClass('ZendExt_Builder_Generic')
             ->setProperty(
                 array(
                     'name' => '_class',
                     'visibility' => 'protected',
-                    'defaultValue' => $this->_opts->modelnamespace
-                        . ucfirst($table)
+                    'defaultValue' => $this->_getClassName(
+                        $this->_opts->modelnamespace,
+                        $name
+                    )
                  )
             )
             ->setMethod(
@@ -107,7 +110,7 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
                            'shortDescription' => 'Creates a new builder',
                            'tags' => array(
                                 new Zend_CodeGenerator_Php_Docblock_Tag_Return(
-                                    array('datatype' => $name)
+                                    array('datatype' => $className)
                                 )
                             )
                         )
@@ -118,7 +121,7 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
             );
 
         $desc = ucfirst($table) . ' model builder.';
-        $doc = $this->_generateClassDocblock($desc, $name);
+        $doc = $this->_generateClassDocblock($desc, $className);
 
         foreach ($this->_schema[$table] as $column => $def) {
             $f = $this->_getCamelCased($this->_removeColumnPrefix($column));
@@ -127,7 +130,7 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
             $doc->setTag(
                 array(
                     'name' => 'method',
-                    'description' => "{$name} {$n}() $n(\$value)"
+                    'description' => "{$className} {$n}() $n(\$value)"
                 )
             );
         }
@@ -136,9 +139,9 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
         $file = new Zend_CodeGenerator_Php_File();
 
         $file->setClass($class);
-        $file->setDocblock($this->_generateFileDocblock($desc, $name));
+        $file->setDocblock($this->_generateFileDocblock($desc, $className));
 
-        $this->_saveFile($file->generate(), $name);
+        $this->_saveFile($file->generate(), $className);
     }
 
     /**
@@ -307,7 +310,8 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
     private function _transformDefaultToPhp($default)
     {
         switch ($default) {
-            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_TIMESTAMP:
+            case
+            ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_TIMESTAMP:
                 return 'date(\'c\')';
 
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_DATE:

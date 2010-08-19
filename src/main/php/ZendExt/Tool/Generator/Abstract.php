@@ -448,4 +448,21 @@ abstract class ZendExt_Tool_Generator_Abstract
     {
         return $this->_getCamelCased($column, $separator, true);
     }
+    
+    /**
+     * Returns a class name using the given namespace and component.
+     * 
+     * This is just to concetrate the concatenation logic and prevent
+     * inconsistencies like if the _ is needed or not at the namespace's end.
+     * 
+     * @param string $namespace The class namespace.
+     * @param string $component The class component.
+     * 
+     * @return string
+     */
+    protected function _getClassName($namespace, $component)
+    {
+        return $namespace . '_' . $this->_getPascalCase($component);
+    }
+    
 }

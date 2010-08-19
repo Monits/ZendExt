@@ -100,7 +100,10 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
 
         $this->_modelName = $this->_getPascalCase($table);
 
-        $className = $this->_opts->namespace . '_' . $this->_modelName;
+        $className = $this->_getClassName(
+            $this->_opts->namespace,
+            $this->_modelName
+        );
 
         $class = new Zend_CodeGenerator_Php_Class(
             array(
