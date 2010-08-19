@@ -36,8 +36,9 @@ abstract class ZendExt_Tool_Generator_Abstract
     private $_docIdentation = 0;
 
     const PHP_TYPE_BOOLEAN = 'boolean';
-    const PHP_TYPE_INTEGER = 'int';
+    const PHP_TYPE_INTEGER = 'integer';
     const PHP_TYPE_STRING = 'string';
+    const PHP_TYPE_FLOAT = 'float';
 
     /**
      * Creates a new generator.
@@ -448,21 +449,21 @@ abstract class ZendExt_Tool_Generator_Abstract
     {
         return $this->_getCamelCased($column, $separator, true);
     }
-    
+
     /**
      * Returns a class name using the given namespace and component.
-     * 
+     *
      * This is just to concetrate the concatenation logic and prevent
      * inconsistencies like if the _ is needed or not at the namespace's end.
-     * 
+     *
      * @param string $namespace The class namespace.
      * @param string $component The class component.
-     * 
+     *
      * @return string
      */
     protected function _getClassName($namespace, $component)
     {
         return $namespace . '_' . $this->_getPascalCase($component);
     }
-    
+
 }

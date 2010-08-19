@@ -370,9 +370,12 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_INTEGER:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_SMALLINT:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_BIGINT:
-            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_DOUBLE_PRECISION:
-            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_DECIMAL:
                 return self::PHP_TYPE_INTEGER;
+
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_DECIMAL:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_FLOAT:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_DOUBLE_PRECISION:
+                return self::PHP_TYPE_FLOAT;
 
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_BLOB:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_TEXT:
@@ -380,10 +383,10 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_BINARY_VARYING:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_VARCHAR:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_ENUM:
-            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_TIMESTAMP:
-            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_DATE:
-            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_TIME:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_DATE:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_TIME:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_TIMESTAMP:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_DATETIME:
                 return self::PHP_TYPE_STRING;
 
             default:
