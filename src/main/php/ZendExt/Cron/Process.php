@@ -231,7 +231,7 @@ abstract class ZendExt_Cron_Process
             foreach ($logConfig as $key => $value) {
 
                 if (isset($value['writerName'])
-                    && $value['writerName'] == 'Stream'
+                    && false !== strstr($value['writerName'], 'Stream')
                     && isset($value['writerParams']['stream'])
                     && !is_resource($value['writerParams']['stream'])) {
 
