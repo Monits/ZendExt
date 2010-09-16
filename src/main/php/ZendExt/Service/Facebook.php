@@ -233,6 +233,27 @@ class ZendExt_Service_Facebook
         $this->_makeApiCall('dashboard.setCount', $params);
     }
 
+    /**
+     * This method publishes a post into the stream.
+     *
+     * {@link http://developers.facebook.com/docs/reference/rest/stream.publish}
+     * @param array $attachment  An array with the post attachment.
+     * @param array $actionLinks An array with the post's action links.
+     * @param int   $uid         The id of the user whose stream will get the
+     *                           publish.
+     *
+     * @return string
+     */
+    public function streamPublish(array $attachment, array $actionLinks, $uid)
+    {
+        $params = array(
+            'attachment' => Zend_Json::encode($attachment),
+            'action_links' => Zend_Json::encode($actionLinks),
+            'uid' => $uid
+        );
+
+        return $this->_makeApiCall('stream.publish', $params);
+    }
 
     /**
      * Get the users info.
@@ -322,8 +343,8 @@ class ZendExt_Service_Facebook
 
 
     /**
-     * Generate the profile pic url. 
-     * 
+     * Generate the profile pic url.
+     *
      * @param string $uid  The facebook uid.
      * @param string $type The size of the image to ask for. Has to be one of:
      *                     {@see ZendExt_Service_Facebook::SMALL},
