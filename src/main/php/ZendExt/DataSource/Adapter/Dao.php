@@ -30,11 +30,11 @@ class ZendExt_DataSource_Adapter_Dao implements ZendExt_DataSource_Adapter
     /**
      * Sets the Dao into the adapter.
      *
-     * @param ZendExt_Dao_Abstract $dao An instance of Dao
+     * @param ZendExt_Db_Dao_Abstract $dao An instance of Dao
      *
      * @return void
      */
-    public function __construct(ZendExt_Dao_Abstract $dao)
+    public function __construct(ZendExt_Db_Dao_Abstract $dao)
     {
         $this->_dao = $dao;
     }
@@ -46,7 +46,7 @@ class ZendExt_DataSource_Adapter_Dao implements ZendExt_DataSource_Adapter
      */
     public function getPk()
     {
-        return $this->_dao->getTable(ZendExt_Dao_Abstract::OPERATION_WRITE)
+        return $this->_dao->getTable(ZendExt_Db_Dao_Abstract::OPERATION_WRITE)
                 ->info(Zend_Db_Table_Abstract::PRIMARY);
     }
 
@@ -57,7 +57,7 @@ class ZendExt_DataSource_Adapter_Dao implements ZendExt_DataSource_Adapter
      */
     public function isSequence()
     {
-        return $this->_dao->getTable(ZendExt_Dao_Abstract::OPERATION_WRITE)
+        return $this->_dao->getTable(ZendExt_Db_Dao_Abstract::OPERATION_WRITE)
                 ->info(Zend_Db_Table_Abstract::SEQUENCE);
     }
 
@@ -71,7 +71,7 @@ class ZendExt_DataSource_Adapter_Dao implements ZendExt_DataSource_Adapter
     public function getTable($param = null)
     {
         return $this->_dao
-                    ->getTable(ZendExt_Dao_Abstract::OPERATION_WRITE, $param);
+                    ->getTable(ZendExt_Db_Dao_Abstract::OPERATION_WRITE, $param);
 
     }
 }
