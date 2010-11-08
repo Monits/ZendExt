@@ -50,7 +50,6 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
      */
     protected function _doGenerate()
     {
-
         if (null === $this->_opts->table) {
             $this->_getLogger()->info(
                 'No table option given, generating all tables'
@@ -65,7 +64,6 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
             $this->_getLogger()->info('Generating ' . $table . ' builder');
             $this->_generateBuilder($table);
         }
-
     }
 
     /**
@@ -88,7 +86,7 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
 
         $className = $this->_getClassName($this->_opts->namespace, $table);
         $name = $this->_getPascalCase($table);
-        
+
         $class = new Zend_CodeGenerator_Php_Class();
         $class->setName($className)
             ->setExtendedClass('ZendExt_Builder_Generic')
@@ -127,7 +125,7 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
             $f = $this->_getCamelCased(
                 $this->_removeColumnPrefix($column, $this->_opts->prefix)
             );
-            
+
             $n = 'with' . ucfirst($f);
 
             $doc->setTag(
@@ -230,16 +228,20 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
 
         switch ($column['type']) {
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_TEXT:
-                return 'new Zend_Validate_NotEmpty(array(' . PHP_EOL
-                    . str_repeat(self::TAB, 4)
+                return 'new Zend_Validate_NotEmpty(' . PHP_EOL
+                    . str_repeat(self::TAB, 4) . 'array(' . PHP_EOL
+                    . str_repeat(self::TAB, 5)
                     . "'type' => Zend_Validate_NotEmpty::STRING" . PHP_EOL
-                    . str_repeat(self::TAB, 3) . '))';
+                    . str_repeat(self::TAB, 4) . ')'. PHP_EOL
+                    . str_repeat(self::TAB, 3) . ')';
 
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_VARCHAR:
-                return 'new Zend_Validate_StringLength(array(' . PHP_EOL .
-                    str_repeat(self::TAB, 4) . "'min' => 0, 'max' => "
-                    . $column['extra']['length']
-                    . PHP_EOL . str_repeat(self::TAB, 3) . '))';
+                return 'new Zend_Validate_StringLength(' . PHP_EOL
+                    . str_repeat(self::TAB, 4) . 'array(' . PHP_EOL
+                    . str_repeat(self::TAB, 5) . "'min' => 0, 'max' => "
+                    . $column['extra']['length'] . PHP_EOL
+                    . str_repeat(self::TAB, 4) . ')' . PHP_EOL
+                    . str_repeat(self::TAB, 3) . ')';
 
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_INTEGER:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_SMALLINT:
@@ -262,23 +264,29 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
                 return 'new Zend_Validate_Float()';
 
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_TIME:
-                return 'new Zend_Validate_Date(array(' . PHP_EOL
-                    . str_repeat(self::TAB, 4)
+                return 'new Zend_Validate_Date(' . PHP_EOL
+                    . str_repeat(self::TAB, 4) . 'array(' . PHP_EOL
+                    . str_repeat(self::TAB, 5)
                     . "'format' => 'h:i:s'" . PHP_EOL
-                    . str_repeat(self::TAB, 3) . '))';
+                    . str_repeat(self::TAB, 4) . ')' . PHP_EOL
+                    . str_repeat(self::TAB, 3) . ')';
 
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_DATE:
-                return 'new Zend_Validate_Date(array(' . PHP_EOL
-                    . str_repeat(self::TAB, 4)
+                return 'new Zend_Validate_Date('. PHP_EOL
+                    . str_repeat(self::TAB, 4) . 'array(' . PHP_EOL
+                    . str_repeat(self::TAB, 5)
                     . "'format' => 'Y-m-d'" . PHP_EOL
-                    . str_repeat(self::TAB, 3) . '))';
+                    . str_repeat(self::TAB, 4) . ')' . PHP_EOL
+                    . str_repeat(self::TAB, 3) . ')';
 
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_DATETIME:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_TIMESTAMP:
-                return 'new Zend_Validate_Date(array(' . PHP_EOL
-                    . str_repeat(self::TAB, 4)
+                return 'new Zend_Validate_Date(' . PHP_EOL
+                    . str_repeat(self::TAB, 4) . 'array(' . PHP_EOL
+                    . str_repeat(self::TAB, 5)
                     . "'format' => Zend_Date::ISO_8601" . PHP_EOL
-                    . str_repeat(self::TAB, 3) . '))';
+                    . str_repeat(self::TAB, 4) . ')' . PHP_EOL
+                    . str_repeat(self::TAB, 3) . ')';
 
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_ENUM:
                 for ($i = 0; $i < count($column['extra']['options']); $i++) {
@@ -286,13 +294,15 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
                         "'" . $column['extra']['options'][$i] . "'";
                 }
 
-                return 'new Zend_Validate_InArray(array(' . PHP_EOL
-                    . str_repeat(self::TAB, 4)
+                return 'new Zend_Validate_InArray(' . PHP_EOL
+                    . str_repeat(self::TAB, 4) . 'array(' . PHP_EOL
+                    . str_repeat(self::TAB, 5)
                     . implode(
                         $column['extra']['options'],
-                        ',' . PHP_EOL . str_repeat(self::TAB, 4)
+                        ',' . PHP_EOL . str_repeat(self::TAB, 5)
                     ) . PHP_EOL
-                    . str_repeat(self::TAB, 3) . '))';
+                    . str_repeat(self::TAB, 4) . ')' . PHP_EOL
+                    . str_repeat(self::TAB, 3) . ')';
 
             default:
                 $this->_getLogger()->notice(
