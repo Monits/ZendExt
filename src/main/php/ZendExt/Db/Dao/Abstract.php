@@ -282,77 +282,30 @@ abstract class ZendExt_Db_Dao_Abstract
     }
 
     /**
-     * Execute an update for an array of values in the correspoding shard.
+     * Execute an update for an array of values in the correspoding shards.
      *
-     * @param array  $data         The data to update.
-     * @param string $where        SQL where clause.
-     * @param array  $shardingArgs Array with values on which
-     *                             to perform sharding.
-     * @param array  $extra        Extra where conditions. If any needs quoting
-     *                             set the where string as key with the
-     *                             corresponding value. Optional.
+     * @param array $data         The data to update.
+     * @param mixed $where        SQL where clause or array of clause => value.
+     * @param array $shardingArgs Array with values on which to
+     *                            perform sharding.
      *
-     * @return void
+     * @return int Total number of rows updated.
      */
-    protected function _updateForShard($data, $where, array $shardingArgs,
-        array $extra = array())
+    protected function _update($data, $where, array $shardingArgs)
     {
         $shards = self::$_config->getShardsForValues(
             $this->_tableClass, $shardingArgs
         );
 
-
-        $rowset = array();
+        $total = 0;
         foreach ($shards as $shard => $valuesForShard) {
             $table = $this->_getTableForShard($shard, self::OPERATION_WRITE);
             $adapter = $table->getAdapter();
 
-            $cond = $this->_quoteWhere(
-                $adapter, $where, $valuesForShard, $extra
-            );
-
-            $table->update($data, $cond);
-        }
-    }
-
-    /**
-     * Prepare a where clause.
-     *
-     * @param Zend_Db_Adapter_Abstract $adapter The adapter to use to quote.
-     * @param string                   $where   The base where clause.
-     * @param mixed                    $value   The value to quote into  $where.
-     * @param array                    $extra   Extra where conditions. If any
-     *                                          needs quoting set the where
-     *                                          string as key with the
-     *                                          corresponding value. Optional.
-     *
-     * @return string the prepared where clause.
-     */
-    private function _quoteWhere(Zend_Db_Adapter_Abstract $adapter,
-        $where = null, $value = null, array $extra = array())
-    {
-        if (null !== $where) {
-            $where = $adapter->quoteInto($where, $value);
-        } else {
-            $where = '';
+            $total += $table->update($data, $where);
         }
 
-        foreach ($extra as $key => $value) {
-
-            if ('' != $where) {
-                $where .= ' AND ';
-            }
-
-            if (is_string($key)) {
-
-                $where .= $adapter->quoteInto($key, $value);
-            } else {
-
-                $where .= $key;
-            }
-        }
-
-        return $where;
+        return $total;
     }
 
     /**
