@@ -286,16 +286,22 @@ abstract class ZendExt_Db_Dao_Abstract
      *
      * @param array $data         The data to update.
      * @param mixed $where        SQL where clause or array of clause => value.
-     * @param array $shardingArgs Array with values on which to
-     *                            perform sharding.
+     * @param array $shardingArgs Optional. Array with values on which to
+     *                            perform sharding. Defaults to all shards.
      *
      * @return int Total number of rows updated.
      */
-    protected function _update($data, $where, array $shardingArgs)
+    protected function _update($data, $where, array $shardingArgs = array())
     {
-        $shards = self::$_config->getShardsForValues(
-            $this->_tableClass, $shardingArgs
-        );
+        if (empty($shardingArgs)) {
+            $shards = self::$_config->getShardsForTable(
+                $this->_tableClass, $shardingArgs
+            );
+        } else {
+            $shards = self::$_config->getShardsForValues(
+                $this->_tableClass, $shardingArgs
+            );
+        }
 
         $total = 0;
         foreach ($shards as $shard => $valuesForShard) {
@@ -303,6 +309,38 @@ abstract class ZendExt_Db_Dao_Abstract
             $adapter = $table->getAdapter();
 
             $total += $table->update($data, $where);
+        }
+
+        return $total;
+    }
+
+    /**
+     * Execute a delete for an array of values in the correspoding shards.
+     *
+     * @param mixed $where        SQL where clause or array of clause => value.
+     * @param array $shardingArgs Optional. Array with values on which to
+     *                            perform sharding. Defaults to all shards.
+     *
+     * @return int Total number of rows deleted.
+     */
+    protected function _delete($where, array $shardingArgs = array())
+    {
+        if (empty($shardingArgs)) {
+            $shards = self::$_config->getShardsForTable(
+                $this->_tableClass, $shardingArgs
+            );
+        } else {
+            $shards = self::$_config->getShardsForValues(
+                $this->_tableClass, $shardingArgs
+            );
+        }
+
+        $total = 0;
+        foreach ($shards as $shard => $valuesForShard) {
+            $table = $this->_getTableForShard($shard, self::OPERATION_WRITE);
+            $adapter = $table->getAdapter();
+
+            $total += $table->delete($where);
         }
 
         return $total;
