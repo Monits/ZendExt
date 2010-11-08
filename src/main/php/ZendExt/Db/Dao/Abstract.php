@@ -3,7 +3,7 @@
  * Abstract DAO implementation.
  *
  * @category  ZendExt
- * @package   ZendExt_Dao
+ * @package   ZendExt_Db_Dao
  * @copyright 2010 Juan Sotuyo
  * @license   Copyright (C) 2010. All rights reserved.
  * @version   Release: 1.0.0
@@ -15,7 +15,7 @@
  * Abstract DAO implementation.
  *
  * @category  ZendExt
- * @package   ZendExt_Dao
+ * @package   ZendExt_Db_Dao
  * @author    jsotuyod <juansotuyo@gmail.com>
  * @copyright 2010 Juan Sotuyo
  * @license   Copyright 2010. All rights reserved.
@@ -23,7 +23,7 @@
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
-abstract class ZendExt_Dao_Abstract
+abstract class ZendExt_Db_Dao_Abstract
 {
     /**
      * Defines the read operation.
@@ -56,13 +56,30 @@ abstract class ZendExt_Dao_Abstract
     protected $_tableClass = null;
 
     /**
+     * @var ZendExt_Db_Dao_Hydrator_Interface
+     */
+    protected $_hydrator = null;
+
+    /**
+     * Class constructor.
+     *
+     * @param ZendExt_Db_Dao_Hydrator_Interface $hydrator The hydrator to apply to queries.
+     *
+     * @return ZendExt_Db_Dao_Abstract
+     */
+    public function __construct(ZendExt_Db_Dao_Hydrator_Interface $hydrator)
+    {
+        $this->_hydrator = $hydrator;
+    }
+
+    /**
      * Given an adapter get the corresponding table.
      *
      * @param Zend_Db_Adapter_Abstract $adapter The adapter to search for.
      *
      * @return Zend_Db_Table_Abstract The associated table.
      */
-    protected function _getTableForAdapter($adapter)
+    private function _getTableForAdapter($adapter)
     {
         $key = spl_object_hash($adapter);
         if (!isset(self::$_tables[$this->_tableClass][$key])) {
@@ -84,7 +101,7 @@ abstract class ZendExt_Dao_Abstract
      *
      * @return Zend_Db_Table_Abstract The table to be used by this DAO.
      */
-    protected function _getTableForShard($shard,
+    private function _getTableForShard($shard,
         $operation = self::OPERATION_READ)
     {
         if (null === self::$_config) {
@@ -108,7 +125,7 @@ abstract class ZendExt_Dao_Abstract
      *
      * @return Zend_Db_Table_Abstract The table to be used by this DAO.
      */
-    protected function _getTable($operation = self::OPERATION_READ,
+    private function _getTable($operation = self::OPERATION_READ,
         $shardingArg = null)
     {
         if (null === self::$_config) {
@@ -132,7 +149,7 @@ abstract class ZendExt_Dao_Abstract
      *
      * @return Zend_Db_Adapter_Abstract The adapter to use.
      */
-    protected function _getAdapterForShard($shard,
+    private function _getAdapterForShard($shard,
         $operation = self::OPERATION_READ)
     {
         if (null === self::$_config) {
@@ -215,86 +232,56 @@ abstract class ZendExt_Dao_Abstract
     }
 
     /**
-     * Get the rows of the shards containing the given values.
+     * Create a query for all shards.
      *
-     * @param string $where        SQL where clause.
-     * @param array  $shardingArgs Array with values
-     *                             on which to perform sharding.
-     * @param array  $extra        Extra where conditions. If any needs quoting
-     *                             set the where string as key with the
-     *                             corresponding value. Optional.
-     *
-     * @return array
+     * @return ZendExt_Db_Dao_Select
      */
-    protected function _selectForShardWithValues($where, array $shardingArgs,
-        array $extra = array())
-    {
-        $shards = self::$_config->getShardsForValues(
-            $this->_tableClass, $shardingArgs
-        );
-
-        $rowset = array();
-
-        foreach ($shards as $shard => $valuesForShard) {
-            $table = $this->_getTableForShard($shard, self::OPERATION_READ);
-            $adapter = $table->getAdapter();
-
-            $cond = $this->_quoteWhere(
-                $adapter, $where, $valuesForShard, $extra
-            );
-            foreach ($table->fetchAll($cond) as $row) {
-                $rowset[] = $row;
-            }
-        }
-
-        return $rowset;
-    }
-
-    /**
-     * Execute a query on all shards.
-     *
-     * @param array $extra Extra where conditions. If any needs quoting
-     *                     set the where string as key with the
-     *                     corresponding value. Optional.
-     *
-     * @return array
-     */
-    protected function _selectForAllShards(array $extra = array())
+    protected function _selectForAllShards()
     {
         return $this->_selectForShards(
-            $this->_getShardsForTable(self::OPERATION_READ),
-            $extra
+            $this->_getShardsForTable(self::OPERATION_READ)
         );
     }
 
     /**
-     * Get the rows of the shards and retrieves a rowset.
+     * Create a query for the given values shards.
      *
-     * @param array $shards Array with shards to query.
-     * @param array $extra  Extra where conditions. If any needs quoting
-     *                      set the where string as key with the
-     *                      corresponding value. Optional.
+     * @param array $shardingArgs The values for which the query
+     *                            will be executed.
      *
-     * @return array
+     * @return ZendExt_Db_Dao_Select
      */
-    protected function _selectForShards(array $shards, array $extra = array())
+    protected function _selectForShardWithValues(array $shardingArgs)
     {
-        $rowset = array();
+        return $this->_selectForShards(
+            self::$_config->getShardsForValues(
+                $this->_tableClass, $shardingArgs
+            )
+        );
+    }
+
+    /**
+     * Create a query for the given shards.
+     *
+     * @param array $shards The shards for which the query will be executed.
+     *
+     * @return ZendExt_Db_Dao_Select
+     */
+    protected function _selectForShards(array $shards)
+    {
+        $select = new ZendExt_Db_Dao_Select($this);
+
+        $adapters = array();
 
         foreach ($shards as $shard) {
-            $table = $this->_getTableForShard($shard, self::OPERATION_READ);
-            $adapter = $table->getAdapter();
-
-            $cond = $this->_quoteWhere(
-                $adapter, null, null, $extra
+            $adapters = self::$_config->getAdapterForTableShard(
+                $this->_tableClass, $shard, self::OPERATION_READ
             );
-
-            foreach ($table->fetchAll($cond) as $row) {
-                $rowset[] = $row;
-            }
         }
 
-        return $rowset;
+        $select->setAdapters($adapters);
+
+        return $select;
     }
 
     /**
@@ -344,7 +331,7 @@ abstract class ZendExt_Dao_Abstract
      *
      * @return string the prepared where clause.
      */
-    protected function _quoteWhere(Zend_Db_Adapter_Abstract $adapter,
+    private function _quoteWhere(Zend_Db_Adapter_Abstract $adapter,
         $where = null, $value = null, array $extra = array())
     {
         if (null !== $where) {
@@ -380,7 +367,7 @@ abstract class ZendExt_Dao_Abstract
      *
      * @return array
      */
-    protected function _getShardsForTable($operation)
+    private function _getShardsForTable($operation)
     {
         return array_keys(
             self::$_config->getShardsForTable($this->_tableClass, $operation)
@@ -394,7 +381,7 @@ abstract class ZendExt_Dao_Abstract
      *
      * @return int
      */
-    protected function _getShardIdForValue($shardingArg)
+    private function _getShardIdForValue($shardingArg)
     {
         $shads = self::$_config->getShardsForValues(
             $this->_tableClass, array($shardingArg)
@@ -403,5 +390,66 @@ abstract class ZendExt_Dao_Abstract
         $shardIds = array_keys($shads);
 
         return $shardIds[0];
+    }
+
+    /**
+     * Fetches all rows.
+     *
+     * @param Zend_Db_Dao_Select $select The query to be performed.
+     *
+     * @return array The row results, hydrated as configured.
+     */
+    protected function _fetchAll(ZendExt_Db_Dao_Select $select)
+    {
+        return $this->_fetch($select);
+    }
+
+    /**
+     * Fetches a single row.
+     *
+     * @param Zend_Db_Dao_Select $select The query to be performed.
+     *
+     * @return array The row results, hydrated as configured.
+     */
+    protected function _fetchRow(ZendExt_Db_Dao_Select $select)
+    {
+        $select->limit(1);
+        $rows = $this->_fetch($select);
+
+        if (0 == count($rows)) {
+            return null;
+        }
+
+        return $rows[0];
+    }
+
+    /**
+     * Actually perform a select query.
+     *
+     * @param ZendExt_Db_Dao_Select $select The query whose rows to fetch.
+     *
+     * @return array
+     */
+    private function _fetch(ZendExt_Db_Dao_Select $select)
+    {
+        $stmts = $select->query();
+
+        $data = array();
+
+        foreach ($stmts as $stmt) {
+            $rows = $stmt->fetchAll(Zend_Db::FETCH_ASSOC);
+
+            if (null !== $this->_hydrator) {
+                // Hydrate every row
+                foreach ($rows as $row) {
+                    $data[] = $this->_hydrator->hydrate($row);
+                }
+            } else {
+                // Just copy data
+                $data = array_merge($data, $rows);
+            }
+        }
+
+        return $data;
     }
 }
