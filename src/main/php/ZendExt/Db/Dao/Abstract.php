@@ -251,8 +251,10 @@ abstract class ZendExt_Db_Dao_Abstract
     protected function _selectForShardWithValues(array $shardingArgs)
     {
         return $this->_selectForShards(
-            self::$_config->getShardsForValues(
-                $this->_tableClass, $shardingArgs
+            array_keys(
+                self::$_config->getShardsForValues(
+                    $this->_tableClass, $shardingArgs
+                )
             )
         );
     }
