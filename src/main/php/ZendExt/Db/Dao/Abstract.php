@@ -46,8 +46,6 @@ abstract class ZendExt_Db_Dao_Abstract
 
     private static $_tables = array();
 
-    private static $_shardingStrategies = array();
-
     /**
      * @var ZendExt_Application_Resource_Multidb
      */
@@ -212,7 +210,6 @@ abstract class ZendExt_Db_Dao_Abstract
 
         // Reset all local caches
         self::$_tables = array();
-        self::$_shardingStrategies = array();
     }
 
     /**
