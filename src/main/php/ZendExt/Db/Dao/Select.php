@@ -74,7 +74,11 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
             $adapters = array($adapters);
         }
 
-        $this->_adapters = $adapters;
+        /*
+         * Make sure no adapters are repeated, therefore the query won't
+         * be executed twice on the same database.
+         */
+        $this->_adapters = array_unique($adapters);
     }
 
     /**
