@@ -174,6 +174,7 @@ abstract class ZendExt_Db_Dao_Abstract
         self::$_tables = array();
     }
 
+    // TODO : this may go if the datasource uses the new _select, _insert, _update and _delete methods...
     /**
      * Retrieves the table instance to be used.
      *
@@ -197,13 +198,16 @@ abstract class ZendExt_Db_Dao_Abstract
      */
     protected function _selectForAllShards()
     {
-        // FIXME : Be tolerant of the possibility of self::$_config === null
-        return $this->_selectForShards(
-            self::$_config->getAllShardIdsForTable(
+        $shards = array();
+
+        if (null !== self::$_config) {
+            $shards = self::$_config->getAllShardIdsForTable(
                 $this->_tableClass,
                 ZendExt_Application_Resource_Multidb::OPERATION_READ
-            )
-        );
+            );
+        }
+
+        return $this->_selectForShards($shards);
     }
 
     /**
@@ -216,14 +220,17 @@ abstract class ZendExt_Db_Dao_Abstract
      */
     protected function _selectForShardWithValues(array $shardingArgs)
     {
-        // FIXME : Be tolerant of the possibility of self::$_config === null
-        return $this->_selectForShards(
-            array_keys(
+        $shards = array();
+
+        if (null !== self::$_config) {
+            $shards = array_keys(
                 self::$_config->getShardsForValues(
                     $this->_tableClass, $shardingArgs
                 )
-            )
-        );
+            );
+        }
+
+        return $this->_selectForShards($shards);
     }
 
     /**
@@ -239,12 +246,16 @@ abstract class ZendExt_Db_Dao_Abstract
 
         $adapters = array();
 
-        // FIXME : Be tolerant of the possibility of self::$_config === null
-        foreach ($shards as $shard) {
-            $adapters[] = self::$_config->getAdapterForTableShard(
-                $this->_tableClass, $shard,
-                ZendExt_Application_Resource_Multidb::OPERATION_READ
-            );
+        if (null === self::$_config) {
+            // No sharding config or no shards set, go to the default adapter
+            $adapters[] = $this->_getTableForDefaultAdapter();
+        } else {
+            foreach ($shards as $shard) {
+                $adapters[] = self::$_config->getAdapterForTableShard(
+                    $this->_tableClass, $shard,
+                    ZendExt_Application_Resource_Multidb::OPERATION_READ
+                );
+            }
         }
 
         $select->setAdapters($adapters);
@@ -264,7 +275,12 @@ abstract class ZendExt_Db_Dao_Abstract
      */
     protected function _update($data, $where, array $shardingArgs = array())
     {
-        // FIXME : Be tolerant of the possibility of self::$_config === null
+        // If no config, go to default adapter - no sharding
+        if (null === self::$_config) {
+            return $this->_getTableForDefaultAdapter()->update($data, $where);
+        }
+
+        // Get the appropiate shards
         if (empty($shardingArgs)) {
             $shards = self::$_config->getAllShardIdsForTable(
                 $this->_tableClass,
@@ -278,10 +294,10 @@ abstract class ZendExt_Db_Dao_Abstract
             );
         }
 
+        // Perform the query on each one
         $total = 0;
         foreach ($shards as $shard) {
             $table = $this->_getTableForShard($shard, self::OPERATION_WRITE);
-            $adapter = $table->getAdapter();
 
             $total += $table->update($data, $where);
         }
@@ -300,7 +316,12 @@ abstract class ZendExt_Db_Dao_Abstract
      */
     protected function _delete($where, array $shardingArgs = array())
     {
-        // FIXME : Be tolerant of the possibility of self::$_config === null
+        // If no config, go to default adapter - no sharding
+        if (null === self::$_config) {
+            return $this->_getTableForDefaultAdapter()->delete($where);
+        }
+
+        // Get the appropiate shards
         if (empty($shardingArgs)) {
             $shards = self::$_config->getAllShardIdsForTable(
                 $this->_tableClass,
@@ -314,10 +335,10 @@ abstract class ZendExt_Db_Dao_Abstract
             );
         }
 
+        // Perform the query on each one
         $total = 0;
         foreach ($shards as $shard) {
             $table = $this->_getTableForShard($shard, self::OPERATION_WRITE);
-            $adapter = $table->getAdapter();
 
             $total += $table->delete($where);
         }
@@ -337,7 +358,12 @@ abstract class ZendExt_Db_Dao_Abstract
      */
     public function insert(array $data, $shardingArg = null)
     {
-        // FIXME : Be tolerant of the possibility of self::$_config === null
+        // If no config, go to default adapter - no sharding
+        if (null === self::$_config) {
+            return $this->_getTableForDefaultAdapter()->insert($data);
+        }
+
+        // Get the appropiate shard
         if (null === $shardingArg) {
             // No sharding arg specified, go to the default adapter
             $adapter = self::$_config->getDefaultAdapterForTable(
