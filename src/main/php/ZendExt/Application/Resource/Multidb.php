@@ -1,4 +1,4 @@
-<?php
+g<?php
 /**
  * Real multidb support with slaves and sharding per table.
  *
@@ -85,11 +85,11 @@ class ZendExt_Application_Resource_Multidb
      */
     protected function _getShardingStrategy($table)
     {
-        $shard = $this->_getDbForTable($table);
+        $shardName = $this->_getShardNameForTable($table);
 
-        if (isset($this->_shards[$shard])) {
-            if (isset($this->_shards[$shard]['shardingStrategy'])) {
-                return $this->_shards[$shard]['shardingStrategy'];
+        if (isset($this->_shards[$shardName])) {
+            if (isset($this->_shards[$shardName]['shardingStrategy'])) {
+                return $this->_shards[$shardName]['shardingStrategy'];
             }
         }
 
@@ -99,7 +99,7 @@ class ZendExt_Application_Resource_Multidb
     /**
      * Retrieves the configuration for a requested shard for a given operation.
      *
-     * @param string $db        The name of the database for which to request
+     * @param string $shardName The name of the shard for which to request
      *                          the configuration.
      * @param int    $shardId   The id of the shard to retrieve (as obtained
      *                          from the sharding strategy).
@@ -112,7 +112,7 @@ class ZendExt_Application_Resource_Multidb
      *
      * @throws Zend_Application_Resource_Exception
      */
-    protected function _getDbAdapters($db, $shardId, $operation)
+    protected function _getDbAdapters($shardName, $shardId, $operation)
     {
         if ($operation != self::OPERATION_READ
                 && $operation != self::OPERATION_WRITE) {
@@ -121,10 +121,10 @@ class ZendExt_Application_Resource_Multidb
             );
         }
 
-        if (isset($this->_shards[$db])) {
-            if (isset($this->_shards[$db][$operation])) {
-                if (isset($this->_shards[$db][$operation][$shardId])) {
-                    return $this->_shards[$db][$operation][$shardId];
+        if (isset($this->_shards[$shardName])) {
+            if (isset($this->_shards[$shardName][$operation])) {
+                if (isset($this->_shards[$shardName][$operation][$shardId])) {
+                    return $this->_shards[$shardName][$operation][$shardId];
                 }
             }
         }
@@ -143,11 +143,11 @@ class ZendExt_Application_Resource_Multidb
      */
     protected function _getDefaultDbAdapters($table)
     {
-        $shard = $this->_getDbForTable($table);
+        $shardName = $this->_getShardNameForTable($table);
 
-        if (isset($this->_shards[$shard])) {
-            if (isset($this->_shards[$shard]['default'])) {
-                return $this->_shards[$shard]['default'];
+        if (isset($this->_shards[$shardName])) {
+            if (isset($this->_shards[$shardName]['default'])) {
+                return $this->_shards[$shardName]['default'];
             }
         }
 
@@ -155,9 +155,9 @@ class ZendExt_Application_Resource_Multidb
     }
 
     /**
-     * Retrieve the db with the given name.
+     * Retrieve the db adapter with the given name.
      *
-     * @param string $name The name of the db requested.
+     * @param string $name The name of the db adapter requested.
      *
      * @return Zend_Db_Adapter_Abstract The requested adapter.
      */
@@ -172,13 +172,13 @@ class ZendExt_Application_Resource_Multidb
     }
 
     /**
-     * Retrieves the shard to which a given table belongs.
+     * Retrieves the name of the shard to which a given table belongs.
      *
      * @param string $table The name of the table whose shard to retrieve.
      *
      * @return string The name of the shard to which the table belongs.
      */
-    protected function _getDbForTable($table)
+    protected function _getShardNameForTable($table)
     {
         if (!isset($this->_tables[$table])) {
             return null;
@@ -197,13 +197,13 @@ class ZendExt_Application_Resource_Multidb
      *
      * @return array
      */
-    public function getShardsForTable($table, $operation)
+    public function getAllShardsForTable($table, $operation)
     {
-        $db = $this->_getDbForTable($table);
-        if (isset($this->_shards[$db])) {
-            if (isset($this->_shards[$db][$operation])) {
+        $shardName = $this->_getShardNameForTable($table);
+        if (isset($this->_shards[$shardName])) {
+            if (isset($this->_shards[$shardName][$operation])) {
 
-                return $this->_shards[$db][$operation];
+                return $this->_shards[$shardName][$operation];
             }
         }
 
@@ -211,20 +211,40 @@ class ZendExt_Application_Resource_Multidb
     }
 
     /**
-     * Computes the shard id for the current table given a sharding value.
+     * Get the ids all of the available shards for a given table and operation.
+     *
+     * @param string $table     The table name.
+     * @param string $operation The operation to perform on the table.
+     *                          See {@link #OPERATION_READ} and
+     *                          {@link #OPERATION_WRITE}
+     *
+     * @return array
+     */
+    public function getAllShardIdsForTable($table, $operation)
+    {
+        $shards = $this->getAllShardsForTable($table, $operation);
+
+        if (null === $shards) {
+            return null;
+        }
+
+        return array_keys($shards);
+    }
+
+    /**
+     * Computes the shard id for the given table for a sharding value.
      *
      * @param string $table       The name of the table to get the id for.
      * @param any    $shardingArg The value on which to perform sharding.
      *
      * @return int The shard id for the current table and the sharding value.
      */
-    protected function _getShardId($table, $shardingArg)
+    protected function _getShardIdForValue($table, $shardingArg)
     {
         // If not already instantiated, create a new sharding strategy
         $shardingClass = $this->_getShardingStrategy($table);
 
         if (null === $shardingClass) {
-
             return null;
         }
 
@@ -251,31 +271,30 @@ class ZendExt_Application_Resource_Multidb
     public function getAdapterForTableShard($table, $shardId,
         $operation = self::OPERATION_READ)
     {
-        $db = $this->_getDbForTable($table);
-        if (null === $db) {
+        $shardName = $this->_getShardNameForTable($table);
+        if (null === $shardName) {
 
             return null;
         }
 
-        $dbData = $this->_getDbData($db, $operation, $shardId);
+        $dbData = $this->_getDbData($shardName, $operation, $shardId);
 
         if (null === $dbData) {
             // Retrieve the adapter to be used for the instance
-            $dbNames = (array) $this->_getDbAdapters(
-                $db,
+            $adapterNames = (array) $this->_getDbAdapters(
+                $shardName,
                 $shardId,
                 $operation
             );
 
-            if (0 === count($dbNames)) {
-
+            if (0 === count($adapterNames)) {
                 return null;
             }
 
             // Pick anyone at random
-            $adapter = $this->_chooseAdapter($dbNames);
+            $adapter = $this->_chooseAdapter($adapterNames);
             $dbData = $this->_setDbData(
-                $db, $operation, $shardId, $adapter
+                $shardName, $operation, $shardId, $adapter
             );
         }
 
@@ -291,13 +310,13 @@ class ZendExt_Application_Resource_Multidb
      */
     public function getDefaultAdapterForTable($table)
     {
-        $db = $this->_getDbForTable($table);
-        if (null === $db) {
+        $shardName = $this->_getShardNameForTable($table);
+        if (null === $shardName) {
 
             return null;
         }
 
-        if (!isset($this->_dbData[$db][self::DATA_KEY_DEFAULT])) {
+        if (!isset($this->_dbData[$shardName][self::DATA_KEY_DEFAULT])) {
 
             $defaultDbs = (array) $this->_getDefaultDbAdapters($table);
             if (0 === count($defaultDbs)) {
@@ -307,10 +326,10 @@ class ZendExt_Application_Resource_Multidb
 
             $adapter = $this->_chooseAdapter($defaultDbs);
 
-            $this->_dbData[$db][self::DATA_KEY_DEFAULT] = $adapter;
+            $this->_dbData[$shardName][self::DATA_KEY_DEFAULT] = $adapter;
         }
 
-        return $this->_dbData[$db][self::DATA_KEY_DEFAULT];
+        return $this->_dbData[$shardName][self::DATA_KEY_DEFAULT];
     }
 
     /**
@@ -332,7 +351,7 @@ class ZendExt_Application_Resource_Multidb
             return $this->getDefaultAdapterForTable($table);
         } else {
 
-            $shardId = $this->_getShardId($table, $shardingArg);
+            $shardId = $this->_getShardIdForValue($table, $shardingArg);
             if (null === $shardId) {
 
                 return null;
@@ -355,21 +374,21 @@ class ZendExt_Application_Resource_Multidb
     }
 
     /**
-     * Get the data for a given db.
+     * Get the data for a given shard.
      *
-     * @param string $db        The name of the db to fetch data for.
+     * @param string $shardName The name of the shard to fetch data for.
      * @param string $operation The operation type to fetch for.
      * @param string $shardId   The shard to fetch for.
      *
      * @return array An array containing the data.
      */
-    protected function _getDbData($db, $operation, $shardId)
+    protected function _getDbData($shardName, $operation, $shardId)
     {
-        if (!isset($this->_dbData[$db][$operation][$shardId])) {
-            $this->_dbData[$db][$operation][$shardId] = null;
+        if (!isset($this->_dbData[$shardName][$operation][$shardId])) {
+            $this->_dbData[$shardName][$operation][$shardId] = null;
         }
 
-        return $this->_dbData[$db][$operation][$shardId];
+        return $this->_dbData[$shardName][$operation][$shardId];
     }
 
     /**
@@ -388,7 +407,7 @@ class ZendExt_Application_Resource_Multidb
         return $this->_getDbData($db, $operation, $shardId);
     }
 
-    /** 
+    /**
      * Computes the shard ids for the tables given shard values.
      *
      * @param string $table        The table to look for.
@@ -398,18 +417,18 @@ class ZendExt_Application_Resource_Multidb
      * @return array
      */
     public function getShardsForValues($table, array $shardingArgs)
-    {   
+    {
         $shards = array();
         foreach ($shardingArgs as $id) {
-            $shardId = $this->_getShardId($table, $id);
+            $shardId = $this->_getShardIdForValue($table, $id);
             if (null === $shardId) {
 
                 return null;
             }
 
             $shards[$shardId][] = $id;
-        }   
+        }
 
         return $shards;
-    }   
+    }
 }

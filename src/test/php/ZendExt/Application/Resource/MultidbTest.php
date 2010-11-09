@@ -131,6 +131,7 @@ class MultidbTest extends PHPUnit_Framework_TestCase
         $adapter = $this->_multidb->getDb('test_adapter_r');
         $adapterConfig = $adapter->getConfig();
 
+        // Make sure it's the same one
         $this->assertEquals(
             $this->_config['adapters']['test_adapter_r']['username'],
             $adapterConfig['username']
@@ -140,6 +141,7 @@ class MultidbTest extends PHPUnit_Framework_TestCase
         $adapter = $this->_multidb->getDb('test_adapter_w');
         $adapterConfig = $adapter->getConfig();
 
+        // Make sure it's the same one
         $this->assertEquals(
             $this->_config['adapters']['test_adapter_w']['username'],
             $adapterConfig['username']
@@ -149,6 +151,7 @@ class MultidbTest extends PHPUnit_Framework_TestCase
         $adapter = $this->_multidb->getDb('test_adapter_default');
         $adapterConfig = $adapter->getConfig();
 
+        // Make sure it's the same one
         $this->assertEquals(
             $this->_config['adapters']['test_adapter_default']['username'],
             $adapterConfig['username']
@@ -158,6 +161,7 @@ class MultidbTest extends PHPUnit_Framework_TestCase
         $adapter = $this->_multidb->getDb('test_adapter_rw');
         $adapterConfig = $adapter->getConfig();
 
+        // Make sure it's the same one
         $this->assertEquals(
             $this->_config['adapters']['test_adapter_rw']['username'],
             $adapterConfig['username']
@@ -165,21 +169,52 @@ class MultidbTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test the getShardsForTable method.
+     * Test the geAllShardsForTable method.
      *
      * @return void
      */
-    public function testGetShardsForTable()
+    public function testGetAllShardIdsForTable()
     {
         $this->assertNull(
-            $this->_multidb->getShardsForTable(
+            $this->_multidb->getAllShardIdsForTable(
                 'Non_Existing_Table',
                 ZendExt_Application_Resource_Multidb::OPERATION_WRITE
             )
         );
 
         $this->assertNull(
-            $this->_multidb->getShardsForTable(
+            $this->_multidb->getAllShardIdsForTable(
+                'Random_Table_1',
+                'foobar'
+            )
+        );
+
+        $operation = ZendExt_Application_Resource_Multidb::OPERATION_WRITE;
+        $this->assertEquals(
+            array_keys($this->_config['shards']['realshard'][$operation]),
+            $this->_multidb->getAllShardIdsForTable(
+                'Random_Table_1',
+                $operation
+            )
+        );
+    }
+
+    /**
+     * Test the geAllShardsForTable method.
+     *
+     * @return void
+     */
+    public function testGetAllShardsForTable()
+    {
+        $this->assertNull(
+            $this->_multidb->getAllShardsForTable(
+                'Non_Existing_Table',
+                ZendExt_Application_Resource_Multidb::OPERATION_WRITE
+            )
+        );
+
+        $this->assertNull(
+            $this->_multidb->getAllShardsForTable(
                 'Random_Table_1',
                 'foobar'
             )
@@ -188,7 +223,7 @@ class MultidbTest extends PHPUnit_Framework_TestCase
         $operation = ZendExt_Application_Resource_Multidb::OPERATION_WRITE;
         $this->assertEquals(
             $this->_config['shards']['realshard'][$operation],
-            $this->_multidb->getShardsForTable(
+            $this->_multidb->getAllShardsForTable(
                 'Random_Table_1',
                 $operation
             )
@@ -196,8 +231,8 @@ class MultidbTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test get adapter for table shard. 
-     * 
+     * Test get adapter for table shard.
+     *
      * @return void
      */
     public function testGetAdapterForTableShard()
@@ -249,8 +284,8 @@ class MultidbTest extends PHPUnit_Framework_TestCase
 
 
     /**
-     * Test get default adapter for table. 
-     * 
+     * Test get default adapter for table.
+     *
      * @return void
      */
     public function testGetDefaultAdapterForTable()
@@ -283,7 +318,7 @@ class MultidbTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test getAdapterForTable.
-     * 
+     *
      * @return void
      */
     public function testGetAdapterForTable()
@@ -349,8 +384,8 @@ class MultidbTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test getShardsForValues. 
-     * 
+     * Test getShardsForValues.
+     *
      * @return void
      */
     public function testGetShardsForValues()
@@ -367,8 +402,8 @@ class MultidbTest extends PHPUnit_Framework_TestCase
 
 
     /**
-     * Test what happens when no config or invalid config is set. 
-     * 
+     * Test what happens when no config or invalid config is set.
+     *
      * @return void
      */
     public function testMissingConfig()
@@ -389,7 +424,7 @@ class MultidbTest extends PHPUnit_Framework_TestCase
 
         $this->assertNull(
             $multidb->getAdapterForTable(
-                'foo', 
+                'foo',
                 ZendExt_Application_Resource_Multidb::OPERATION_READ,
                 'asd'
             )
@@ -414,7 +449,7 @@ class MultidbTest extends PHPUnit_Framework_TestCase
         $this->assertNull(
             $multidb->getAdapterForTableShard(
                 'foo',
-                1, 
+                1,
                 ZendExt_Application_Resource_Multidb::OPERATION_READ
             )
         );
@@ -486,8 +521,8 @@ class MultidbTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test whether an exception is thrown when an invalid operation is used. 
-     * 
+     * Test whether an exception is thrown when an invalid operation is used.
+     *
      * @return void
      */
     public function testInvalidOperation()

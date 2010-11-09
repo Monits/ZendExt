@@ -70,6 +70,7 @@ abstract class ZendExt_Db_Dao_Abstract
         $this->_hydrator = $hydrator;
     }
 
+    // USADO
     /**
      * Given an adapter get the corresponding table.
      *
@@ -89,6 +90,7 @@ abstract class ZendExt_Db_Dao_Abstract
         return self::$_tables[$this->_tableClass][$key];
     }
 
+    // USADO
     /**
      * Retrieves the table for the requested shard id.
      *
@@ -160,19 +162,7 @@ abstract class ZendExt_Db_Dao_Abstract
         );
     }
 
-    /**
-     * Creates a new adapter using a random adapter from the given list.
-     *
-     * @param array $dbs The list of possible adapters to be used for the table.
-     *
-     * @return Zend_Db_Adapter_Abstract The newly created adapter.
-     */
-    private function _chooseAdapter(array $dbs)
-    {
-        $dbName = $dbs[array_rand($dbs)];
-        return self::$_config->getDb($dbName);
-    }
-
+    // USADO
     /**
      * Retrieves the table assuming a default table adapter.
      *
@@ -236,7 +226,10 @@ abstract class ZendExt_Db_Dao_Abstract
     protected function _selectForAllShards()
     {
         return $this->_selectForShards(
-            $this->_getShardsForTable(self::OPERATION_READ)
+            self::$_config->getAllShardIdsForTable(
+                $this->_tableClass,
+                ZendExt_Application_Resource_Multidb::OPERATION_READ
+            )
         );
     }
 
@@ -273,8 +266,9 @@ abstract class ZendExt_Db_Dao_Abstract
         $adapters = array();
 
         foreach ($shards as $shard) {
-            $adapters = self::$_config->getAdapterForTableShard(
-                $this->_tableClass, $shard, self::OPERATION_READ
+            $adapters[] = self::$_config->getAdapterForTableShard(
+                $this->_tableClass, $shard,
+                ZendExt_Application_Resource_Multidb::OPERATION_READ
             );
         }
 
@@ -296,17 +290,20 @@ abstract class ZendExt_Db_Dao_Abstract
     protected function _update($data, $where, array $shardingArgs = array())
     {
         if (empty($shardingArgs)) {
-            $shards = self::$_config->getShardsForTable(
-                $this->_tableClass, $shardingArgs
+            $shards = self::$_config->getAllShardIdsForTable(
+                $this->_tableClass,
+                ZendExt_Application_Resource_Multidb::OPERATION_WRITE
             );
         } else {
-            $shards = self::$_config->getShardsForValues(
-                $this->_tableClass, $shardingArgs
+            $shards = array_keys(
+                self::$_config->getShardsForValues(
+                    $this->_tableClass, $shardingArgs
+                )
             );
         }
 
         $total = 0;
-        foreach ($shards as $shard => $valuesForShard) {
+        foreach ($shards as $shard) {
             $table = $this->_getTableForShard($shard, self::OPERATION_WRITE);
             $adapter = $table->getAdapter();
 
@@ -328,17 +325,20 @@ abstract class ZendExt_Db_Dao_Abstract
     protected function _delete($where, array $shardingArgs = array())
     {
         if (empty($shardingArgs)) {
-            $shards = self::$_config->getShardsForTable(
-                $this->_tableClass, $shardingArgs
+            $shards = self::$_config->getAllShardIdsForTable(
+                $this->_tableClass,
+                ZendExt_Application_Resource_Multidb::OPERATION_WRITE
             );
         } else {
-            $shards = self::$_config->getShardsForValues(
-                $this->_tableClass, $shardingArgs
+            $shards = array_keys(
+                self::$_config->getShardsForValues(
+                    $this->_tableClass, $shardingArgs
+                )
             );
         }
 
         $total = 0;
-        foreach ($shards as $shard => $valuesForShard) {
+        foreach ($shards as $shard) {
             $table = $this->_getTableForShard($shard, self::OPERATION_WRITE);
             $adapter = $table->getAdapter();
 
@@ -349,37 +349,33 @@ abstract class ZendExt_Db_Dao_Abstract
     }
 
     /**
-     * Get all of the available shards for an operation on a given table.
+     * Inserts a new row.
      *
-     * @param string $operation The operation to perform on the table.
-     *                          See {@link #OPERATION_READ} and
-     *                          {@link #OPERATION_WRITE}
+     * @param array $data        Column-value pairs.
+     * @param mixed $shardingArg Optional. The argument that specifies to
+     *                           which shard the row should go. Uses the
+     *                           default if not specified.
      *
-     * @return array
+     * @return mixed         The primary key of the row inserted.
      */
-    private function _getShardsForTable($operation)
+    public function insert(array $data, $shardingArg = null)
     {
-        return array_keys(
-            self::$_config->getShardsForTable($this->_tableClass, $operation)
-        );
-    }
+        if (null === $shardingArg) {
+            // No sharding arg specified, go to the default adapter
+            $adapter = self::$_config->getDefaultAdapterForTable(
+                $this->_tableClass
+            );
+        } else {
+            // Go to the appropiate shard
+            $adapter = self::$_config->getAdapterForTable(
+                $this->_tableClass,
+                ZendExt_Application_Resource_Multidb::OPERATION_WRITE,
+                $shardingArg
+            );
+        }
 
-    /**
-     * Retrieves the shard id for the given value.
-     *
-     * @param any $shardingArg The argument by which sharding is perfmored.
-     *
-     * @return int
-     */
-    private function _getShardIdForValue($shardingArg)
-    {
-        $shads = self::$_config->getShardsForValues(
-            $this->_tableClass, array($shardingArg)
-        );
-
-        $shardIds = array_keys($shads);
-
-        return $shardIds[0];
+        $table = $this->_getTableForAdapter($adapter);
+        return $table->insert($data);
     }
 
     /**

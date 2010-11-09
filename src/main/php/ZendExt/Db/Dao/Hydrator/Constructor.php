@@ -26,20 +26,20 @@
 class ZendExt_Db_Dao_Hydrator_Constructor
         implements ZendExt_Db_Dao_Hydrator_Interface
 {
-	protected $_class;
-	
-	/**
-	 * Class constructor.
-	 * 
-	 * @param string $class The class to be used when hydrating.
-	 * 
-	 * @return ZendExt_Db_Dao_Hydrator_Constructor
-	 */
-	public function __construct($class)
-	{
-		$this->_class = $class;
-	}
-	
+    protected $_class;
+
+    /**
+     * Class constructor.
+     *
+     * @param string $class The class to be used when hydrating.
+     *
+     * @return ZendExt_Db_Dao_Hydrator_Constructor
+     */
+    public function __construct($class)
+    {
+        $this->_class = $class;
+    }
+
     /**
      * Hydrate a row as retrieved from the database into a rich object.
      *
@@ -49,6 +49,6 @@ class ZendExt_Db_Dao_Hydrator_Constructor
      */
     public function hydrate(array $row)
     {
-    	return new $this->_class($row);
+        return new $this->_class($row);
     }
 }
