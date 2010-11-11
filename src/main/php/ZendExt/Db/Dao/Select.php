@@ -113,9 +113,53 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
                     $i--; // Decrease iterator to prevent skipping elements
                 }
             }
+        } else if ($part === self::FROM) {
+            $count = count($this->_calls);
+
+            for ($i = 0; $i < $count; $i++) {
+                $callMethod = $this->_calls[$i][self::CALL_METHOD];
+
+                if ($callMethod === '_joinUsing') {
+                    unset($this->_calls[$i]);
+                    $i--; // Decrease iterator to prevent skipping elements
+                }
+            }
         }
 
         return parent::reset($part);
+    }
+
+    /**
+     * Get part of the structured information for the currect query.
+     *
+     * @param string $part The part of the query to retrieve.
+     *
+     * @return mixed
+     *
+     * @throws ZendExt_Db_Dao_Select_Exception
+     * @throws Zend_Db_Select_Exception
+     */
+    public function getPart($part)
+    {
+        if ($part === self::HAVING || $part === self::WHERE
+                || $part === self::FROM) {
+            // Get original FROM, it may be modified by _joinUsing...
+            $originalFrom = $this->_parts[self::FROM];
+
+            $this->_executeDeferredCalls();
+        }
+
+        $ret = parent::getPart($part);
+
+        if ($part === self::HAVING || $part === self::WHERE
+                || $part === self::FROM) {
+            // Reset!
+            $this->_parts[self::FROM] = $originalFrom;
+            $this->_parts[self::WHERE] = array();
+            $this->_parts[self::HAVING] = array();
+        }
+
+        return $ret;
     }
 
     /**
@@ -153,7 +197,6 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      */
     public function where($cond, $value = null, $type = null)
     {
-        // TODO : getPart(self::WHERE) is broken by this...
         $this->_calls[] = array(
             self::CALL_METHOD    => __FUNCTION__,
             self::CALL_ARGUMENTS => func_get_args()
@@ -177,7 +220,6 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      */
     public function orWhere($cond, $value = null, $type = null)
     {
-        // TODO : getPart(self::WHERE) is broken by this...
         $this->_calls[] = array(
             self::CALL_METHOD    => __FUNCTION__,
             self::CALL_ARGUMENTS => func_get_args()
@@ -200,7 +242,6 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      */
     public function having($cond)
     {
-        // TODO : getPart(self::HAVING) is broken by this...
         $this->_calls[] = array(
             self::CALL_METHOD    => __FUNCTION__,
             self::CALL_ARGUMENTS => func_get_args()
@@ -223,7 +264,6 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      */
     public function orHaving($cond)
     {
-        // TODO : getPart(self::HAVING) is broken by this...
         $this->_calls[] = array(
             self::CALL_METHOD    => __FUNCTION__,
             self::CALL_ARGUMENTS => func_get_args()
@@ -306,24 +346,10 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      */
     public function assemble()
     {
-        if (null === $this->_adapter) {
-            if (isset($this->_adapters[0])) {
-                $this->_adapter = $this->_adapters[0];
-            } else {
-                throw new ZendExt_Db_Dao_Select_Exception('No adapters were set!');
-            }
-        }
-
         // Get original FROM, it may be modified by _joinUsing...
         $originalFrom = $this->_parts[self::FROM];
 
-        // Call every intercepted function on the parent...
-        foreach ($this->_calls as $fCall) {
-            $fName = $fCall[self::CALL_METHOD];
-            $fArgs = $fCall[self::CALL_ARGUMENTS];
-
-            call_user_func_array(array($this, 'parent::' . $fName), $fArgs);
-        }
+        $this->_executeDeferredCalls();
 
         // Actually do it
         $ret = parent::assemble();
@@ -334,5 +360,31 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
         $this->_parts[self::HAVING] = array();
 
         return $ret;
+    }
+
+    /**
+     * Execute all deferred calls to parent class.
+     *
+     * @throws ZendExt_Db_Dao_Select_Exception
+     */
+    protected function _executeDeferredCalls()
+    {
+        if (null === $this->_adapter) {
+            if (isset($this->_adapters[0])) {
+                $this->_adapter = $this->_adapters[0];
+            } else {
+                throw new ZendExt_Db_Dao_Select_Exception('No adapters were set!');
+            }
+        }
+
+        // Call every intercepted function on the parent...
+        foreach ($this->_calls as $fCall) {
+            $fName = $fCall[self::CALL_METHOD];
+            $fArgs = $fCall[self::CALL_ARGUMENTS];
+
+            call_user_func_array(array($this, 'parent::' . $fName), $fArgs);
+        }
+
+        return $originalFrom;
     }
 }
