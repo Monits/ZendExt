@@ -92,6 +92,33 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
     }
 
     /**
+     * Clear parts of the Select object, or an individual part.
+     *
+     * @param string $part Optional. The part to be reset.
+     *
+     * @return ZendExt_Db_Dao_Select
+     */
+    public function reset($part = null)
+    {
+        if ($part == null) {
+            $this->_calls = array();
+        } else if ($part === self::HAVING || $part === self::WHERE) {
+            $count = count($this->_calls);
+
+            for ($i = 0; $i < $count; $i++) {
+                $callMethod = $this->_calls[$i][self::CALL_METHOD];
+
+                if (stristr($callMethod, $part) !== false) {
+                    unset($this->_calls[$i]);
+                    $i--; // Decrease iterator to prevent skipping elements
+                }
+            }
+        }
+
+        return parent::reset($part);
+    }
+
+    /**
      * Adds a WHERE condition to the query by AND.
      *
      * If a value is passed as the second param, it will be quoted
@@ -126,6 +153,7 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      */
     public function where($cond, $value = null, $type = null)
     {
+        // TODO : getPart(self::WHERE) is broken by this...
         $this->_calls[] = array(
             self::CALL_METHOD    => __FUNCTION__,
             self::CALL_ARGUMENTS => func_get_args()
@@ -149,6 +177,7 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      */
     public function orWhere($cond, $value = null, $type = null)
     {
+        // TODO : getPart(self::WHERE) is broken by this...
         $this->_calls[] = array(
             self::CALL_METHOD    => __FUNCTION__,
             self::CALL_ARGUMENTS => func_get_args()
@@ -171,6 +200,7 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      */
     public function having($cond)
     {
+        // TODO : getPart(self::HAVING) is broken by this...
         $this->_calls[] = array(
             self::CALL_METHOD    => __FUNCTION__,
             self::CALL_ARGUMENTS => func_get_args()
@@ -193,6 +223,7 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      */
     public function orHaving($cond)
     {
+        // TODO : getPart(self::HAVING) is broken by this...
         $this->_calls[] = array(
             self::CALL_METHOD    => __FUNCTION__,
             self::CALL_ARGUMENTS => func_get_args()
