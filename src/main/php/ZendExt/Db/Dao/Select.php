@@ -82,6 +82,16 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
     }
 
     /**
+     * Retrieve the query's adapters.
+     *
+     * @return array of Zend_Db_Adapter_Abstract
+     */
+    public function getAdapters()
+    {
+        return $this->_adapters;
+    }
+
+    /**
      * Adds a WHERE condition to the query by AND.
      *
      * If a value is passed as the second param, it will be quoted
@@ -199,12 +209,12 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      *
      * @return array of PDO_Statement|Zend_Db_Statement
      *
-     * @throws Zend_Db_Dao_Select_Exception
+     * @throws ZendExt_Db_Dao_Select_Exception
      */
     public function query($fetchMode = null, $bind = array())
     {
         if (empty($this->_adapters)) {
-            throw new Zend_Db_Dao_Select_Exception('No adapters were set!');
+            throw new ZendExt_Db_Dao_Select_Exception('No adapters were set!');
         }
 
         $ret = array();
@@ -260,6 +270,8 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      *
      * @return string|null This object as a SELECT string
      *                     (or null if a string cannot be produced)
+     *
+     * @throws ZendExt_Db_Dao_Select
      */
     public function assemble()
     {
@@ -267,7 +279,7 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
             if (isset($this->_adapters[0])) {
                 $this->_adapter = $this->_adapters[0];
             } else {
-                throw new Zend_Db_Dao_Select_Exception('No adapters were set!');
+                throw new ZendExt_Db_Dao_Select_Exception('No adapters were set!');
             }
         }
 
