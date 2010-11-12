@@ -114,22 +114,6 @@ class ZendExt_Service_Facebook
     }
 
     /**
-     * <strong>Deprecated</strong> Require the user to have the app installed.
-     *
-     * Notice: This method probably won't work anymore, given that the fb lib
-     * is clearly outdated.
-     *
-     * Checks whether an user is logged in and has installed the app.
-     * In case it's not, it redirects the user to install the app.
-     *
-     * @return integer The user's uid
-     */
-    public function requireLogin()
-    {
-        return $this->_fb->require_login();
-    }
-
-    /**
      * Get the user uid.
      *
      * @return integer
