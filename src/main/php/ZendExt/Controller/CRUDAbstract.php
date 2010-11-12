@@ -31,6 +31,9 @@ abstract class ZendExt_Controller_CRUDAbstract
     protected $_fieldToColumnMap = null;
     protected $_itemsPerPage = 10;
 
+    /**
+     * @var ZendExt_DataSource_Adapter
+     */
     protected $_dataSource = null;
 
     protected $_updateTitle;
@@ -88,12 +91,10 @@ abstract class ZendExt_Controller_CRUDAbstract
         }
         $order = $arr;
 
-        $table = $this->_dataSource->getTable();
+        $select = $this->_dataSource->select();
+        $select->order($order);
 
-        $select = $table->select()
-                        ->order($order);
-
-        $paginator = Zend_Paginator::factory($select);
+        $paginator = $this->_dataSource->paginate($select);
         $paginator->setCurrentPageNumber($page);
         $paginator->setItemCountPerPage($ipp);
 
@@ -166,8 +167,6 @@ abstract class ZendExt_Controller_CRUDAbstract
         }
 
         try {
-            $table = $this->_dataSource->getTable();
-
             $build = true;
             if ($this->_dataSource->isSequence()) {
                 $build = false;
@@ -175,7 +174,7 @@ abstract class ZendExt_Controller_CRUDAbstract
 
             $data = $this->_completeData($fields, $build);
 
-            $table->insert($data);
+            $this->_dataSource->insert($data);
 
             /**
              * TODO : Optionally alow the user to "add another"
@@ -252,17 +251,13 @@ abstract class ZendExt_Controller_CRUDAbstract
         $builder = new $this->_builderClass();
         $fields = $builder->getFieldsNames();
 
-        $pk = $this->_dataSource->getPk();
-
         $data = array();
         try{
-            $table = $this->_dataSource->getTable();
-
             $data = $this->_completeData($fields, true);
 
-            $where = $this->_completeWhere($pk, $table);
+            $primaryKey = $this->_completePkValues();
 
-            $table->update($data, $where);
+            $this->_dataSource->update($data, $primaryKey);
 
             $this->_redirectTo('list');
         } catch (Exception $e) {
@@ -291,8 +286,6 @@ abstract class ZendExt_Controller_CRUDAbstract
                 $this->_helper->viewRenderer->renderScript($template);
             }
         }
-
-
     }
 
     /**
@@ -309,14 +302,10 @@ abstract class ZendExt_Controller_CRUDAbstract
             return;
         }
 
-        $pk = $this->_dataSource->getPk();
-
         try {
-            $table = $this->_dataSource->getTable();
+            $primaryKey = $this->_completePkValues();
 
-            $where = $this->_completeWhere($pk, $table);
-
-            $table->delete($where);
+            $this->_dataSource->delete($where, $primaryKey);
 
         } catch (ZendExt_Builder_ValidationException $e) {
             $this->view->failedField = $e->getField();
@@ -327,16 +316,14 @@ abstract class ZendExt_Controller_CRUDAbstract
     }
 
     /**
-     * Retrieves the WHERE sentence for each primary key.
-     *
-     * @param string|array           $pk    The primary key of the table.
-     * @param Zend_Db_Table_Abstract $table The table.
+     * Retrieves the col_name => value pair for each primary key column.
      *
      * @return array
      */
-    private function _completeWhere($pk, $table)
+    private function _completePkValues()
     {
-        $adapter = $table->getAdapter();
+        $pk = $this->_dataSource->getPk();
+
         $builder = new $this->_builderClass();
         $where = array();
 
@@ -345,7 +332,7 @@ abstract class ZendExt_Controller_CRUDAbstract
             $method = 'with' . ucfirst($field);
             $value = $this->_getParam($field);
             $builder->$method($value);
-            $where[] = $adapter->quoteInto($k . ' = ?', $value);
+            $where[$k] = $value;
         }
 
         return $where;
@@ -454,21 +441,14 @@ abstract class ZendExt_Controller_CRUDAbstract
      */
     private function _getRow(array $pk)
     {
-
-        $table = $this->_dataSource->getTable();
-        $select = $table->select();
+        $select = $this->_dataSource->select();
 
         foreach ($pk as $field => $value) {
             $column = $this->_fieldToColumnMap[$field];
             $select->where($column . ' = ?', $value);
         }
 
-        $row = $table->fetchRow($select);
-        if (null === $row) {
-            return null;
-        }
-
-        return $row->toArray();
+        return $this->_dataSource->fetchOne($select);
     }
 
     /**
@@ -513,7 +493,7 @@ abstract class ZendExt_Controller_CRUDAbstract
         foreach ($fields as $field) {
 
             $type = $this->_getType($field);
-            $nullable = $this->_getFieldDescription($field, 'NULLABLE');
+            $nullable = $this->_dataSource->isFieldNullable($field);
 
             //if type is a array add a input type radio
             if (is_array($type)) {
@@ -562,7 +542,7 @@ abstract class ZendExt_Controller_CRUDAbstract
             }
 
             /*
-             * if the field can be null add a checkbox
+             * If the field can be null add a checkbox
              * to make de field able or disable.
              */
             if (true == $nullable) {
@@ -626,7 +606,7 @@ abstract class ZendExt_Controller_CRUDAbstract
             }
         }
 
-        $desc = $this->_getFieldDescription($field, 'DATA_TYPE');
+        $desc = $this->_dataSource->getFieldType($field);
 
         if ($desc == 'text') {
             return 'Textarea';
@@ -702,43 +682,5 @@ abstract class ZendExt_Controller_CRUDAbstract
         $renderer->render();
 
         $this->_helper->viewRenderer->setNoRender();
-    }
-
-    /**
-     * Retrieves the description of the field from the database.
-     *
-     * @param string $field           The field .
-     * @param string $descriptionType The type of description to retrieve.
-     *
-     * The value of each array element is an associative array
-     * with the following keys:
-     *  SCHEMA_NAME     => string; name of database or schema
-     *  TABLE_NAME      => string;
-     *  COLUMN_NAME     => string; column name
-     *  COLUMN_POSITION => number; ordinal position of column in table
-     *  DATA_TYPE       => string; SQL datatype name of column
-     *  DEFAULT         => string; default expression of column, null if none
-     *  NULLABLE        => boolean; true if column can have nulls
-     *  LENGTH          => number; length of CHAR/VARCHAR
-     *  SCALE           => number; scale of NUMERIC/DECIMAL
-     *  PRECISION       => number; precision of NUMERIC/DECIMAL
-     *  UNSIGNED        => boolean; unsigned property of an integer type
-     *  PRIMARY         => boolean; true if column is part of the primary key
-     *  PRIMARY_POSITION => integer; position of column in primary key
-     *
-     * @return string
-     */
-    private function _getFieldDescription($field, $descriptionType)
-    {
-        $table = $this->_dataSource->getTable();
-        $adapter = $table->getAdapter();
-        $description = $adapter->describeTable(
-            $table->info(Zend_Db_Table_Abstract::NAME)
-        );
-
-        $column = $this->_fieldToColumnMap[$field];
-        $desc = $description[$column][$descriptionType];
-
-        return $desc;
     }
 }

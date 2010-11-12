@@ -28,7 +28,7 @@ class ZendExt_DataSource_Adapter_Table implements ZendExt_DataSource_Adapter
     private $_table;
 
     /**
-     * The adapter's table.
+     * Class constructor.
      *
      * @param Zend_Db_Table_Abstract $table The table.
      */
@@ -38,9 +38,9 @@ class ZendExt_DataSource_Adapter_Table implements ZendExt_DataSource_Adapter
     }
 
     /**
-     * Retrieves the table's primary key.
+     * Retrieves the data source's primary key.
      *
-     * @return string/array
+     * @return string|array
      */
     public function getPk()
     {
@@ -48,7 +48,7 @@ class ZendExt_DataSource_Adapter_Table implements ZendExt_DataSource_Adapter
     }
 
     /**
-     * Retrieves the table's sequence.
+     * Retrieves wether the data soruce has a sequence primary key or not.
      *
      * @return boolean
      */
@@ -58,14 +58,133 @@ class ZendExt_DataSource_Adapter_Table implements ZendExt_DataSource_Adapter
     }
 
     /**
-     * Retrieves the table.
+     * Inserts a new registry into the data source.
      *
-     * @param any $param Ignored.
+     * @param array $data Associate array of col_name => value
+     *                    for the new registry.
      *
-     * @return Zend_Db_Table_Abstract
+     * @return void
      */
-    public function getTable($param = null)
+    public function insert(array $data)
     {
-        return $this->_table;
+        $this->_table->insert($data);
+    }
+
+    /**
+     * Updates a registry already in the data source.
+     *
+     * @param array $data       Associate array of col_name => value
+     *                          for the updated registry.
+     * @param array $primaryKey The col_name => value for the primary key,
+     *                          or null if it's a sequence.
+     *
+     * @return void
+     */
+    public function update(array $data, array $primaryKey)
+    {
+        $where = $this->_primaryKeyToWhere($primaryKey);
+
+        $this->_table->update($data, $where);
+    }
+
+    /**
+     * Deletes a registry already in the data source.
+     *
+     * @param array $primaryKey The col_name => value for the primary key.
+     *
+     * @return void
+     */
+    public function delete(array $primaryKey)
+    {
+        $where = $this->_primaryKeyToWhere($primaryKey);
+
+        $this->_table->delete($where);
+    }
+
+    /**
+     * Creates an object to perform a query on the datasource.
+     *
+     * @return Zend_Db_Select
+     */
+    public function select()
+    {
+        return $this->_table->select();
+    }
+
+    /**
+     * Performs the given select query retrieving a single matchng record.
+     *
+     * @param Zend_Db_Select $select The query to be performed.
+     *
+     * @return ArrayAccess An object that can be accessed as an array using
+     *                     column names as keys.
+     */
+    public function fetchOne(Zend_Db_Select $select)
+    {
+        return $this->_table->fetchRow($select);
+    }
+
+    /**
+     * Retrieves a paginator for the given query.
+     *
+     * @param Zend_Db_Select $select The select query to be paginated.
+     *
+     * @return Zend_Paginator
+     */
+    public function paginate(Zend_Db_Select $select)
+    {
+        return new Zend_Paginator(
+            new Zend_Paginator_Adapter_DbTableSelect($select)
+        );
+    }
+
+    /**
+     * Retrieves the field's data type.
+     *
+     * @param string $field The name of the field whose type to retrieve.
+     *
+     * @return string
+     */
+    public function getFieldType($field)
+    {
+        $metadata = $this->_table->info(Zend_Db_Table_Abstract::METADATA);
+
+        return $metadata[$column]['DATA_TYPE'];
+    }
+
+    /**
+     * Checks if the field is nullable or not.
+     *
+     * @param sintrg $field The name of the field to check if it's nullable.
+     *
+     * @return boolean
+     */
+    public function isFieldNullable($field)
+    {
+        $metadata = $this->_table->info(Zend_Db_Table_Abstract::METADATA);
+
+        return $metadata[$column]['NULLABLE'];
+    }
+
+    /**
+     * Transforms a col_name => value array into a valid where condition.
+     *
+     * A valid where condition for Zend_Db_Table are in the form:
+     *  col_name = ? => value
+     *
+     * @param array $primaryKey The primary key data to transform.
+     *
+     * @return array
+     */
+    private function _primaryKeyToWhere(array $primaryKey)
+    {
+        $where = array();
+
+        // Transform the primary key array into a valid where condition
+        foreach ($primaryKey as $column => $value) {
+            $where[$column . ' = ?'] = $value;
+        }
+
+        return $where;
     }
 }

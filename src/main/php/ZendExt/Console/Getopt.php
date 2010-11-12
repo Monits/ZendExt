@@ -49,7 +49,7 @@ class ZendExt_Console_Getopt extends Zend_Console_Getopt
         }
 
         if (isset($this->_ruleMap[$flag])) {
-                parent::_parseSingleOption($flag, $argv);
+            parent::_parseSingleOption($flag, $argv);
         }
     }
 

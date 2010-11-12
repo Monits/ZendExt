@@ -110,31 +110,6 @@ abstract class ZendExt_Db_Dao_Abstract
         return $this->_getTableForAdapter($adapter);
     }
 
-    // TODO : this may go if pagination is sorted out more elegantly...
-    /**
-     * Retrieves the table instance to be used.
-     *
-     * @param string $operation   The operation to be performed on the table.
-     *                            See {@link #OPERATION_READ}
-     *                            and {@link #OPERATION_WRITE}
-     * @param any    $shardingArg The value on which to perform sharding.
-     *
-     * @return Zend_Db_Table_Abstract The table to be used by this DAO.
-     */
-    private function _getTable($operation = self::OPERATION_READ,
-        $shardingArg = null)
-    {
-        if (null === self::$_config) {
-            return $this->_getTableForDefaultAdapter();
-        }
-
-        $adapter = self::$_config->getAdapterForTable(
-            $this->_tableClass, $operation, $shardingArg
-        );
-
-        return $this->_getTableForAdapter($adapter);
-    }
-
     /**
      * Retrieves the table assuming a default table adapter.
      *
@@ -172,23 +147,6 @@ abstract class ZendExt_Db_Dao_Abstract
 
         // Reset all local caches
         self::$_tables = array();
-    }
-
-    // TODO : this may go if the datasource uses the new _select, _insert, _update and _delete methods...
-    /**
-     * Retrieves the table instance to be used.
-     *
-     * @param string $operation   The operation to be performed on the table.
-     *                            See {@link #OPERATION_READ}
-     *                            and {@link #OPERATION_WRITE}
-     * @param any    $shardingArg The value on which to perform sharding.
-     *
-     * @return Zend_Db_Table_Abstract The table to be used by this DAO.
-     */
-    public function getTable($operation = self::OPERATION_READ,
-        $shardingArg = null)
-    {
-        return $this->_getTable($operation, $shardingArg);
     }
 
     /**
@@ -247,7 +205,7 @@ abstract class ZendExt_Db_Dao_Abstract
         $adapters = array();
 
         if (null === self::$_config) {
-            // No sharding config or no shards set, go to the default adapter
+            // No sharding config, go to the default adapter
             $adapters[] = $this->_getTableForDefaultAdapter();
         } else {
             foreach ($shards as $shard) {
@@ -356,7 +314,7 @@ abstract class ZendExt_Db_Dao_Abstract
      *
      * @return mixed         The primary key of the row inserted.
      */
-    public function insert(array $data, $shardingArg = null)
+    protected function _insert(array $data, $shardingArg = null)
     {
         // If no config, go to default adapter - no sharding
         if (null === self::$_config) {
@@ -383,9 +341,33 @@ abstract class ZendExt_Db_Dao_Abstract
     }
 
     /**
+     * Retrieves a paginator for the given query.
+     *
+     * If an Hydrator is set, results will be hydrated.
+     *
+     * @param ZendExt_Db_Dao_Select $select The query to be paginated.
+     *
+     * @return Zend_Paginator
+     */
+    protected function _paginate(ZendExt_Db_Dao_Select $select)
+    {
+        $selectAdapter = new ZendExt_Paginator_Adapter_DbDaoSelect($select);
+
+        // Add hydration if needed
+        if (null !== $this->_hydrator) {
+            $selectAdapter = new ZendExt_Paginator_Adapter_CallbackDecorator(
+                array($this->_hydrator, 'hydrate'),
+                $selectAdapter
+            );
+        }
+
+        return new Zend_Paginator($selectAdapter);
+    }
+
+    /**
      * Fetches all rows.
      *
-     * @param Zend_Db_Dao_Select $select The query to be performed.
+     * @param ZendExt_Db_Dao_Select $select The query to be performed.
      *
      * @return array The row results, hydrated as configured.
      */
@@ -397,7 +379,7 @@ abstract class ZendExt_Db_Dao_Abstract
     /**
      * Fetches a single row.
      *
-     * @param Zend_Db_Dao_Select $select The query to be performed.
+     * @param ZendExt_Db_Dao_Select $select The query to be performed.
      *
      * @return array The row results, hydrated as configured.
      */
@@ -441,5 +423,45 @@ abstract class ZendExt_Db_Dao_Abstract
         }
 
         return $data;
+    }
+
+    /**
+     * Returns table information.
+     *
+     * You can elect to return only a part of this information by supplying
+     * its key name, otherwise all information is returned as an array.
+     *
+     * @param null|string $key The specific info part to return OPTIONAL.
+     *
+     * @return mixed
+     */
+    protected function _info($key = null)
+    {
+        /*
+         * We need a table instance, no matter which one
+         * (all tables should have the same schema, no matter the adapter)
+         */
+
+        // Was there a table already cached?
+        if (isset(self::$_tables[$this->_tableClass])) {
+            $tables = self::$_tables[$this->_tableClass];
+
+            reset($tables);
+            $table = current($tables);
+        } else {
+
+            // No table previously created.... is there a sharding config?
+            if (self::$_config === null) {
+                $table = $this->_getTableForDefaultAdapter();
+            } else {
+                // There is, just get the default adapter, and a table for that
+                $adapter = self::$_config->getDefaultAdapterForTable(
+                    $this->_tableClass
+                );
+                $table = $this->_getTableForAdapter($adapter);
+            }
+        }
+
+        return $table->info($key);
     }
 }
