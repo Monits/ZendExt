@@ -38,6 +38,10 @@ class ZendExt_Service_Facebook
 
     const PHOTO_LARGE = 'large';
 
+    const GRAPH_URL = 'https://graph.facebook.com';
+
+    const COOKIE_PREFIX = 'fbs_';
+
     private static $_params = array(
                                   'locale'  => 'fb_sig_locale',
                                   'friends' => 'fb_sig_friends',
@@ -62,18 +66,25 @@ class ZendExt_Service_Facebook
 
     private $_apiKey;
 
+    private $_appId;
+
     private $_apiSecret;
+
+    private $_cookie;
 
     /**
      * Construct a new FB API service.
      *
+     * @param string  $appId		  The application id.
      * @param string  $apiKey         The API key given by FB.
      * @param string  $apiSecret      The API secret given by FB.
      * @param boolean $generateSecret Whether session API calls should
      *                                   generate a new secret.
      */
-    public function __construct($apiKey, $apiSecret, $generateSecret=false)
+    public function __construct($appId, $apiKey, $apiSecret,
+        $generateSecret=false)
     {
+        $this->_appId = $appId;
         $this->_apiKey = $apiKey;
         $this->_apiSecret = $apiSecret;
 
@@ -103,7 +114,10 @@ class ZendExt_Service_Facebook
     }
 
     /**
-     * Require the user to have the application installed.
+     * <strong>Deprecated</strong> Require the user to have the app installed.
+     *
+     * Notice: This method probably won't work anymore, given that the fb lib
+     * is clearly outdated.
      *
      * Checks whether an user is logged in and has installed the app.
      * In case it's not, it redirects the user to install the app.
@@ -118,43 +132,22 @@ class ZendExt_Service_Facebook
     /**
      * Get the user uid.
      *
-     * Warning: This method only works with canvas pages.
-     *
      * @return integer
      */
     public function getUserId()
     {
-        return $this->_request->getParam(self::$_params['userId']);
-    }
+        if ($this->hasValidCookie()) {
+            $cookie = $this->_getCookieParams();
+            if (isset($cookie['uid'])) {
+                return $cookie['uid'];
+            }
 
-    /**
-     * Get the user's locale.
-     *
-     * @return string
-     */
-    public function getUserLocale()
-    {
-        return $this->_request->getParam(self::$_params['locale']);
-    }
-
-    /**
-     * Check whether the request is AJAX.
-     *
-     * @return boolean
-     */
-    public function isAjax()
-    {
-        return $this->_request->getParam(self::$_params['ajax']) == 1;
-    }
-
-    /**
-     * Get an array of uids that user invited on the last request.
-     *
-     * @return array
-     */
-    public function getInvitedIds()
-    {
-        return $this->_request->getParam(self::$_params['invited']);
+            $response = $this->_makeGraphCall('me', $this->getAccessToken());
+            if (isset($response['id'])) {
+                return $response['id'];
+            }
+        }
+        return null;
     }
 
     /**
@@ -179,12 +172,8 @@ class ZendExt_Service_Facebook
      *
      * @return string
      */
-    public function getUserEmail($userId = null)
+    public function getUserEmail($userId)
     {
-        if (null === $userId) {
-            $userId = $this->getUserId();
-        }
-
         $query = "SELECT email FROM user WHERE uid=\"$userId\"";
         $data = $this->_fb->api_client->fql_query($query);
 
@@ -194,17 +183,12 @@ class ZendExt_Service_Facebook
     /**
      * Increment the users counter.
      *
-     * @param integer $userId The user id. If null, defaults to current user.
+     * @param integer $userId The user id.
      *
      * @return void
      */
-    public function incrementCounter($userId = null)
+    public function incrementCounter($userId )
     {
-        if ($userId === null) {
-
-            $userId = $this->getUserId();
-        }
-
         $params = array(
             'uid' => $userId
         );
@@ -214,18 +198,13 @@ class ZendExt_Service_Facebook
     /**
      * Set the users counter to a value.
      *
-     * @param integer $userId The user id. If null, defaults to current user.
+     * @param integer $userId The user id.
      * @param integer $count  The new value. Defaults to 0.
      *
      * @return void
      */
-    public function setCounter($userId = null, $count = 0)
+    public function setCounter($userId, $count = 0)
     {
-        if ($userId === null) {
-
-            $userId = $this->getUserId();
-        }
-
         $params = array(
             'uid' => $userId,
             'count' => $count
@@ -237,6 +216,7 @@ class ZendExt_Service_Facebook
      * This method publishes a post into the stream.
      *
      * {@link http://developers.facebook.com/docs/reference/rest/stream.publish}
+     *
      * @param array $attachment  An array with the post attachment.
      * @param array $actionLinks An array with the post's action links.
      * @param int   $uid         The id of the user whose stream will get the
@@ -263,13 +243,8 @@ class ZendExt_Service_Facebook
      *
      * @return array
      */
-    public function getUserInfo(array $fields, $userId = null)
+    public function getUserInfo(array $fields, $userId)
     {
-        if (null === $userId) {
-
-            $userId = $this->getUserId();
-        }
-
         return $this->_fb->api_client->users_getInfo($userId, $fields);
     }
 
@@ -335,7 +310,9 @@ class ZendExt_Service_Facebook
         $requestStr = '';
         foreach ($params as $key => $value) {
 
-            $requestStr .= $key . '=' . $value;
+            if ('sig' !== $key) {
+                $requestStr .= $key . '=' . $value;
+            }
         }
         $sig = $requestStr . $this->_apiSecret;
         return md5($sig);
@@ -355,6 +332,87 @@ class ZendExt_Service_Facebook
      */
     public function generateProfilePicUrl($uid, $type = self::SMALL)
     {
-        return 'http://graph.facebook.com/'.$uid.'/picture?type='.$type;
+        return self::GRAPH_URL.'/'.$uid.'/picture?type='.$type;
+    }
+
+    /**
+     * Check whether we have a valid facebook cookie.
+     *
+     * @return boolean
+     */
+    public function hasValidCookie()
+    {
+        $params = $this->_getCookieParams();
+        return isset($params['sig'])
+            && $this->_makeSig($params) == $params['sig'];
+    }
+
+    /**
+     * Get the params in the session cookie.
+     *
+     * @return array
+     */
+    private function _getCookieParams()
+    {
+        if (null === $this->_cookie) {
+            $cookie = substr(
+                $this->_request->getCookie(self::COOKIE_PREFIX.$this->_appId),
+                1,
+                -1
+            );
+
+            $this->_cookie = array();
+            foreach (explode('&', urldecode($cookie)) as $item) {
+                $tokens = explode('=', $item);
+                $this->_cookie[$tokens[0]] = $tokens[1];
+            }
+        }
+
+        return $this->_cookie;
+    }
+
+    /**
+     * Get the access token for the current session.
+     *
+     * @return string
+     */
+    public function getAccessToken()
+    {
+        $params = $this->_getCookieParams();
+        if (isset($params['access_token'])) {
+            return $params['access_token'];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Make a call to the graph api.
+     *
+     * @param string $method The method to call.
+     * @param string $token  The access token to use.
+     * @param array $params  Extra params.
+     *
+     * @return array
+     */
+    private function _makeGraphCall($method, $token, array $params = array())
+    {
+        $url = self::GRAPH_URL . '/' . $method;
+        $params['access_token'] = $token;
+
+        $url .= '?';
+        foreach ($params as $key => $value) {
+            $url .= $key .'='.$value.'&';
+        }
+        $url = substr($url, 0, -1);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $res = curl_exec($ch);
+        curl_close($ch);
+
+        return Zend_Json::decode($res);
     }
 }
