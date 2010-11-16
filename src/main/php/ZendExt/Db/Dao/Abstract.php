@@ -202,21 +202,21 @@ abstract class ZendExt_Db_Dao_Abstract
     {
         $select = new ZendExt_Db_Dao_Select($this);
 
-        $adapters = array();
+        $tables = array();
 
         if (null === self::$_config) {
             // No sharding config, go to the default adapter
-            $adapters[] = $this->_getTableForDefaultAdapter();
+            $tables[] = $this->_getTableForDefaultAdapter();
         } else {
             foreach ($shards as $shard) {
-                $adapters[] = self::$_config->getAdapterForTableShard(
-                    $this->_tableClass, $shard,
+                $tables[] = $this->_getTableForShard(
+                    $shard,
                     ZendExt_Application_Resource_Multidb::OPERATION_READ
                 );
             }
         }
 
-        $select->setAdapters($adapters);
+        $select->setTables($tables);
 
         return $select;
     }

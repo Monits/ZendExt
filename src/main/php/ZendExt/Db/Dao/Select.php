@@ -45,7 +45,7 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      */
     protected $_dao;
 
-    protected $_adapters;
+    protected $_tables;
 
     /**
      * Class constructor.
@@ -57,38 +57,38 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
     public function __construct(ZendExt_Db_Dao_Abstract $dao)
     {
         $this->_dao = $dao;
-        $this->_adapters = array();
+        $this->_tables = array();
         $this->_calls = array();
     }
 
     /**
-     * Sets the adapters to be used for this query.
+     * Sets the tables to be used for this query.
      *
-     * @param array|Zend_Db_Adapter $adapters
+     * @param array|Zend_Db_Table_Abstract $tables
      *
      * @return void
      */
-    public function setAdapters($adapters)
+    public function setTables($tables)
     {
-        if (!is_array($adapters)) {
-            $adapters = array($adapters);
+        if (!is_array($tables)) {
+            $tables = array($tables);
         }
 
         /*
-         * Make sure no adapters are repeated, therefore the query won't
+         * Make sure no tables are repeated, therefore the query won't
          * be executed twice on the same database.
          */
-        $this->_adapters = array_unique($adapters);
+        $this->_tables = array_unique($tables);
     }
 
     /**
-     * Retrieve the query's adapters.
+     * Retrieve the query's tables.
      *
-     * @return array of Zend_Db_Adapter_Abstract
+     * @return array of Zend_Db_Table_Abstract
      */
-    public function getAdapters()
+    public function getTables()
     {
-        return $this->_adapters;
+        return $this->_tables;
     }
 
     /**
@@ -284,15 +284,15 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      */
     public function query($fetchMode = null, $bind = array())
     {
-        if (empty($this->_adapters)) {
-            throw new ZendExt_Db_Dao_Select_Exception('No adapters were set!');
+        if (empty($this->_tables)) {
+            throw new ZendExt_Db_Dao_Select_Exception('No tables were set!');
         }
 
         $ret = array();
 
         // Perform the query for each adapter and group all retrieved data
-        foreach ($this->_adapters as $adapter) {
-            $this->_adapter = $adapter;
+        foreach ($this->_tables as $table) {
+            $this->setTable($table);
 
             // Perform the query itself now it's ready
             $ret[] = parent::query($fetchMode, $bind);
@@ -369,11 +369,11 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      */
     protected function _executeDeferredCalls()
     {
-        if (null === $this->_adapter) {
-            if (isset($this->_adapters[0])) {
-                $this->_adapter = $this->_adapters[0];
+        if (null === $this->_table) {
+            if (isset($this->_tables[0])) {
+                $this->setTable($this->_tables[0]);
             } else {
-                throw new ZendExt_Db_Dao_Select_Exception('No adapters were set!');
+                throw new ZendExt_Db_Dao_Select_Exception('No tables were set!');
             }
         }
 
@@ -384,7 +384,5 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
 
             call_user_func_array(array($this, 'parent::' . $fName), $fArgs);
         }
-
-        return $originalFrom;
     }
 }
