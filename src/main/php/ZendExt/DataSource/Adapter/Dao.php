@@ -174,7 +174,7 @@ class ZendExt_DataSource_Adapter_Dao extends ZendExt_Db_Dao_Abstract
     {
         $metadata = $this->_info(Zend_Db_Table_Abstract::METADATA);
 
-        return $metadata[$column]['DATA_TYPE'];
+        return $metadata[$field]['DATA_TYPE'];
     }
 
     /**
@@ -188,7 +188,7 @@ class ZendExt_DataSource_Adapter_Dao extends ZendExt_Db_Dao_Abstract
     {
         $metadata = $this->_info(Zend_Db_Table_Abstract::METADATA);
 
-        return $metadata[$column]['NULLABLE'];
+        return $metadata[$field]['NULLABLE'];
     }
 
     /**

@@ -149,7 +149,7 @@ class ZendExt_DataSource_Adapter_Table implements ZendExt_DataSource_Adapter
     {
         $metadata = $this->_table->info(Zend_Db_Table_Abstract::METADATA);
 
-        return $metadata[$column]['DATA_TYPE'];
+        return $metadata[$field]['DATA_TYPE'];
     }
 
     /**
@@ -163,7 +163,7 @@ class ZendExt_DataSource_Adapter_Table implements ZendExt_DataSource_Adapter
     {
         $metadata = $this->_table->info(Zend_Db_Table_Abstract::METADATA);
 
-        return $metadata[$column]['NULLABLE'];
+        return $metadata[$field]['NULLABLE'];
     }
 
     /**
