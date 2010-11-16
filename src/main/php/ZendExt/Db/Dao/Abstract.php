@@ -25,22 +25,6 @@
  */
 abstract class ZendExt_Db_Dao_Abstract
 {
-    /**
-     * Defines the read operation.
-     *
-     * @var string
-     */
-    const OPERATION_READ = ZendExt_Application_Resource_Multidb::OPERATION_READ;
-
-    /**
-     * Defines the write operation.
-     *
-     * @var string
-     */
-    const OPERATION_WRITE =
-        ZendExt_Application_Resource_Multidb::OPERATION_WRITE;
-
-
     private static $_tables = array();
 
     /**
@@ -91,13 +75,11 @@ abstract class ZendExt_Db_Dao_Abstract
      *
      * @param int    $shard     The id of shard to be used.
      * @param string $operation The operation to be performed on the table.
-     *                          See {@link #OPERATION_READ}
-     *                          and {@link #OPERATION_WRITE}
      *
      * @return Zend_Db_Table_Abstract The table to be used by this DAO.
      */
     private function _getTableForShard($shard,
-        $operation = self::OPERATION_READ)
+        $operation = ZendExt_Application_Resource_Multidb::OPERATION_READ)
     {
         if (null === self::$_config) {
             return $this->_getTableForDefaultAdapter();
@@ -255,7 +237,9 @@ abstract class ZendExt_Db_Dao_Abstract
         // Perform the query on each one
         $total = 0;
         foreach ($shards as $shard) {
-            $table = $this->_getTableForShard($shard, self::OPERATION_WRITE);
+            $table = $this->_getTableForShard(
+                $shard, ZendExt_Application_Resource_Multidb::OPERATION_WRITE
+            );
 
             $total += $table->update($data, $where);
         }
@@ -296,7 +280,9 @@ abstract class ZendExt_Db_Dao_Abstract
         // Perform the query on each one
         $total = 0;
         foreach ($shards as $shard) {
-            $table = $this->_getTableForShard($shard, self::OPERATION_WRITE);
+            $table = $this->_getTableForShard(
+                $shard, ZendExt_Application_Resource_Multidb::OPERATION_WRITE
+            );
 
             $total += $table->delete($where);
         }
