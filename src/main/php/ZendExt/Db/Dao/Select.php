@@ -48,6 +48,20 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
     protected $_tables;
 
     /**
+     * The original from, when deferred calls where first triggered.
+     *
+     * @var array
+     */
+    protected $_originalFrom;
+
+    /**
+     * Indicates how many times the deferred calls whre triggered.
+     *
+     * @var integer
+     */
+    protected $_deferredCallsMade;
+
+    /**
      * Class constructor.
      *
      * @param ZendExt_Db_Dao_Abstract $dao The DAO to whcih this query belongs.
@@ -59,6 +73,11 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
         $this->_dao = $dao;
         $this->_tables = array();
         $this->_calls = array();
+
+        $this->_originalFrom = null;
+        $this->_deferredCallsMade = 0;
+
+        $this->_parts = self::$_partsInit;
     }
 
     /**
@@ -144,8 +163,6 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
         if ($part === self::HAVING || $part === self::WHERE
                 || $part === self::FROM) {
             // Get original FROM, it may be modified by _joinUsing...
-            $originalFrom = $this->_parts[self::FROM];
-
             $this->_executeDeferredCalls();
         }
 
@@ -154,9 +171,7 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
         if ($part === self::HAVING || $part === self::WHERE
                 || $part === self::FROM) {
             // Reset!
-            $this->_parts[self::FROM] = $originalFrom;
-            $this->_parts[self::WHERE] = array();
-            $this->_parts[self::HAVING] = array();
+            $this->_clearDeferredCalls();
         }
 
         return $ret;
@@ -346,18 +361,14 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      */
     public function assemble()
     {
-        // Get original FROM, it may be modified by _joinUsing...
-        $originalFrom = $this->_parts[self::FROM];
-
+        // Execute deferred calls
         $this->_executeDeferredCalls();
 
         // Actually do it
         $ret = parent::assemble();
 
         // Reset!
-        $this->_parts[self::FROM] = $originalFrom;
-        $this->_parts[self::WHERE] = array();
-        $this->_parts[self::HAVING] = array();
+        $this->_clearDeferredCalls();
 
         return $ret;
     }
@@ -365,10 +376,26 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
     /**
      * Execute all deferred calls to parent class.
      *
+     * Some methods end up in deferred calls being triggered multiple times.
+     * The idea is to keep track on the number of calls and clears so that
+     * the calls are only performed once at the start, and the cleanup only
+     * once at the end.
+     *
      * @throws ZendExt_Db_Dao_Select_Exception
      */
     protected function _executeDeferredCalls()
     {
+        // Increment deferred call counter for our call stack
+        $this->_deferredCallsMade++;
+
+        if ($this->_deferredCallsMade > 1) {
+            // Call already made, just ignore them
+            return;
+        }
+
+        // Store the original from now the call stack is started
+        $this->_originalFrom = $this->_parts[self::FROM];
+
         if (null === $this->_table) {
             if (isset($this->_tables[0])) {
                 $this->setTable($this->_tables[0]);
@@ -384,5 +411,27 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
 
             call_user_func_array(array($this, 'parent::' . $fName), $fArgs);
         }
+    }
+
+    /**
+     * Clear all data altered by deferred calls to parent class.
+     *
+     * Some methods end up in deferred calls being triggered multiple times.
+     * The idea is to keep track on the number of calls and clears so that
+     * the calls are only performed once at the start, and the cleanup only
+     * once at the end.
+     */
+    protected function _clearDeferredCalls()
+    {
+        $this->_deferredCallsMade--;
+
+        if ($this->_deferredCallsMade != 0) {
+            // Still not done, just ignore them
+            return;
+        }
+
+        $this->_parts[self::FROM] = $this->_originalFrom;
+        $this->_parts[self::WHERE] = array();
+        $this->_parts[self::HAVING] = array();
     }
 }
