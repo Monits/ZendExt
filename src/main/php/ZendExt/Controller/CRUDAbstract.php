@@ -305,7 +305,7 @@ abstract class ZendExt_Controller_CRUDAbstract
         try {
             $primaryKey = $this->_completePkValues();
 
-            $this->_dataSource->delete($where, $primaryKey);
+            $this->_dataSource->delete($primaryKey, $primaryKey);
 
         } catch (ZendExt_Builder_ValidationException $e) {
             $this->view->failedField = $e->getField();
