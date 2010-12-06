@@ -200,7 +200,7 @@ class ZendExt_Paginator_Adapter_DbDaoSelect
 
         $rowCount= new ZendExt_Db_Dao_Select();
         $rowCount->setTables($this->_select->getTables());
-        $rowCount->setIntegrityCheck(false);
+        $rowCount->setIntegrityCheck(false)->bind($this->_select->getBind());
 
         $countColumn = self::ROW_COUNT_COLUMN;
         $expression  = new Zend_Db_Expr('COUNT(1)');
