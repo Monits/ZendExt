@@ -38,13 +38,6 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
 
     protected $_calls;
 
-    /**
-     * The DAO for which this query is created.
-     *
-     * @var ZendExt_Db_Dao_Abstract
-     */
-    protected $_dao;
-
     protected $_tables;
 
     /**
@@ -64,13 +57,10 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
     /**
      * Class constructor.
      *
-     * @param ZendExt_Db_Dao_Abstract $dao The DAO to whcih this query belongs.
-     *
      * @return ZendExt_Db_Dao_Select
      */
-    public function __construct(ZendExt_Db_Dao_Abstract $dao)
+    public function __construct()
     {
-        $this->_dao = $dao;
         $this->_tables = array();
         $this->_calls = array();
 

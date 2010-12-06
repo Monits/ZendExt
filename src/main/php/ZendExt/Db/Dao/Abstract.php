@@ -182,7 +182,7 @@ abstract class ZendExt_Db_Dao_Abstract
      */
     protected function _selectForShards(array $shards)
     {
-        $select = new ZendExt_Db_Dao_Select($this);
+        $select = new ZendExt_Db_Dao_Select();
 
         $tables = array();
 

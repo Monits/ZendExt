@@ -90,10 +90,10 @@ class ZendExt_Paginator_Adapter_DbDaoSelect
      */
     public function setRowCount($rowCount)
     {
-        if ($rowCount instanceof Zend_DbExt_Dao_Select) {
+        if ($rowCount instanceof ZendExt_Db_Dao_Select) {
             $columns = $rowCount->getPart(Zend_Db_Select::COLUMNS);
 
-            $countColumnPart = $columns[0][1];
+            $countColumnPart = $columns[0][2];
 
             if ($countColumnPart instanceof Zend_Db_Expr) {
                 $countColumnPart = $countColumnPart->__toString();
@@ -198,8 +198,9 @@ class ZendExt_Paginator_Adapter_DbDaoSelect
             return $this->_countSelect;
         }
 
-        $rowCount = clone $this->_select;
-        $rowCount->__toString(); // Workaround for ZF-3719 and related
+        $rowCount= new ZendExt_Db_Dao_Select();
+        $rowCount->setTables($this->_select->getTables());
+        $rowCount->setIntegrityCheck(false);
 
         $countColumn = self::ROW_COUNT_COLUMN;
         $expression  = new Zend_Db_Expr('COUNT(1)');
@@ -209,7 +210,7 @@ class ZendExt_Paginator_Adapter_DbDaoSelect
          * Execute the original query as subquery. Not optimum,
          * but works for every case.
          */
-        $rowCount->from($rowCount, $columns);
+        $rowCount->from($this->_select, $columns);
 
         $this->_countSelect = $rowCount;
 
