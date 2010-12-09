@@ -25,7 +25,7 @@
  */
 class ZendExt_Service_DineroMail_IPN_Ping
 {
-    const REQUEST_PARAM = 'NOTIFICATION';
+    const REQUEST_PARAM = 'Notificacion';
 
     /**
      * @var DOMDocument
