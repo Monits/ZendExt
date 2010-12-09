@@ -27,6 +27,8 @@ class ZendExt_Service_DineroMail_IPN_Request
 {
     const REQUEST_PARAM = 'DATA';
 
+    const SUCCESS = '1';
+
     const URI = 'https://argentina.dineromail.com/Vender/Consulta_IPN.asp';
 
     private $_accountNumber;
@@ -117,6 +119,7 @@ class ZendExt_Service_DineroMail_IPN_Request
     {
         $res = '<REPORTE>';
         $res .= '<NROCTA>'.$this->_accountNumber.'</NROCTA>';
+        $res .= '<DETALLE>';
         $res .= '<CONSULTA>';
         $res .= '<CLAVE>'.$this->_password.'</CLAVE>';
         $res .= '<TIPO>1</TIPO>';
@@ -143,7 +146,7 @@ class ZendExt_Service_DineroMail_IPN_Request
     {
         $doc = new SimpleXMLElement($response->getBody());
 
-        $message = $responseData->xpath('//ESTADOREPORTE');
+        $message = $doc->xpath('//ESTADOREPORTE');
         if (false === $message) {
 
             throw new ZendExt_Service_DineroMail_Exception(
@@ -159,7 +162,7 @@ class ZendExt_Service_DineroMail_IPN_Request
             );
         }
 
-        $operations = $responseData->xpath('//OPERACION');
+        $operations = $doc->xpath('//OPERACION');
         if (false === $operations) {
 
             throw new ZendExt_Service_DineroMail_Exception(
