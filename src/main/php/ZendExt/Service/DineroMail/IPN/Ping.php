@@ -55,7 +55,7 @@ class ZendExt_Service_DineroMail_IPN_Ping
 
         $result = array();
         for ($i = 0; $i < $ops->length; $i++) {
-            $result[] = $ops->item($i);
+            $result[] = $ops->item($i)->nodeValue;
         }
 
         return $result;
