@@ -51,7 +51,14 @@ class ZendExt_Service_DineroMail_IPN_Ping
     public function getOperationList()
     {
         $xpath = new DOMXPath($this->_data);
-        return $xpath->query('//OPERACION/TIPO/text()');
+        $ops = $xpath->query('//operacion/id/text()');
+
+        $result = array();
+        for ($i = 0; $i < $ops->length; $i++) {
+            $result[] = $ops->item($i);
+        }
+
+        return $result;
     }
 
     /**

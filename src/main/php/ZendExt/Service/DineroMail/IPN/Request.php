@@ -63,7 +63,7 @@ class ZendExt_Service_DineroMail_IPN_Request
     public function getPayments()
     {
         $this->_makeRequest();
-        return $this->_data;
+        return $this->_response;
     }
 
     /**
@@ -145,7 +145,7 @@ class ZendExt_Service_DineroMail_IPN_Request
     private function _parseResponse(Zend_Http_Response $response)
     {
         $doc = new SimpleXMLElement($response->getBody());
-var_dump($response->getBody());die();
+
         $message = $doc->xpath('//ESTADOREPORTE');
         if (false === $message) {
 
@@ -174,9 +174,9 @@ var_dump($response->getBody());die();
         foreach ($operations as $operation) {
 
             $this->_response[] =
-            ZendExt_Service_DineroMail_IPN_Payment::createFromSimpleXML(
-                $operation
-            );
+                new ZendExt_Service_DineroMail_IPN_Payment(
+                    $operation
+                );
         }
     }
 }
