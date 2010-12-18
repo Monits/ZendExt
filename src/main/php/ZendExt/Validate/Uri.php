@@ -1,6 +1,6 @@
 <?php
 /**
- * Uri validator. 
+ * Uri validator.
  *
  * @category  ZendExt
  * @package   ZendExt_Validate
@@ -17,7 +17,7 @@
  * @category  ZendExt
  * @package   ZendExt_Validate
  * @author    jpcivile <jpcivile@monits.com>
- * @copyright 2010 Monits. 
+ * @copyright 2010 Monits.
  * @license   Copyright 2010. All rights reserved.
  * @version   Release: 1.0.0
  * @link      http://www.zendext.com/
@@ -28,12 +28,13 @@ class ZendExt_Validate_Uri extends Zend_Validate_Abstract
     const INVALID_URI = 'invalidUri';
 
     protected $_messageTemplates = array(
-        self::INVALID_URI   => "'%value%' is not a valid URI.",
+        self::INVALID_URI   => "'%value%' is not a valid URI.
+            Remember to start with http:// or https://",
     );
 
     /**
      * Check whether the value is a valid uri or not.
-     * 
+     *
      * @param mixed $value The value to check.
      *
      * @return boolean Whether the value is valid or not.
