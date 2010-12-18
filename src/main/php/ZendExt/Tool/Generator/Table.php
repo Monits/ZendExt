@@ -35,6 +35,7 @@ class ZendExt_Tool_Generator_Table extends ZendExt_Tool_Generator_Abstract
      */
     protected function _doGenerate()
     {
+        // FIXME : Why isn't this using _getExtraOptions to set the table properly??
 
         if (null === $this->_opts->table) {
             $this->_getLogger()->info(
