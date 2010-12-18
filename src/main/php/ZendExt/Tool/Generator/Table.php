@@ -94,20 +94,25 @@ class ZendExt_Tool_Generator_Table extends ZendExt_Tool_Generator_Abstract
 
         $defaultValue = new Zend_CodeGenerator_Php_Property_DefaultValue();
         if (count($pks) == 1) {
-            $value = "'" . $pks[0] . "'";
+            $value = $pks[0];
+            $type = Zend_CodeGenerator_Php_Property_DefaultValue::TYPE_STRING;
         } else {
             $value = 'array(';
             foreach ($pks as $pk) {
-                $value .= addcslashes($pk, "'") . ', ';
+                $value .= "'" . addcslashes($pk, "'") . "', ";
             }
             $value .= ')';
+            $type = Zend_CodeGenerator_Php_Property_DefaultValue::TYPE_CONSTANT;
         }
 
         $class->setProperty(
             array(
                 'name' 	       => '_primary',
                 'visibility'   => 'protected',
-                'defaultValue' => $value
+                'defaultValue' => array(
+                    'value' => $value,
+                    'type'  => $type
+                )
             )
         );
 
