@@ -496,7 +496,7 @@ abstract class ZendExt_Controller_CRUDAbstract
 
             $type = $this->_getType($field);
             $nullable = $this->_dataSource->isFieldNullable($field);
-
+    
             //if type is a array add a input type radio
             if (is_array($type)) {
                 $elements[$field] = new Zend_Form_Element_Radio($field);
@@ -516,7 +516,11 @@ abstract class ZendExt_Controller_CRUDAbstract
                             'Label', array('tag' => 'dt'))
                     );
                     $elements[$field]->addDecorators($decorators);
-                    $elements[$field]->setLabel($field . ' :');
+                    $elements[$field]
+                        ->setLabel(
+                            (isset($this->_viewToColumnMap[$field]) ? 
+                                $this->_viewToColumnMap[$field] : $field) . ':'
+                    );
 
                     $required = true == $nullable ? false : true;
 
