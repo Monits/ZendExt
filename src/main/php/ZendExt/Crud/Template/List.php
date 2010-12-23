@@ -88,7 +88,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
                     '' : "/ipp/{$this->_view->paginator->getItemCountPerPage()}"
             );
             echo '">';
-            echo $field;
+            echo (isset($this->_view->viewMap[$col]) ? $this->_view->viewMap[$col] : $field);
             echo '</a>';
             echo '</th>';
         }

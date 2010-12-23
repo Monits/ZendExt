@@ -30,7 +30,8 @@ abstract class ZendExt_Controller_CRUDAbstract
     protected $_builderClass = null;
     protected $_fieldToColumnMap = null;
     protected $_itemsPerPage = 10;
-
+    protected $_viewToColumnMap = null;
+    
     /**
      * @var ZendExt_DataSource_Adapter
      */
@@ -103,6 +104,7 @@ abstract class ZendExt_Controller_CRUDAbstract
         $this->view->paginator = $paginator;
         $this->view->pk = $pk;
         $this->view->fieldsMap = $this->_fieldToColumnMap;
+        $this->view->viewMap = $this->_viewToColumnMap;
         $this->view->controllerName = $request->getControllerName();
         $this->view->defaultIpp = $this->_itemsPerPage;
 
@@ -676,7 +678,7 @@ abstract class ZendExt_Controller_CRUDAbstract
     private function _renderTemplate($type, $title)
     {
         $template = 'ZendExt_Crud_Template_' . $type;
-
+        
         $renderer = new $template($this->view);
         $renderer->setTitle($title);
         $renderer->render();
