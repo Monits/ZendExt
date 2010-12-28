@@ -167,7 +167,7 @@ abstract class ZendExt_Controller_CRUDAbstract
             $pk = $this->_dataSource->getPk();
             $fields = $this->_unsetPk($pk, $fields);
         }
-
+        
         try {
             $build = true;
             if ($this->_dataSource->isSequence()) {
@@ -266,7 +266,6 @@ abstract class ZendExt_Controller_CRUDAbstract
             if ($e instanceof Zend_Db_Exception) {
                 $this->view->errorDb = 'Duplicate entry';
             }
-
             $this->view->failedField = $e->getField();
             $this->view->errors = $e->getErrors();
 
@@ -357,7 +356,7 @@ abstract class ZendExt_Controller_CRUDAbstract
             $value = $this->_getParam($field);
             $method = 'with' . ucfirst($field);
             $isChecked = $this->_getParam('check' . $field);
-
+            
             if ('0' == $isChecked) {
                 // If empty, take the default (if there is any)
                 if ($builder->hasDefault($field)) {
@@ -504,7 +503,10 @@ abstract class ZendExt_Controller_CRUDAbstract
                         'Label', array('tag' => 'dt'))
                 );
                 $elements[$field]->addDecorators($decorators);
-                $elements[$field]->setLabel($field . ' :');
+                $elements[$field]->setLabel(
+                    (isset($this->_viewToColumnMap[$field]) ? 
+                        $this->_viewToColumnMap[$field] : $field) . ':'
+                );
                 $elements[$field]->addMultiOptions($type);
 
             } else {
