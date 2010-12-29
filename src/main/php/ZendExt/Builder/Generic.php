@@ -92,7 +92,8 @@ class ZendExt_Builder_Generic
             $validators = array($this->_fields[$var]['validators']);
         }
 
-        if (null === $val && $this->getDefault($var) === null) {
+        if (null === $val && $this->hasDefault($var)
+                && $this->getDefault($var) === null) {
             return;
         }
 
