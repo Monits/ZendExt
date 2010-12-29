@@ -92,6 +92,10 @@ class ZendExt_Builder_Generic
             $validators = array($this->_fields[$var]['validators']);
         }
 
+        if (null === $val && $this->getDefault($var) === null) {
+            return;
+        }
+
         foreach ($validators as $validator) {
             if (!$validator instanceof Zend_Validate_Interface) {
                 throw new ZendExt_Builder_Exception(
