@@ -26,15 +26,22 @@
 class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
 {
     protected $_view;
-
+    
+    protected $_translatedList;
+    
     /**
      * Crud template construct.
      *
      * @param Zend_View $view The view
+     * @param array  $translatedList Array with the buttons and titles  
+     * 	                             of the list template translated
+     * 
+     * @return void
      */
-    public function __construct(Zend_View $view)
+    public function __construct(Zend_View $view, array $translatedList)
     {
         $this->_view = $view;
+        $this->_translatedList = $translatedList;
     }
 
     /**
@@ -47,15 +54,37 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         echo '<style type="text/css">';
         $this->_style();
         echo '</style>';
-
+        
         $items = $this->_view->paginator->getCurrentItems();
         $controllerName = $this->_view->controllerName;
         $moduleUrl = $this->_view->moduleUrl;
-
+        $newButton = 'New '. $controllerName;
+        $deleteButton = 'Delete';
+        $editButton = 'Edit';
+        $modifyColumnTitle = 'Modify';
+        
+        if ($this->_translatedList['modifyTitle'] != null) {
+            $modifyColumnTitle = $this->_translatedList['modifyTitle'];
+        }
+        
+        if ($this->_translatedList['newButton'] != null) {
+            $newButton = $this->_translatedList['newButton'];
+        }
+        
+        if ($this->_translatedList['deleteButton'] != null) {
+            $deleteButton = $this->_translatedList['deleteButton'];
+        }
+        
+        if ($this->_translatedList['editButton'] != null) {
+            $editButton = $this->_translatedList['editButton'];
+        }
+        
         echo '<div class="crudContent">';
         echo     '<div class="newButton">';
         echo         '<a href="/' . $moduleUrl . $controllerName . '/new">';
-        echo             '<button>New '. $controllerName .' </button>';
+        
+        echo             '<button>'.$newButton.' </button>';
+        
         echo         '</a>';
         echo     '</div>';
 
@@ -93,7 +122,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             echo '</th>';
         }
         echo '<th colspan="2">';
-        echo     'Modify';
+        echo     $modifyColumnTitle;
         echo '</th>';
 
         echo '</tr>';
@@ -131,7 +160,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
                 echo $field . '/'. $arrCols[$k] . '/';
             }
             echo '">';
-            echo '<button> Edit </button>';
+            echo '<button> '.$editButton.' </button>';
             echo '</a>';
             echo '</td>';
 
@@ -139,7 +168,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
             echo '<form action="/' . $moduleUrl . $controllerName . '/delete"',
                     ' method="post">',
                     '<input class="button_delete" type="submit"',
-                    ' name="delete" value="Delete">';
+                    ' name="delete" value="'.$deleteButton.'">';
 
             foreach ($this->_view->pk as $k) {
                 $field = array_search($k, $this->_view->fieldsMap);
@@ -162,7 +191,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
 
         echo '<div class="newButton">';
         echo     '<a href="/' . $moduleUrl . $controllerName . '/new">';
-        echo         '<button>New '. $controllerName .' </button>';
+        echo         '<button>'.$newButton.' </button>';
         echo     '</a>';
         echo '</div>';
 

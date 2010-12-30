@@ -46,7 +46,15 @@ abstract class ZendExt_Controller_CRUDAbstract
     protected $_templateList = null;
     protected $_templateNew = null;
     protected $_templateUpdate = null;
-
+    
+    protected $_listModifyTitle = null;
+    protected $_listNewButton = null;
+    protected $_listDeleteButton = null;
+    protected $_listEditButton = null;
+    protected $_createButton = null;
+    
+    private $_actualForm = null;
+    
     const DEFAULT_PAGE = 1;
 
     /**
@@ -119,8 +127,15 @@ abstract class ZendExt_Controller_CRUDAbstract
             if (null !== $this->_listTitle) {
                 $title = $this->_listTitle;
             }
-
-            $this->_renderTemplate('List', $title);
+            
+            $translatedList = array(
+                'modifyTitle' => $this->_listModifyTitle,
+            	'newButton' => $this->_listNewButton,
+                'deleteButton' => $this->_listDeleteButton,
+                'editButton' => $this->_listEditButton
+            );
+            
+            $this->_renderTemplate('List', $title, $translatedList);
         } else {
             $template = $this->_templateList;
             $this->_helper->viewRenderer->renderScript($template);
@@ -135,7 +150,8 @@ abstract class ZendExt_Controller_CRUDAbstract
     public function newAction()
     {
         $request = $this->getRequest();
-
+        $this->_actualForm = 'new';
+        
         if (!$request->isPost()) {
             // Assign the form
             $this->view->form = $this->_newForm();
@@ -221,7 +237,8 @@ abstract class ZendExt_Controller_CRUDAbstract
     public function updateAction()
     {
         $request = $this->getRequest();
-
+        $this->_actualForm = 'update';
+        
         if (!$request->isPost()) {
             // Retrieve params for primary key
             $pkFields = $this->_dataSource->getPk();
@@ -590,7 +607,22 @@ abstract class ZendExt_Controller_CRUDAbstract
             }
         }
 
-        $form->addElement('submit', 'send');
+        $sendButton = 'send';
+        if ($this->_actualForm === 'new'
+        	&& null != $this->_createButton
+        ) {
+            $sendButton = $this->_createButton;
+        } 
+        elseif ($this->_actualForm === 'update'
+        	&& null != $this->_listEditButton
+        ) {
+            $sendButton = $this->_listEditButton;
+        }
+        
+        $submit = new Zend_Form_Element_Submit($sendButton);
+        $submit->setName('send');
+        $submit->setLabel($sendButton);
+        $form->addElement($submit);
 
         return $form;
     }
@@ -676,16 +708,18 @@ abstract class ZendExt_Controller_CRUDAbstract
     /**
      * Render the form/list.
      *
-     * @param string $type  The type of render.
-     * @param string $title The title of the form.
+     * @param string $type           The type of render.
+     * @param string $title          The title of the form.
+     * @param array  $translatedList Array with the buttons and titles  
+     * 	                             of the list template translated
      *
      * @return void
      */
-    private function _renderTemplate($type, $title)
+    private function _renderTemplate($type, $title, $translatedList = null)
     {
         $template = 'ZendExt_Crud_Template_' . $type;
         
-        $renderer = new $template($this->view);
+        $renderer = new $template($this->view, $translatedList);
         $renderer->setTitle($title);
         $renderer->render();
 
