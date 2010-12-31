@@ -161,6 +161,17 @@ class ZendExt_Service_DineroMail_BuyNow
         $this->_image = $url;
     }
 
+    /**
+     * Sets the payment method.
+     * @param string $method The method.
+     *
+     * @return void
+     */
+    public function setPaymentMethod($method)
+    {
+        $this->_data['MediosPago'] = $method;
+    }
+
     public function toString()
     {
         $form = '<form action="https://'.$this->_country
