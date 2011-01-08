@@ -35,17 +35,17 @@ class ZendExt_Service_Mailing
     /**
      * Creates a new mailing service.
      *
-     * @param Zend_View                          $view      The view object to 
-     *                                                      render the 
+     * @param Zend_View                          $view      The view object to
+     *                                                      render the
      *                                                      templates.
-     * @param array|Zend_Mail_Transport_Abstract $transport An instance of a 
-     *                                                      transport or the 
+     * @param array|Zend_Mail_Transport_Abstract $transport An instance of a
+     *                                                      transport or the
      *                                                      configuration.
      * @param string                             $mail      Which mail to send,
      *                                                      NOT the address to
      *                                                      send the e-mail.
      * @param string                             $subject   The mails' subject.
-     * @param string                             $from      The mails' from 
+     * @param string                             $from      The mails' from
      *                                                      address.
      * @param string                             $fromName  The mails' sender.
      *
@@ -175,7 +175,7 @@ class ZendExt_Service_Mailing
     /**
      * Sends a mail to the given address.
      *
-     * @param string $to The e-mail address where to send the mail.
+     * @param string|array $to The e-mail addresses where to send the mail.
      *
      * @return void
      */
