@@ -31,7 +31,7 @@ abstract class ZendExt_Controller_CRUDAbstract
     protected $_fieldToColumnMap = null;
     protected $_itemsPerPage = 10;
     protected $_viewToColumnMap = null;
-    
+
     /**
      * @var ZendExt_DataSource_Adapter
      */
@@ -46,15 +46,15 @@ abstract class ZendExt_Controller_CRUDAbstract
     protected $_templateList = null;
     protected $_templateNew = null;
     protected $_templateUpdate = null;
-    
+
     protected $_listModifyTitle = null;
     protected $_listNewButton = null;
     protected $_listDeleteButton = null;
     protected $_listEditButton = null;
     protected $_createButton = null;
-    
+
     private $_actualForm = null;
-    
+
     const DEFAULT_PAGE = 1;
 
     /**
@@ -127,14 +127,14 @@ abstract class ZendExt_Controller_CRUDAbstract
             if (null !== $this->_listTitle) {
                 $title = $this->_listTitle;
             }
-            
+
             $translatedList = array(
                 'modifyTitle' => $this->_listModifyTitle,
             	'newButton' => $this->_listNewButton,
                 'deleteButton' => $this->_listDeleteButton,
                 'editButton' => $this->_listEditButton
             );
-            
+
             $this->_renderTemplate('List', $title, $translatedList);
         } else {
             $template = $this->_templateList;
@@ -151,7 +151,7 @@ abstract class ZendExt_Controller_CRUDAbstract
     {
         $request = $this->getRequest();
         $this->_actualForm = 'new';
-        
+
         if (!$request->isPost()) {
             // Assign the form
             $this->view->form = $this->_newForm();
@@ -183,7 +183,7 @@ abstract class ZendExt_Controller_CRUDAbstract
             $pk = $this->_dataSource->getPk();
             $fields = $this->_unsetPk($pk, $fields);
         }
-        
+
         try {
             $build = true;
             if ($this->_dataSource->isSequence()) {
@@ -238,7 +238,7 @@ abstract class ZendExt_Controller_CRUDAbstract
     {
         $request = $this->getRequest();
         $this->_actualForm = 'update';
-        
+
         if (!$request->isPost()) {
             // Retrieve params for primary key
             $pkFields = $this->_dataSource->getPk();
@@ -373,7 +373,7 @@ abstract class ZendExt_Controller_CRUDAbstract
             $value = $this->_getParam($field);
             $method = 'with' . ucfirst($field);
             $isChecked = $this->_getParam('check' . $field);
-            
+
             if ('0' == $isChecked) {
                 // If empty, take the default (if there is any)
                 if ($builder->hasDefault($field)) {
@@ -512,7 +512,7 @@ abstract class ZendExt_Controller_CRUDAbstract
 
             $type = $this->_getType($field);
             $nullable = $this->_dataSource->isFieldNullable($field);
-    
+
             //if type is a array add a input type radio
             if (is_array($type)) {
                 $elements[$field] = new Zend_Form_Element_Radio($field);
@@ -521,7 +521,7 @@ abstract class ZendExt_Controller_CRUDAbstract
                 );
                 $elements[$field]->addDecorators($decorators);
                 $elements[$field]->setLabel(
-                    (isset($this->_viewToColumnMap[$field]) ? 
+                    (isset($this->_viewToColumnMap[$field]) ?
                         $this->_viewToColumnMap[$field] : $field) . ':'
                 );
                 $elements[$field]->addMultiOptions($type);
@@ -537,7 +537,7 @@ abstract class ZendExt_Controller_CRUDAbstract
                     $elements[$field]->addDecorators($decorators);
                     $elements[$field]
                         ->setLabel(
-                            (isset($this->_viewToColumnMap[$field]) ? 
+                            (isset($this->_viewToColumnMap[$field]) ?
                                 $this->_viewToColumnMap[$field] : $field) . ':'
                     );
 
@@ -552,7 +552,7 @@ abstract class ZendExt_Controller_CRUDAbstract
             }
 
             //Complete the form with the DB data for update form.
-            if (null !== $row ) {
+            if (null !== $row) {
                 $column = $this->_fieldToColumnMap[$field];
                 $value = $row[$column];
                 $elements[$field]->setValue($value);
@@ -579,6 +579,10 @@ abstract class ZendExt_Controller_CRUDAbstract
                 $checkValue = 'checked';
                 if (null !== $checks) {
                     $checkValue = $checks[$field] == '0' ? '' : 'checked';
+                } else if (null !== $row) { // We are updating from db, check if null
+                    $column = $this->_fieldToColumnMap[$field];
+                    $value = $row[$column];
+                    $checkValue = $value === null ? '' : 'checked';
                 }
                 $textLabel = 'Enable';
 
@@ -612,13 +616,13 @@ abstract class ZendExt_Controller_CRUDAbstract
         	&& null != $this->_createButton
         ) {
             $sendButton = $this->_createButton;
-        } 
+        }
         elseif ($this->_actualForm === 'update'
         	&& null != $this->_listEditButton
         ) {
             $sendButton = $this->_listEditButton;
         }
-        
+
         $submit = new Zend_Form_Element_Submit($sendButton);
         $submit->setName('send');
         $submit->setLabel($sendButton);
@@ -710,7 +714,7 @@ abstract class ZendExt_Controller_CRUDAbstract
      *
      * @param string $type           The type of render.
      * @param string $title          The title of the form.
-     * @param array  $translatedList Array with the buttons and titles  
+     * @param array  $translatedList Array with the buttons and titles
      * 	                             of the list template translated
      *
      * @return void
@@ -718,7 +722,7 @@ abstract class ZendExt_Controller_CRUDAbstract
     private function _renderTemplate($type, $title, $translatedList = null)
     {
         $template = 'ZendExt_Crud_Template_' . $type;
-        
+
         $renderer = new $template($this->view, $translatedList);
         $renderer->setTitle($title);
         $renderer->render();
