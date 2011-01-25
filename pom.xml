@@ -6,9 +6,54 @@
 	<packaging>php</packaging>
 	<name>ZendExt</name>
 	<version>1.5-SNAPSHOT</version>
+	
+    <description>An extension library for Zend Framework adding multiple new features.</description>
+
+    <organization>
+      <name>Monits S.A.</name>
+      <url>http://monits.com/</url>
+    </organization>
+
+    <licenses>
+      <license>
+        <name>GPL 3</name>
+        <url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
+        <distribution>repo</distribution>
+      </license>
+      <license>
+        <name>Apache 2</name>
+        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        <distribution>repo</distribution>
+      </license>
+    </licenses>
+
+    <scm>
+      <developerConnection>scm:svn:http://svn.monits.com/ZendExt/trunk</developerConnection>
+      <url>http://svn.monits.com/ZendExt/trunk</url>
+      <!-- TODO : Change this andd add <connection> with public url -->
+    </scm>
+    <issueManagement>
+      <system>Mantis BugTracker</system>
+      <url>http://mantis.monits.com/</url>
+    </issueManagement>
+    <ciManagement>
+      <system>Hudson</system>
+      <url>http://hudson.monits.com/hudson</url>
+    </ciManagement>
+	
 	<properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+	<distributionManagement>
+		<repository>
+			<id>nexus</id>
+			<url>http://nexus.monits.com/content/repositories/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus</id>
+			<url>http://nexus.monits.com/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<build>
 		<plugins>
 			<plugin>
@@ -156,11 +201,6 @@
                     </reportSet>
                 </reportSets>
             </plugin>
-			<plugin>
-				<groupId>org.phpmaven</groupId>
-				<artifactId>maven-php-plugin</artifactId>
-				<version>1.0</version>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
