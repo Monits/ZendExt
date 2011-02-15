@@ -5,7 +5,7 @@
 	<artifactId>ZendExt</artifactId>
 	<packaging>php</packaging>
 	<name>ZendExt</name>
-	<version>1.5</version>
+	<version>1.6-SNAPSHOT</version>
 	
     <description>An extension library for Zend Framework adding multiple new features.</description>
 
