@@ -412,7 +412,7 @@ abstract class ZendExt_Tool_Generator_Abstract
     protected final function _saveFile($content, $className)
     {
         $fileName = str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
-        $dir = dirname($fileName);
+        $dir = $this->_outputDir . DIRECTORY_SEPARATOR . dirname($fileName);
 
         if (!file_exists($dir)) {
             mkdir($dir, 0755, true);
