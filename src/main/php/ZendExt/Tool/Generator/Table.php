@@ -25,8 +25,19 @@
  */
 class ZendExt_Tool_Generator_Table extends ZendExt_Tool_Generator_Abstract
 {
-
     protected $_requiresSchema = true;
+
+    /**
+     * Retrieves all the extra options that the generator needs.
+     *
+     * @return array An array formatted like needed by Zend_Console_Getopt.
+     */
+    protected function _getExtraOptions()
+    {
+        return array(
+            'table|t=s' => 'The table to generate.',
+        );
+    }
 
     /**
      * Actually generates the code.
@@ -35,8 +46,6 @@ class ZendExt_Tool_Generator_Table extends ZendExt_Tool_Generator_Abstract
      */
     protected function _doGenerate()
     {
-        // FIXME : Why isn't this using _getExtraOptions to set the table properly??
-
         if (null === $this->_opts->table) {
             $this->_getLogger()->info(
                 'No table option given, generating all tables'
