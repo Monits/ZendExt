@@ -89,7 +89,7 @@ class ZendExt_Tool_Generator_Table extends ZendExt_Tool_Generator_Abstract
                 array(
                     'name' => '_name',
                     'visibility' => 'protected',
-                    'defaultValue' => strtolower($table)
+                    'defaultValue' => $table
                  )
             );
 
