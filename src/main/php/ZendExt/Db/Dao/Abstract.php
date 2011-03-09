@@ -25,6 +25,9 @@
  */
 abstract class ZendExt_Db_Dao_Abstract
 {
+    const SELECT_WITH_FROM_PART    = true;
+    const SELECT_WITHOUT_FROM_PART = false;
+
     private static $_tables = array();
 
     /**
@@ -134,9 +137,12 @@ abstract class ZendExt_Db_Dao_Abstract
     /**
      * Create a query for all shards.
      *
+     * @param bool $withFromPart Whether or not to include the from part of
+     *                           the select based on the table
+     *
      * @return ZendExt_Db_Dao_Select
      */
-    protected function _selectForAllShards()
+    protected function _selectForAllShards($withFromPart = self::SELECT_WITHOUT_FROM_PART)
     {
         $shards = array();
 
@@ -147,7 +153,7 @@ abstract class ZendExt_Db_Dao_Abstract
             );
         }
 
-        return $this->_selectForShards($shards);
+        return $this->_selectForShards($shards, $withFromPart);
     }
 
     /**
@@ -155,10 +161,13 @@ abstract class ZendExt_Db_Dao_Abstract
      *
      * @param array $shardingArgs The values for which the query
      *                            will be executed.
+     * @param bool $withFromPart Whether or not to include the from part of
+     *                           the select based on the table
      *
      * @return ZendExt_Db_Dao_Select
      */
-    protected function _selectForShardWithValues(array $shardingArgs)
+    protected function _selectForShardWithValues(array $shardingArgs,
+                        $withFromPart = self::SELECT_WITHOUT_FROM_PART)
     {
         $shards = array();
 
@@ -170,17 +179,20 @@ abstract class ZendExt_Db_Dao_Abstract
             );
         }
 
-        return $this->_selectForShards($shards);
+        return $this->_selectForShards($shards, $withFromPart);
     }
 
     /**
      * Create a query for the given shards.
      *
      * @param array $shards The shards for which the query will be executed.
+     * @param bool $withFromPart Whether or not to include the from part of
+     *                           the select based on the table
      *
      * @return ZendExt_Db_Dao_Select
      */
-    protected function _selectForShards(array $shards)
+    protected function _selectForShards(array $shards,
+                                $withFromPart = self::SELECT_WITHOUT_FROM_PART)
     {
         $select = new ZendExt_Db_Dao_Select();
 
@@ -199,6 +211,10 @@ abstract class ZendExt_Db_Dao_Abstract
         }
 
         $select->setTables($tables);
+
+        if (self::SELECT_WITH_FROM_PART === $withFromPart) {
+            $select->from($tables[0], Zend_Db_Table_Select::SQL_WILDCARD);
+        }
 
         return $select;
     }
