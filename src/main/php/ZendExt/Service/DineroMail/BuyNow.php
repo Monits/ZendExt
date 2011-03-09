@@ -42,6 +42,8 @@ class ZendExt_Service_DineroMail_BuyNow
      *
      * @param integer $accountNumber The account number to user.
      * @param string  $country       One of the DineroMail supported countries.
+     *
+     * @return ZendExt_Service_DineroMail_BuyNow
      */
     public function __construct($accountNumber, $country = 'argentina')
     {
@@ -60,6 +62,8 @@ class ZendExt_Service_DineroMail_BuyNow
      * Set the alt text for the button.
      *
      * @param string $alt The new alt.
+     *
+     * @return void
      */
     public function setAltText($alt)
     {
@@ -76,6 +80,8 @@ class ZendExt_Service_DineroMail_BuyNow
      *                          and
      *                          {@see ZendExt_Service_DineroMail_BuyNow::DOLAR}.
      * @param integer $id       Optional. The item's id.
+     *
+     * @return void
      */
     public function setItem($name, $price, $currency = self::ARS, $id = null)
     {
@@ -91,6 +97,8 @@ class ZendExt_Service_DineroMail_BuyNow
      * Set the vendor transaction id.
      *
      * @param string $id The transaction id.
+     *
+     * @return void
      */
     public function setTransactionId($id)
     {
@@ -102,6 +110,8 @@ class ZendExt_Service_DineroMail_BuyNow
      *
      * @param string $success The success url.
      * @param string $fail    The fail url.
+     *
+     * @return void
      */
     public function setUrls($success, $fail)
     {
@@ -116,6 +126,8 @@ class ZendExt_Service_DineroMail_BuyNow
      * @param string $lastName    The user's last name.
      * @param string $phoneNumber The user's phone number.
      * @param string $mail        The user's email address.
+     *
+     * @return void
      */
     public function setUserData($name, $lastName, $phoneNumber, $mail)
     {
@@ -127,6 +139,8 @@ class ZendExt_Service_DineroMail_BuyNow
 
     /**
      * Allow the user to attach a message to the purchase.
+     *
+     * @return void
      */
     public function allowMessage()
     {
@@ -137,6 +151,8 @@ class ZendExt_Service_DineroMail_BuyNow
      * Allows you to show your site's logo when the user is making the purchase.
      *
      * @param string $url The logo's url.
+     *
+     * @return void
      */
     public function setSiteLogo($url)
     {
@@ -145,6 +161,8 @@ class ZendExt_Service_DineroMail_BuyNow
 
     /**
      * Allow the user to enter the delivery address when making the purchase.
+     *
+     * @return void
      */
     public function allowDeliveryAddress()
     {
@@ -155,6 +173,8 @@ class ZendExt_Service_DineroMail_BuyNow
      * Set the button image.
      *
      * @param string $url The url where the image is located.
+     *
+     * @return void
      */
     public function setButtonImage($url)
     {
@@ -163,6 +183,7 @@ class ZendExt_Service_DineroMail_BuyNow
 
     /**
      * Sets the payment method.
+     *
      * @param string $method The method.
      *
      * @return void
@@ -172,7 +193,12 @@ class ZendExt_Service_DineroMail_BuyNow
         $this->_data['MediosPago'] = $method;
     }
 
-    public function toString()
+    /**
+     * Transforms the objects to a string representation of the form in HTML.
+     *
+     * @return string
+     */
+    public function __toString()
     {
         $form = '<form action="https://'.$this->_country
             .'.dineromail.com/Shop/Shop_Ingreso.asp" method="post">';
