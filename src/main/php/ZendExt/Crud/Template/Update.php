@@ -44,6 +44,6 @@ class ZendExt_Crud_Template_Update extends ZendExt_Crud_TemplateAbstract
      */
     protected function _renderContent()
     {
-        echo $this->_view->Updateform;
+        echo $this->_view->form;
     }
 }

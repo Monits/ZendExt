@@ -250,7 +250,7 @@ abstract class ZendExt_Controller_CRUDAbstract
             }
 
             // Display the form with the current values
-            $this->view->Updateform = $this->_newForm($pk);
+            $this->view->form = $this->_newForm($pk);
             // Render the script
             if (null == $this->_templateUpdate) {
                 $title = 'Update';
@@ -290,7 +290,7 @@ abstract class ZendExt_Controller_CRUDAbstract
             $checks = $this->_getCheckboxValue($fields);
 
             // Assign the form
-            $this->view->Updateform = $this->_newForm(null, $data, $checks);
+            $this->view->form = $this->_newForm(null, $data, $checks);
             // Render the script
             if (null == $this->_templateUpdate) {
                 $title = 'Update';
