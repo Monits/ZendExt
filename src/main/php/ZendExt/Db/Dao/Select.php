@@ -73,7 +73,8 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
     /**
      * Sets the tables to be used for this query.
      *
-     * @param array|Zend_Db_Table_Abstract $tables
+     * @param array|Zend_Db_Table_Abstract $tables The tables to which to
+     *                                             submit the query.
      *
      * @return void
      */
@@ -240,8 +241,8 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      * and replaced into the condition wherever a question-mark
      * appears. See {@link where()} for an example
      *
-     * @param string $cond The HAVING condition.
-     * @param string|Zend_Db_Expr $val The value to quote into the condition.
+     * @param string              $cond The HAVING condition.
+     * @param string|Zend_Db_Expr $val  The value to quote into the condition.
      *
      * @return ZendExt_Db_Dao_Select This ZendExt_Db_Dao_Select object.
      */
@@ -281,7 +282,7 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      * Executes the current select object and returns the result
      *
      * @param integer $fetchMode OPTIONAL
-     * @param  mixed  $bind An array of data to bind to the placeholders.
+     * @param mixed   $bind      An array of data to bind to the placeholders.
      *
      * @return array of PDO_Statement|Zend_Db_Statement
      *
@@ -318,7 +319,7 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      * $select = $db->select()->from('table1')
      *                        ->joinUsing('table2', 'column1');
      *
-     * // SELECT * FROM table1 JOIN table2 ON table1.column1 = table2.column2
+     * // SELECT * FROM table1 JOIN table2 ON table1.column1 = table2.column1
      * </code>
      *
      * These joins are called by the developer simply by adding 'Using' to the
@@ -328,6 +329,15 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      * * joinFullUsing
      * * joinRightUsing
      * * joinLeftUsing
+     *
+     * @param  null|string               $type   Type of join; inner, left, and
+     *                                           null are currently supported
+     * @param  array|string|Zend_Db_Expr $name   Table name
+     * @param  string                    $cond   The column on which to join
+     * @param  array|string              $cols   The columns to select from the
+     *                                           joined table
+     * @param  string                    $schema The database name to specify,
+     *                                           if any.
      *
      * @return ZendExt_Db_Dao_Select This ZendExt_Db_Dao_Select object.
      */
@@ -371,6 +381,8 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      * the calls are only performed once at the start, and the cleanup only
      * once at the end.
      *
+     * @return void
+     *
      * @throws ZendExt_Db_Dao_Select_Exception
      */
     protected function _executeDeferredCalls()
@@ -410,6 +422,8 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      * The idea is to keep track on the number of calls and clears so that
      * the calls are only performed once at the start, and the cleanup only
      * once at the end.
+     *
+     * @return void
      */
     protected function _clearDeferredCalls()
     {
