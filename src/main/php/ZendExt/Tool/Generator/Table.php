@@ -35,7 +35,7 @@ class ZendExt_Tool_Generator_Table extends ZendExt_Tool_Generator_Abstract
     protected function _getExtraOptions()
     {
         return array(
-            'table|t=s' => 'The table to generate.',
+            'table|t-s' => 'The table to generate.',
         );
     }
 
