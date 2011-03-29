@@ -154,14 +154,18 @@ class ZendExt_Service_Facebook
      *
      * @param string $userId The id of the user whose mail to request.
      *
-     * @return string
+     * @return string|null
      */
     public function getUserEmail($userId)
     {
-        $query = "SELECT email FROM user WHERE uid=\"$userId\"";
-        $data = $this->_fb->api_client->fql_query($query);
-
-        return $data[0]['email'];
+        if (null !== $userId) {
+            $query = "SELECT email FROM user WHERE uid=\"$userId\"";
+            $data = $this->_fb->api_client->fql_query($query);
+    
+            return $data[0]['email'];
+        }
+        
+        return null;
     }
 
     /**
@@ -339,8 +343,17 @@ class ZendExt_Service_Facebook
     private function _getCookieParams()
     {
         if (null === $this->_cookie) {
+            
+            $cookie = $this->_request->getCookie(
+                self::COOKIE_PREFIX.$this->_appId
+            ); 
+            
+            if (null === $cookie) {
+                return null;
+            }
+            
             $cookie = substr(
-                $this->_request->getCookie(self::COOKIE_PREFIX.$this->_appId),
+                $cookie,
                 1,
                 -1
             );
