@@ -199,7 +199,8 @@ abstract class ZendExt_Cron_Process
 
                 $this->_logger->crit($e->__toString());
                 throw new ZendExt_Cron_ErrorException(
-                    'An unexpected error caused the process to stop running.'
+                    "An unexpected error caused the process to stop running.\n"
+                    . $e
                 );
             }
 
@@ -334,7 +335,8 @@ abstract class ZendExt_Cron_Process
             $this->_logger->crit($e->__toString());
 
             throw new ZendExt_Cron_ErrorException(
-                'An unexpected error caused the process to stop running.'
+                "An unexpected error caused the process to stop running.\n"
+                . $e
             );
         }
 
