@@ -161,10 +161,10 @@ class ZendExt_Service_Facebook
         if (null !== $userId) {
             $query = "SELECT email FROM user WHERE uid=\"$userId\"";
             $data = $this->_fb->api_client->fql_query($query);
-    
+
             return $data[0]['email'];
         }
-        
+
         return null;
     }
 
@@ -221,6 +221,27 @@ class ZendExt_Service_Facebook
         );
 
         return $this->_makeApiCall('stream.publish', $params);
+    }
+
+    /**
+     * Checks if a user is fan.
+     *
+     * @param integer $userId The user id
+     * @param integer $pageId The page id
+     */
+    public function isFan($userId, $pageId)
+    {
+        $params = array(
+            'uid' => $userId,
+            'page_id' => $pageId
+        );
+
+        $ret = $this->_makeApiCall('pages.isFan', $params);
+
+        /*
+         * Ret variable is a xml, needs to delete the tags to know if is fan.
+         */
+        return trim(strip_tags($ret)) == true;
     }
 
     /**
@@ -343,15 +364,15 @@ class ZendExt_Service_Facebook
     private function _getCookieParams()
     {
         if (null === $this->_cookie) {
-            
+
             $cookie = $this->_request->getCookie(
                 self::COOKIE_PREFIX.$this->_appId
-            ); 
-            
+            );
+
             if (null === $cookie) {
                 return null;
             }
-            
+
             $cookie = substr(
                 $cookie,
                 1,
