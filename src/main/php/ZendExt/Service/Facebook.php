@@ -433,4 +433,40 @@ class ZendExt_Service_Facebook
 
         return Zend_Json::decode($res);
     }
+
+    /**
+     * Retrieves the signed request values.
+     *
+     * @return array
+     */
+    public function getSignedRequest() {
+        list($encoded_sig, $payload) = explode('.', $this->_request->getParam('signed_request'), 2);
+
+        // decode the data
+        $sig = $this->_base64UrlDecode($encoded_sig);
+        $data = json_decode($this->_base64UrlDecode($payload), true);
+
+        if (strtoupper($data['algorithm']) !== 'HMAC-SHA256') {
+            return null;
+        }
+
+        // check sig
+        $expected_sig = hash_hmac('sha256', $payload, $secret, $raw = true);
+        if ($sig !== $expected_sig) {
+            return null;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Internal function to decode signed requests.
+     *
+     * @param string $input The input to process.
+     *
+     * @return string
+     */
+    protected function _base64UrlDecode($input) {
+        return base64_decode(strtr($input, '-_', '+/'));
+    }
 }

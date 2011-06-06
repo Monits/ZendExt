@@ -42,7 +42,8 @@ class ZendExt_Tool
         $opts['generator|g=s'] = 'Which generator to use. Case sensitive.';
         $opts['help-s']        = 'Displays help message for the given '
                                    . 'generator if any given, otherwise '
-                                   . 'renders this message';
+                                   . 'renders basic info and list of valid '
+                                   . 'generators';
 
         return new ZendExt_Console_Getopt($opts);
     }
