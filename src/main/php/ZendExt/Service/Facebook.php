@@ -451,7 +451,7 @@ class ZendExt_Service_Facebook
         }
 
         // check sig
-        $expected_sig = hash_hmac('sha256', $payload, $secret, $raw = true);
+        $expected_sig = hash_hmac('sha256', $payload, $this->_apiSecret, $raw = true);
         if ($sig !== $expected_sig) {
             return null;
         }
