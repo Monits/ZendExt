@@ -175,8 +175,8 @@
         </dependency>
         <dependency>
         	<groupId>com.facebook</groupId>
-        	<artifactId>fbrest</artifactId>
-        	<version>0.1.0</version>
+        	<artifactId>graphapi</artifactId>
+        	<version>3.0.1</version>
         </dependency>
 	</dependencies>
 
