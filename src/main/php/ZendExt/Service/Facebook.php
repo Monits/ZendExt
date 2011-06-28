@@ -207,11 +207,11 @@ class ZendExt_Service_Facebook
         );
 
         if (null !== $link) {
-            $opts['link'] = urlencode($link);
+            $opts['link'] = $link;
         }
 
         if (null !== $picture) {
-            $opts['picture'] = urlencode($picture);
+            $opts['picture'] = $picture;
         }
 
         $this->_fb->api(
