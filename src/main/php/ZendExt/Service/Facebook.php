@@ -230,7 +230,7 @@ class ZendExt_Service_Facebook
      */
     public function getUserInfo($userId)
     {
-        $data = $this->_fb->api->api(
+        $data = $this->_fb->api(
             '/' . $userId
         );
 
