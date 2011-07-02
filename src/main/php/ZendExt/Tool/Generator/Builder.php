@@ -275,7 +275,7 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
                 return 'new Zend_Validate_Date('. PHP_EOL
                     . str_repeat(self::TAB, 4) . 'array(' . PHP_EOL
                     . str_repeat(self::TAB, 5)
-                    . "'format' => 'Y-m-d'" . PHP_EOL
+                    . "'format' => 'Y-M-d'" . PHP_EOL
                     . str_repeat(self::TAB, 4) . ')' . PHP_EOL
                     . str_repeat(self::TAB, 3) . ')';
 
@@ -330,7 +330,7 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
                 return 'date(\'c\')';
 
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_DATE:
-                return 'date(\'Y-m-d\')';
+                return 'date(\'Y-M-d\')';
 
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_TIME:
                 return 'date(\'h:i:s\')';
