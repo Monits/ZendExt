@@ -1,4 +1,4 @@
-g<?php
+<?php
 /**
  * Real multidb support with slaves and sharding per table.
  *
