@@ -189,14 +189,17 @@ class ZendExt_Service_Facebook
     /**
      * Post a message on the given wall (own by default).
      *
-     * @param string  $msg     The message to be posted.
-     * @param integer $userId  The id of the user on whose wall to post.
-     * @param string  $picture The picture associated with the post.
-     * @param string  $link    The link associated with the post.
+     * @param string  $msg      The message to be posted.
+     * @param integer $userId   The id of the user on whose wall to post.
+     * @param string  $picture  The picture associated with the post.
+     * @param string  $actions  The actions for this post.
+     * @param string  $link     The link associated with the post.
+     * @param string  $linkName The name of the link associated with the post.
      *
      * @return void
      */
-    public function postFeed($msg, $userId = null, $picture = null, $link = null)
+    public function postFeed($msg, $userId = null, $picture = null,
+        $actions = null, $link = null, $linkName = null)
     {
         if ($userId === null) {
             $userId = $this->getUserId();
@@ -206,8 +209,16 @@ class ZendExt_Service_Facebook
             'message' => $msg
         );
 
+        if (null !== $actions) {
+            $opts['actions'] = $actions;
+        }
+
         if (null !== $link) {
             $opts['link'] = $link;
+        }
+
+        if (null !== $linkName) {
+            $opts['name'] = $linkName;
         }
 
         if (null !== $picture) {
