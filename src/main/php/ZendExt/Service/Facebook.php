@@ -199,7 +199,7 @@ class ZendExt_Service_Facebook
      * @return void
      */
     public function postFeed($msg, $userId = null, $picture = null,
-        $actions = null, $link = null, $linkName = null)
+        $actions = null, $link = null, $linkName = null, $linkDescription = null)
     {
         if ($userId === null) {
             $userId = $this->getUserId();
@@ -219,6 +219,10 @@ class ZendExt_Service_Facebook
 
         if (null !== $linkName) {
             $opts['name'] = $linkName;
+        }
+
+        if (null !== $linkDescription) {
+            $opts['description'] = $linkDescription;
         }
 
         if (null !== $picture) {
