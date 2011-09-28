@@ -307,4 +307,22 @@ class ZendExt_Service_Facebook
     protected function _base64UrlDecode($input) {
         return base64_decode(strtr($input, '-_', '+/'));
     }
+  
+    /**
+     * Checks if the request is from an admin of the given page.
+     * 
+     * @param string $pageId The id of the facebook's page.
+     * 
+     * @return boolean
+     */
+    public function isPageAdmin($pageId)
+    {
+        $signedRequest = $this->getSignedRequest();
+        
+        if (isset($signedRequest['page']['admin'])) {
+            return ($signedRequest['page']['admin'] >= 1 ? true : false);
+        } else {
+            return null;
+        }
+    }
 }
