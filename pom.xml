@@ -17,7 +17,7 @@
     <licenses>
         <license>
             <name>New BSD</name>
-            <url>ihttp://www.opensource.org/licenses/BSD-3-Clause</url>
+            <url>http://www.opensource.org/licenses/BSD-3-Clause</url>
             <distribution>repo</distribution>
             <comments>A business-friendly OSS license</comments>
         </license>
