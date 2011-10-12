@@ -2,6 +2,8 @@
 
 Copyright 2011 Monits.
 
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use this work except in compliance with the License. You may obtain a copy of the License at:
+ZendExt is released under two licenses: Apache2 and New BSD License. You may pick the license that best suits your development code. You may obtain a copy of the Licenses at the LICENSE file or at:
 
 http://www.apache.org/licenses/LICENSE-2.0
+
+http://www.opensource.org/licenses/BSD-3-Clause
