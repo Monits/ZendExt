@@ -55,6 +55,15 @@
 			<url>http://nexus.monits.com/content/repositories/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
+
+	<repositories>
+		<repository>
+			<id>thirdparty</id>
+			<url>http://nexus.monits.com/content/repositories/thirdparty/</url>
+			<name>3rd party</name>
+		</repository>
+	</repositories>
+
 	<build>
 		<plugins>
 			<plugin>
