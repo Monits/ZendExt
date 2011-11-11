@@ -233,14 +233,14 @@ abstract class ZendExt_Db_Dao_Abstract
      *
      * @return Zend_Db_Statement_Interface The statement for the executed query.
      */
-    protected function _selectForAllShards($sql, array $bind = array())
+    protected function _queryForAllShards($sql, array $bind = array())
     {
         $shards = array();
 
         if (null !== self::$_config) {
             $shards = self::$_config->getAllShardIdsForTable(
                 $this->_tableClass,
-                ZendExt_Application_Resource_Multidb::OPERATION_READ
+                ZendExt_Application_Resource_Multidb::OPERATION_WRITE
             );
         }
 
@@ -306,7 +306,7 @@ abstract class ZendExt_Db_Dao_Abstract
         }
 
         $stmts = array();
-        foreach ($adapter as $adapter) {
+        foreach ($adapters as $adapter) {
             $stmts[] = $adapter->query($sql, $bind);
         }
 
