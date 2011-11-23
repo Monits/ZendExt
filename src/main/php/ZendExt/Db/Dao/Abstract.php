@@ -240,7 +240,7 @@ abstract class ZendExt_Db_Dao_Abstract
         if (null !== self::$_config) {
             $shards = self::$_config->getAllShardIdsForTable(
                 $this->_tableClass,
-                ZendExt_Application_Resource_Multidb::OPERATION_READ
+                ZendExt_Application_Resource_Multidb::OPERATION_WRITE
             );
         }
 
