@@ -256,7 +256,7 @@ final class ZendExt_Cron_Manager
     private function _getProcessNameByPid($pid)
     {
         foreach ($this->_forked as $name => $processId) {
-            if ($pid == $this->_forked[$name]) {
+            if ($pid === $processId) {
                 return $name;
             }
         }
