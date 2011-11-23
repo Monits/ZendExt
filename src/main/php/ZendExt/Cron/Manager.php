@@ -230,7 +230,40 @@ final class ZendExt_Cron_Manager
 
         return true;
     }
-
+    
+    /**
+     * Waits for any child process.
+     * 
+     * @return string|boolean The process name on success or false on error
+     */
+    public function waitForAny()
+    {
+        $ret = pcntl_wait($status);
+        if ($ret == -1 || $ret == 0) {
+            return false;
+        }
+        
+        return $this->_getProcessNameByPid($ret);
+    }
+    
+    /**
+     * Retrieves the process name with the given pid.
+     * 
+     * @param string $pid The process ID.
+     * 
+     * @return string|boolean The process name of the pid. Otherwise false.
+     */
+    private function _getProcessNameByPid($pid)
+    {
+        foreach ($this->_forked as $name => $processId) {
+            if ($pid == $this->_forked[$name]) {
+                return $name;
+            }
+        }
+        
+        return false;
+    }
+        
     /**
      * Load a process.
      *
