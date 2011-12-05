@@ -243,7 +243,12 @@ final class ZendExt_Cron_Manager
             return false;
         }
         
-        return $this->_getProcessNameByPid($ret);
+        $name = $this->_getProcessNameByPid($ret);
+
+        // Remove it from the forked child list
+        unset($this->_forked[$name]);
+
+        return $name;
     }
     
     /**
