@@ -326,7 +326,7 @@ final class ZendExt_Cron_Manager
             $process->execute();
         } catch ( ZendExt_Cron_LockException $e ) {
 
-            $this->_log($e->getMessage(), 'crit');
+            $this->_log($e->getMessage(), 'warn');
         } catch ( ZendExt_Cron_ErrorException $e ) {
 
             $this->_log($e->getMessage(), 'crit');
