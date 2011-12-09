@@ -15,11 +15,12 @@
     </organization>
 
     <licenses>
-      <license>
-        <name>GPL 3</name>
-        <url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
-        <distribution>repo</distribution>
-      </license>
+        <license>
+            <name>New BSD</name>
+            <url>http://www.opensource.org/licenses/BSD-3-Clause</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
       <license>
         <name>Apache 2</name>
         <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
@@ -54,6 +55,15 @@
 			<url>http://nexus.monits.com/content/repositories/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
+
+	<repositories>
+		<repository>
+			<id>thirdparty</id>
+			<url>http://nexus.monits.com/content/repositories/thirdparty/</url>
+			<name>3rd party</name>
+		</repository>
+	</repositories>
+
 	<build>
 		<plugins>
 			<plugin>

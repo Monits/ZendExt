@@ -1,11 +1,17 @@
 <?php
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
+
 /**
  * Test case for Multidb resource plugin.
  *
  * @category  ZendExt
  * @package   ZendExt_Application_Resource
- * @copyright 2010 Monits
- * @license   Copyright (C) 2010. All rights reserved.
+ * @copyright 2011 Monits
+ * @license   Copyright (C) 2011. All rights reserved.
  * @version   Release: 1.0.0
  * @link      http://www.zendext.com/
  * @since     1.0.0
@@ -17,8 +23,8 @@
  * @category  ZendExt
  * @package   ZendExt_Application_Resource
  * @author    jsotuyod <jmsotuyo@monits.com>
- * @copyright 2010 Monits
- * @license   Copyright 2010. All rights reserved.
+ * @copyright 2011 Monits
+ * @license   Copyright 2011. All rights reserved.
  * @version   Release: 1.0.0
  * @link      http://www.zendext.com/
  * @since     1.0.0

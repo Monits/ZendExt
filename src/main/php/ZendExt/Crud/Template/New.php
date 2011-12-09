@@ -1,11 +1,17 @@
 <?php
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
+
 /**
  * New crud template.
  *
  * @category  ZendExt
  * @package   ZendExt_Crud_Template
- * @copyright 2010 Monits
- * @license   Copyright (C) 2010. All rights reserved.
+ * @copyright 2011 Monits
+ * @license   Copyright (C) 2011. All rights reserved.
  * @version   Release: 1.0.0
  * @link      http://www.monits.com/
  * @since     1.0.0
@@ -17,8 +23,8 @@
  * @category  ZendExt
  * @package   ZendExt_Crud_Template
  * @author    lbritez <lbritez@monits.com>
- * @copyright 2010 Monits
- * @license   Copyright 2010. All rights reserved.
+ * @copyright 2011 Monits
+ * @license   Copyright 2011. All rights reserved.
  * @version   Release: 1.0.0
  * @link      http://www.monits.com/
  * @since     1.0.0

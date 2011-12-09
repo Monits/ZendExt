@@ -1,11 +1,17 @@
 <?php
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
+
 /**
  * Manager for cron process.
  *
  * @category  ZendExt
  * @package   ZendExt_Cron
- * @copyright 2010 Monits
- * @license   Copyright (C) 2010. All rights reserved.
+ * @copyright 2011 Monits
+ * @license   Copyright (C) 2011. All rights reserved.
  * @version   Release: 1.0.0
  * @link      http://www.zendext.com/
  * @since     1.0.0
@@ -17,8 +23,8 @@
  * @category  ZendExt
  * @package   ZendExt_Cron
  * @author    jpcivile <jpcivile@monits.com>
- * @copyright 2010 Monits
- * @license   Copyright 2010. All rights reserved.
+ * @copyright 2011 Monits
+ * @license   Copyright 2011. All rights reserved.
  * @version   Release: 1.0.0
  * @link      http://www.zendext.com/
  * @since     1.0.0
@@ -224,7 +230,45 @@ final class ZendExt_Cron_Manager
 
         return true;
     }
+    
+    /**
+     * Waits for any child process.
+     * 
+     * @return string|boolean The process name on success or false on error
+     */
+    public function waitForAny()
+    {
+        $ret = pcntl_wait($status);
+        if ($ret == -1 || $ret == 0) {
+            return false;
+        }
+        
+        $name = $this->_getProcessNameByPid($ret);
 
+        // Remove it from the forked child list
+        unset($this->_forked[$name]);
+
+        return $name;
+    }
+    
+    /**
+     * Retrieves the process name with the given pid.
+     * 
+     * @param string $pid The process ID.
+     * 
+     * @return string|boolean The process name of the pid. Otherwise false.
+     */
+    private function _getProcessNameByPid($pid)
+    {
+        foreach ($this->_forked as $name => $processId) {
+            if ($pid === $processId) {
+                return $name;
+            }
+        }
+        
+        return false;
+    }
+        
     /**
      * Load a process.
      *

@@ -1,11 +1,17 @@
 <?php
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
+
 /**
  * Abstract DAO implementation.
  *
  * @category  ZendExt
  * @package   ZendExt_Db_Dao
  * @copyright 2010 Juan Sotuyo
- * @license   Copyright (C) 2010. All rights reserved.
+ * @license   Copyright (C) 2011. All rights reserved.
  * @version   Release: 1.0.0
  * @link      http://www.zendext.com/
  * @since     1.0.0
@@ -18,7 +24,7 @@
  * @package   ZendExt_Db_Dao
  * @author    jsotuyod <juansotuyo@gmail.com>
  * @copyright 2010 Juan Sotuyo
- * @license   Copyright 2010. All rights reserved.
+ * @license   Copyright 2011. All rights reserved.
  * @version   Release: 1.0.0
  * @link      http://www.zendext.com/
  * @since     1.0.0
@@ -217,6 +223,94 @@ abstract class ZendExt_Db_Dao_Abstract
         }
 
         return $select;
+    }
+
+    /**
+     * Executes the given query for all shards.
+     *
+     * @param string $sql    The query.
+     * @param array  $bind   An array of data to bind to the placeholders.
+     *
+     * @return Zend_Db_Statement_Interface The statement for the executed query.
+     */
+    protected function _queryForAllShards($sql, array $bind = array())
+    {
+        $shards = array();
+
+        if (null !== self::$_config) {
+            $shards = self::$_config->getAllShardIdsForTable(
+                $this->_tableClass,
+                ZendExt_Application_Resource_Multidb::OPERATION_WRITE
+            );
+        }
+
+        return $this->_queryForShards($shards, $sql, $bind);
+    }
+
+    /**
+     * Executes the given query.
+     *
+     * @param array  $shardingArgs The values for which the query
+     *                                   will be executed.
+     * @param string $sql    The query.
+     * @param array  $bind   An array of data to bind to the placeholders.
+     *
+     * @return Zend_Db_Statement_Interface The statement for the executed query.
+     */
+    protected function _queryForShardWithValues(array $shardingArgs,
+                        $sql, array $bind = array())
+    {
+        $shards = array();
+
+        if (null !== self::$_config) {
+            $shards = array_keys(
+                self::$_config->getShardsForValues(
+                    $this->_tableClass, $shardingArgs
+                )
+            );
+        }
+
+        return $this->_queryForShards($shards, $sql, $bind);
+    }
+
+    /**
+     * Executes the given query.
+     *
+     * @param array  $shards The shards on which to execute the query.
+     * @param string $sql    The query.
+     * @param array  $bind   An array of data to bind to the placeholders.
+     *
+     * @return Zend_Db_Statement_Interface The statement for the executed query.
+     */
+    protected function _queryForShards(array $shards, $sql, array $bind = array())
+    {
+        // If no config, go to default adapter - no sharding
+        if (null === self::$_config) {
+            return $this->_getTableForDefaultAdapter()->getAdapter()->query($sql, $bind);
+        }
+
+        $adapters = array();
+
+        // Get the appropiate shard
+        if (null === self::$_config) {
+            // No sharding config, go to the default adapter
+            $adapters[] = $this->_getTableForDefaultAdapter();
+        } else {
+            foreach ($shards as $shard) {
+                $adapters[] = self::$_config->getAdapterForTableShard(
+                    $this->_tableClass,
+                    $shard,
+                    ZendExt_Application_Resource_Multidb::OPERATION_WRITE
+                );
+            }
+        }
+
+        $stmts = array();
+        foreach ($adapters as $adapter) {
+            $stmts[] = $adapter->query($sql, $bind);
+        }
+
+        return new ZendExt_Db_Dao_Statement($stmts);
     }
 
     /**
