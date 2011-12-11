@@ -192,8 +192,8 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
         $docParams = new Zend_CodeGenerator_Php_Docblock_Tag_Param(
             array(
                 'paramName'   => self::CONSTRUCT_PARAM,
-                'datatype'    => 'array|Zend_Db_Table_Row',
-                'description' => 'The user data.'
+                'datatype'    => 'array',
+                'description' => 'The model data.'
             )
         );
 
@@ -235,24 +235,12 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
             );
             $body .= $this->_indent()
                     . "\$this->_{$name} = "
-                    . '$' . self::CONSTRUCT_PARAM . "['{$name}'];"
+                    . '$' . self::CONSTRUCT_PARAM . "['{$k}'];"
                     . PHP_EOL;
 
         };
 
-        $body .= '} else if ($' . self::CONSTRUCT_PARAM
-                . ' instanceof Zend_Db_Table_Row) {' . PHP_EOL;
-
-        foreach ($this->_schema[$table] as $k => $column) {
-            $name = $this->_getCamelCased(
-                $this->_removeColumnPrefix($k, $this->_opts->prefix)
-            );
-            $body .= $this->_indent()
-                    . "\$this->_{$name} = "
-                    . '$' . self::CONSTRUCT_PARAM . "->{$k};" . PHP_EOL;
-        };
-
-        $body .= '} else {' . PHP_EOL;
+            $body .= '} else {' . PHP_EOL;
         $body .= $this->_indent() . 'throw new Exception(' . PHP_EOL;
         $body .= $this->_indent(2)
                 . "'Can not create model instance from the given value.'"
