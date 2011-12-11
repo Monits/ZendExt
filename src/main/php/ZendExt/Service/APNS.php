@@ -84,7 +84,7 @@ class ZendExt_Service_APNS
             $json = $message->serialize();
             
             foreach ($tokens as $token) {
-                $msg = chr(0) . pack('n', 32) . pack('H*', $token) . pack('n', strlen($json)) . $json;
+                $msg = chr(0) . pack('nH*n', 32, $token, strlen($json)) . $json;
                 $fwrite = fwrite($fd, $msg);
                 if (!$fwrite) {
                     throw new ZendExt_Service_APNS_CommunicationException();
