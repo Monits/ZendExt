@@ -29,17 +29,17 @@
     </licenses>
 
     <scm>
-      <developerConnection>scm:svn:http://svn.monits.com/ZendExt/trunk</developerConnection>
-      <url>http://svn.monits.com/ZendExt/trunk</url>
-      <!-- TODO : Change this andd add <connection> with public url -->
+      <developerConnection>scm:git@github.com:Monits/ZendExt.git</developerConnection>
+      <url>https://github.com/Monits/ZendExt</url>
+      <connection>scm:git://github.com/Monits/ZendExt.git</connection>
     </scm>
     <issueManagement>
       <system>Mantis BugTracker</system>
       <url>http://mantis.monits.com/</url>
     </issueManagement>
     <ciManagement>
-      <system>Hudson</system>
-      <url>http://hudson.monits.com/hudson</url>
+      <system>Jenkins</system>
+      <url>http://jenkins.monits.com/</url>
     </ciManagement>
 	
 	<properties>
