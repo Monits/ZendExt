@@ -39,6 +39,8 @@ class ZendExt_Service_APNS
     
     private $_certificatePath;
     
+    private $_passphrase;
+    
     private $_sandbox;
     
     /**
@@ -48,11 +50,15 @@ class ZendExt_Service_APNS
      *                                to connect to APNS. MUST be a pem file.
      * @param string $sandbox         Wether if the certificate is for sandbox
      *                                usage or not.
+     * @param string $passphrase      The passphrase with which the certificate
+     *                                was encoded.
      */
-    public function __construct($certificatePath, $sandbox = false)
+    public function __construct($certificatePath, $sandbox = false,
+                                $passphrase = null)
     {
         $this->_certificatePath = $certificatePath;
         $this->_sandbox = $sandbox;
+        $this->_passphrase = $passphrase;
     }
 
     /**
@@ -73,6 +79,11 @@ class ZendExt_Service_APNS
         
         $ctx = stream_context_create();
         stream_context_set_option($ctx, 'ssl', 'local_cert', $this->_certificatePath);
+        
+        // Do we need a passhphrase?
+        if (null !== $this->_passphrase) {
+        	stream_context_set_option($ctx, 'ssl', 'passphrase', $this->_passphrase);
+        }
         
         $pushUrl = $this->_sandbox ? self::SANDBOX_PUSH_URL : self::PRODUCTION_PUSH_URL;
         
@@ -105,6 +116,11 @@ class ZendExt_Service_APNS
         $ctx = stream_context_create();
         stream_context_set_option($ctx, 'ssl', 'local_cert', $this->_certificatePath);
         stream_context_set_option($ctx, 'ssl', 'verify_peer', false);
+        
+        // Do we need a passhphrase?
+        if (null !== $this->_passphrase) {
+        	stream_context_set_option($ctx, 'ssl', 'passphrase', $this->_passphrase);
+        }
         
         $feedbackUrl = $this->_sandbox ? self::SANDBOX_FEEDBACK_URL : self::PRODUCTION_FEEDBACK_URL;
         
