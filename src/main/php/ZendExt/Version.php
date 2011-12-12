@@ -7,9 +7,9 @@
  * @package   ZendExt
  * @copyright 2011 Monits
  * @license   Copyright (C) 2011. All rights reserved.
- * @version   Release: 1.0.0
- * @link      http://www.zendext.com/
- * @since     1.0.0
+ * @version   Release: 1.6.0
+ * @link      http://www.monits.com/
+ * @since     1.6.0
  */
 
 /*
@@ -25,9 +25,9 @@
  * @author    Juan Martín Sotuyo Dodero <jmsotuyo@monits.com>
  * @copyright 2011 Monits
  * @license   Copyright 2011. All rights reserved.
- * @version   Release: 1.0.0
- * @link      http://www.zendext.com/
- * @since     1.0.0
+ * @version   Release: 1.6.0
+ * @link      http://www.monits.com/
+ * @since     1.6.0
  */
 final class ZendExt_Version
 {

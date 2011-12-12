@@ -7,7 +7,7 @@
  * @copyright 2011 Monits
  * @license   Copyright (C) 2011. All rights reserved
  * @version   Release: 1.5.0
- * @link      http://www.monits.com
+ * @link      http://www.monits.com/
  * @since     1.5.0
  */
 
