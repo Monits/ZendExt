@@ -1,0 +1,7 @@
+<phpunit>
+  <filter>
+    <blacklist>
+      <directory suffix=".php">target/phpinc/</directory>
+    </blacklist>
+  </filter>
+</phpunit>

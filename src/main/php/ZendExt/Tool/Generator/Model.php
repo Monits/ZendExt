@@ -193,7 +193,7 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
             array(
                 'paramName'   => self::CONSTRUCT_PARAM,
                 'datatype'    => 'array|Zend_Db_Table_Row',
-                'description' => 'The user data.'
+                'description' => 'The model data.'
             )
         );
 
@@ -235,10 +235,9 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
             );
             $body .= $this->_indent()
                     . "\$this->_{$name} = "
-                    . '$' . self::CONSTRUCT_PARAM . "['{$name}'];"
+                    . '$' . self::CONSTRUCT_PARAM . "['{$k}'];"
                     . PHP_EOL;
-
-        };
+        }
 
         $body .= '} else if ($' . self::CONSTRUCT_PARAM
                 . ' instanceof Zend_Db_Table_Row) {' . PHP_EOL;
@@ -250,7 +249,7 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
             $body .= $this->_indent()
                     . "\$this->_{$name} = "
                     . '$' . self::CONSTRUCT_PARAM . "->{$k};" . PHP_EOL;
-        };
+        }
 
         $body .= '} else {' . PHP_EOL;
         $body .= $this->_indent() . 'throw new Exception(' . PHP_EOL;
