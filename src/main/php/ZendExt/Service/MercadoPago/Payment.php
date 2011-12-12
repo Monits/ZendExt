@@ -1,10 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
-
 /**
  * Wrapper for Mercado Pago state update requests.
  *
@@ -17,6 +11,11 @@
  * @since     1.3.0
  */
 
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 /**
  * Wrapper for Mercado Pago state update requests.
  *

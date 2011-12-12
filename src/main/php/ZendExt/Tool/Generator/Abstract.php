@@ -1,10 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
-
 /**
  * Abstract code generator.
  *
@@ -17,6 +11,11 @@
  * @since     1.3.0
  */
 
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 /**
  * Abstract code generator.
  *
@@ -122,9 +121,8 @@ abstract class ZendExt_Tool_Generator_Abstract
         if ($this->_requiresSchema) {
             if ($opts->dbname === null || $opts->username === null
                 || $opts->adapter === null || $opts->password === null) {
-
-                    throw new ZendExt_Tool_Generator_Exception(
-                        'All database options are required.'
+                throw new ZendExt_Tool_Generator_Exception(
+                    'All database options are required.'
                 );
             }
         }
@@ -135,14 +133,16 @@ abstract class ZendExt_Tool_Generator_Abstract
         if ($this->_requiresSchema) {
             $this->_getLogger()->debug('Schema required, getting it');
 
-            $desc = new ZendExt_Db_Schema(array(
-                'host' => $this->_opts->host === null ?
-                    'localhost' : $this->_opts->host,
-                'dbname' => $this->_opts->dbname,
-                'username' => $this->_opts->username,
-                'password' => $this->_opts->password,
-                'adapter' => $this->_opts->adapter
-            ));
+            $desc = new ZendExt_Db_Schema(
+                array(
+                    'host' => $this->_opts->host === null ?
+                        'localhost' : $this->_opts->host,
+                    'dbname' => $this->_opts->dbname,
+                    'username' => $this->_opts->username,
+                    'password' => $this->_opts->password,
+                    'adapter' => $this->_opts->adapter
+                )
+            );
 
             foreach ($desc->listTables() as $table) {
                 $this->_schema[$table] = $desc->describeTable($table);

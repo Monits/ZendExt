@@ -1,9 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
 
 /**
  * Base class to retrieve and check the version of ZendExt.
@@ -17,6 +12,11 @@
  * @since     1.0.0
  */
 
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 /**
  * Base class to retrieve and check the version of ZendExt.
  *
@@ -37,7 +37,8 @@ final class ZendExt_Version
      * Compare the specified ZendExt version string $version
      * with the current ZendExt_Version::VERSION of ZendExt.
      *
-     * @param  string  $version  A version string (e.g. "0.7.1").
+     * @param  string $version  A version string (e.g. "0.7.1").
+     * 
      * @return boolean           -1 if the $version is older,
      *                           0 if they are the same,
      *                           and +1 if $version is newer.

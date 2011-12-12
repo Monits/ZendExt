@@ -1,10 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
-
 /**
  * Session save handler using memcache as backend.
  *
@@ -17,6 +11,11 @@
  * @since     1.3.0
  */
 
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 /**
  * Session save handler using memcache as backend.
  *
@@ -68,7 +67,8 @@ class ZendExt_Session_SaveHandler_Memcached extends Zend_Cache_Backend_Memcached
             $config = $config->toArray();
         } else if (!is_array($config)) {
             throw new Zend_Session_SaveHandler_Exception(
-                '$config must be an instance of Zend_Config or array');
+                '$config must be an instance of Zend_Config or array'
+            );
         }
 
         $parentConfig = array();

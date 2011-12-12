@@ -1,10 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
-
 /**
  * Tables code generator.
  *
@@ -17,6 +11,11 @@
  * @since     1.3.0
  */
 
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 /**
  * Tables code generator.
  *
@@ -77,7 +76,7 @@ class ZendExt_Tool_Generator_Table extends ZendExt_Tool_Generator_Abstract
      *
      * @return void
      */
-    public function _generateTable($table)
+    private function _generateTable($table)
     {
         if (!isset($this->_schema[$table])) {
             throw new ZendExt_Tool_Generator_Exception(

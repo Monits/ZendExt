@@ -1,10 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
-
 /**
  * Zend_Paginator adapter for ZendExt_Db_Dao_Select.
  *
@@ -17,6 +11,11 @@
  * @since     1.0.0
  */
 
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 /**
  * Zend_Paginator adapter for ZendExt_Db_Dao_Select.
  *
@@ -107,17 +106,20 @@ class ZendExt_Paginator_Adapter_DbDaoSelect
 
             $rowCountColumn = self::ROW_COUNT_COLUMN;
 
-            // The select query can contain only one column, which should be the row count column
+//          The select query can contain only one column, 
+//          which should be the row count column
             if (false === strpos($countColumnPart, $rowCountColumn)) {
                 /**
                  * @see Zend_Paginator_Exception
                  */
-                throw new Zend_Paginator_Exception('Row count column not found');
+                throw new Zend_Paginator_Exception(
+                    'Row count column not found'
+                );
             }
 
             $queries = $rowCount->query(Zend_Db::FETCH_ASSOC);
 
-            // Compute the total row count per shard
+//          Compute the total row count per shard
             $this->_rowCountPerShard = array();
             foreach ($queries as $query) {
                 $result = $query->fetch();
@@ -143,8 +145,9 @@ class ZendExt_Paginator_Adapter_DbDaoSelect
     /**
      * Returns an array of items for a page.
      *
-     * @param  integer $offset Page offset
-     * @param  integer $itemCountPerPage Number of items per page
+     * @param  integer $offset Page offset.
+     * @param  integer $itemCountPerPage Number of items per page.
+     * 
      * @return array
      */
     public function getItems($offset, $itemCountPerPage)
@@ -188,7 +191,8 @@ class ZendExt_Paginator_Adapter_DbDaoSelect
     /**
      * Get the COUNT select object for the provided query
      *
-     * TODO: Have a look at queries that have both GROUP BY and DISTINCT specified.
+     * TODO: Have a look at queries that have both GROUP BY 
+     * and DISTINCT specified.
      * In that use-case I'm expecting problems when either GROUP BY or DISTINCT
      * has one column.
      *

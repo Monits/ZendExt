@@ -1,10 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
-
 /**
  * List crud template.
  *
@@ -17,6 +11,11 @@
  * @since     1.0.0
  */
 
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 /**
  * List crud template.
  *
@@ -38,9 +37,9 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
     /**
      * Crud template construct.
      *
-     * @param Zend_View $view The view
-     * @param array  $translatedList Array with the buttons and titles  
-     * 	                             of the list template translated
+     * @param Zend_View $view           The view
+     * @param array     $translatedList Array with the buttons and titles  
+     * 	                                of the list template translated
      * 
      * @return void
      */
@@ -123,7 +122,8 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
                     '' : "/ipp/{$this->_view->paginator->getItemCountPerPage()}"
             );
             echo '">';
-            echo (isset($this->_view->viewMap[$col]) ? $this->_view->viewMap[$col] : $field);
+            echo (isset($this->_view->viewMap[$col]) ? 
+                $this->_view->viewMap[$col] : $field);
             echo '</a>';
             echo '</th>';
         }

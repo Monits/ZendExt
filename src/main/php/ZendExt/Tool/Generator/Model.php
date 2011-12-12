@@ -1,10 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
-
 /**
  * Models code generator.
  *
@@ -17,6 +11,11 @@
  * @since     1.3.0
  */
 
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 /**
  * Models code generator.
  *
@@ -294,9 +293,9 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
         $method->setBody('return $this->_' . $name . ';');
 
         $docReturnTag = new Zend_CodeGenerator_Php_Docblock_Tag_Return(
-             array(
+            array(
                 'datatype' => $type
-             )
+            )
         );
 
         $docblock = new Zend_CodeGenerator_Php_Docblock(

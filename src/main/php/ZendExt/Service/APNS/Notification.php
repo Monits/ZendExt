@@ -1,10 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
-
 /**
  * APN service notification model.
  *
@@ -17,6 +11,11 @@
  * @since     1.0.0
  */
 
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 /**
  * APN service exception.
  *
@@ -31,7 +30,8 @@
  */
 class ZendExt_Service_APNS_Notification
 {
-    // TODO : Support launch-image. Check how it behaves when set on pre-iOS4 devices...
+    // TODO : Support launch-image. 
+    //        Check how it behaves when set on pre-iOS4 devices...
     private $_alertMessage;
     private $_alertActionLocKey;
     private $_alertLocKey;

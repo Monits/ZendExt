@@ -1,9 +1,4 @@
 <?php
-/*
- *  Copyright 2011, Monits, S.A.
- *  Released under the Apache 2 and New BSD Licenses.
- *  More information: https://github.com/Monits/ZendExt/
- */
 
 /**
  * Wraps several statements as one, allowing to be used in DAOs.
@@ -28,6 +23,11 @@
  * @version   Release: 1.0.0
  * @link      http://www.zendext.com/
  * @since     1.0.0
+ */
+/*
+ *  Copyright 2011, Monits, S.A.
+ *  Released under the Apache 2 and New BSD Licenses.
+ *  More information: https://github.com/Monits/ZendExt/
  */
 class ZendExt_Db_Dao_Statement implements Zend_Db_Statement_Interface
 {
@@ -54,8 +54,10 @@ class ZendExt_Db_Dao_Statement implements Zend_Db_Statement_Interface
      *
      * @param string $column Name the column in the result set, either by
      *                       position or by name.
-     * @param mixed  $param  Reference to the PHP variable containing the value.
+     * @param mixed  $param  Reference to the PHP variable 
+     * 	                     containing the value.
      * @param mixed  $type   OPTIONAL
+     * 
      * @return bool
      * @throws Zend_Db_Statement_Exception
      */
@@ -78,15 +80,18 @@ class ZendExt_Db_Dao_Statement implements Zend_Db_Statement_Interface
      * @param mixed $type      OPTIONAL Datatype of SQL parameter.
      * @param mixed $length    OPTIONAL Length of SQL parameter.
      * @param mixed $options   OPTIONAL Other options.
+     * 
      * @return bool
      * @throws Zend_Db_Statement_Exception
      */
-    public function bindParam($parameter, &$variable, $type = null, $length = null, $options = null)
+    public function bindParam($parameter, &$variable, $type = null, 
+        $length = null, $options = null)
     {
         $ret = true;
 
         foreach ($this->_statements as $stmt) {
-            $ret = $ret && $stmt->bindParam($parameter, $variable, $type, $length, $options);
+            $ret = $ret && $stmt->
+                bindParam($parameter, $variable, $type, $length, $options);
         }
 
         return $ret;
@@ -98,6 +103,7 @@ class ZendExt_Db_Dao_Statement implements Zend_Db_Statement_Interface
      * @param mixed $parameter Name the parameter, either integer or string.
      * @param mixed $value     Scalar value to bind to the parameter.
      * @param mixed $type      OPTIONAL Datatype of the parameter.
+     * 
      * @return bool
      * @throws Zend_Db_Statement_Exception
      */
@@ -179,8 +185,8 @@ class ZendExt_Db_Dao_Statement implements Zend_Db_Statement_Interface
         foreach ($this->_statements as $stmt) {
             $errorInfo = $stmt->errorInfo();
 
-            if (!empty($errorInfo)) {
                 return $errorInfo;
+            if (!empty($errorInfo)) {
             }
         }
 
@@ -191,6 +197,7 @@ class ZendExt_Db_Dao_Statement implements Zend_Db_Statement_Interface
      * Executes a prepared statement.
      *
      * @param array $params OPTIONAL Values to bind to parameter placeholders.
+     * 
      * @return bool
      * @throws Zend_Db_Statement_Exception
      */
@@ -211,6 +218,7 @@ class ZendExt_Db_Dao_Statement implements Zend_Db_Statement_Interface
      * @param int $style  OPTIONAL Fetch mode for this fetch operation.
      * @param int $cursor OPTIONAL Absolute, relative, or other.
      * @param int $offset OPTIONAL Number for absolute or relative cursors.
+     * 
      * @return mixed Array, object, or scalar depending on fetch mode.
      * @throws Zend_Db_Statement_Exception
      */
@@ -232,6 +240,7 @@ class ZendExt_Db_Dao_Statement implements Zend_Db_Statement_Interface
      *
      * @param int $style OPTIONAL Fetch mode.
      * @param int $col   OPTIONAL Column number, if fetch mode is by column.
+     * 
      * @return array Collection of rows, each in a format by the fetch mode.
      * @throws Zend_Db_Statement_Exception
      */
@@ -250,6 +259,7 @@ class ZendExt_Db_Dao_Statement implements Zend_Db_Statement_Interface
      * Returns a single column from the next row of a result set.
      *
      * @param int $col OPTIONAL Position of the column to fetch.
+     * 
      * @return string
      * @throws Zend_Db_Statement_Exception
      */
@@ -270,6 +280,7 @@ class ZendExt_Db_Dao_Statement implements Zend_Db_Statement_Interface
      *
      * @param string $class  OPTIONAL Name of the class to create.
      * @param array  $config OPTIONAL Constructor arguments for the class.
+     * 
      * @return mixed One object instance of the specified class.
      * @throws Zend_Db_Statement_Exception
      */
@@ -289,6 +300,7 @@ class ZendExt_Db_Dao_Statement implements Zend_Db_Statement_Interface
      * Retrieve a statement attribute.
      *
      * @param string $key Attribute name.
+     * 	
      * @return mixed      Attribute value.
      * @throws Zend_Db_Statement_Exception
      */
@@ -344,6 +356,7 @@ class ZendExt_Db_Dao_Statement implements Zend_Db_Statement_Interface
      *
      * @param string $key Attribute name.
      * @param mixed  $val Attribute value.
+     * 
      * @return bool
      * @throws Zend_Db_Statement_Exception
      */
@@ -361,7 +374,8 @@ class ZendExt_Db_Dao_Statement implements Zend_Db_Statement_Interface
     /**
      * Set the default fetch mode for this statement.
      *
-     * @param int   $mode The fetch mode.
+     * @param int $mode The fetch mode.
+     * 
      * @return bool
      * @throws Zend_Db_Statement_Exception
      */

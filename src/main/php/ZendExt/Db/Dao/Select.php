@@ -1,9 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
 
 /**
  * Custom select for DAOs.
@@ -29,6 +24,11 @@
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
 {
     /*
@@ -347,7 +347,9 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      *
      * @return ZendExt_Db_Dao_Select This ZendExt_Db_Dao_Select object.
      */
-    public function _joinUsing($type, $name, $cond, $cols = '*', $schema = null)
+    public function _joinUsing($type, $name, $cond, $cols = '*', 
+        $schema = null
+    )
     {
         $this->_calls[] = array(
             self::CALL_METHOD    => __FUNCTION__,
@@ -408,7 +410,9 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
             if (isset($this->_tables[0])) {
                 $this->setTable($this->_tables[0]);
             } else {
-                throw new ZendExt_Db_Dao_Select_Exception('No tables were set!');
+                throw new ZendExt_Db_Dao_Select_Exception(
+                    'No tables were set!'
+                );
             }
         }
 

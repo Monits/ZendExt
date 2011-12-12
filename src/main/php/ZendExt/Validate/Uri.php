@@ -1,10 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
-
 /**
  * Uri validator.
  *
@@ -17,6 +11,11 @@
  * @since     1.3.0
  */
 
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 /**
  * Uri validator.
  *
@@ -34,8 +33,8 @@ class ZendExt_Validate_Uri extends Zend_Validate_Abstract
     const INVALID_URI = 'invalidUri';
 
     protected $_messageTemplates = array(
-        self::INVALID_URI   => "'%value%' is not a valid URI.
-            Remember to start with http:// or https://",
+        self::INVALID_URI   => '"%value%" is not a valid URI.
+            Remember to start with http:// or https://',
     );
 
     /**

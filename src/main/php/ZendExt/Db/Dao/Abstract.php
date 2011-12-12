@@ -1,10 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
-
 /**
  * Abstract DAO implementation.
  *
@@ -17,6 +11,11 @@
  * @since     1.0.0
  */
 
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 /**
  * Abstract DAO implementation.
  *
@@ -51,7 +50,8 @@ abstract class ZendExt_Db_Dao_Abstract
     /**
      * Class constructor.
      *
-     * @param ZendExt_Db_Dao_Hydrator_Interface $hydrator The hydrator to apply to queries.
+     * @param ZendExt_Db_Dao_Hydrator_Interface $hydrator The hydrator 
+     *                                                    to apply to queries.
      *
      * @return ZendExt_Db_Dao_Abstract
      */
@@ -148,7 +148,9 @@ abstract class ZendExt_Db_Dao_Abstract
      *
      * @return ZendExt_Db_Dao_Select
      */
-    protected function _selectForAllShards($withFromPart = self::SELECT_WITHOUT_FROM_PART)
+    protected function _selectForAllShards(
+        $withFromPart = self::SELECT_WITHOUT_FROM_PART
+    )
     {
         $shards = array();
 
@@ -167,8 +169,8 @@ abstract class ZendExt_Db_Dao_Abstract
      *
      * @param array $shardingArgs The values for which the query
      *                            will be executed.
-     * @param bool $withFromPart Whether or not to include the from part of
-     *                           the select based on the table
+     * @param bool  $withFromPart Whether or not to include the from part of
+     *                            the select based on the table.
      *
      * @return ZendExt_Db_Dao_Select
      */
@@ -192,8 +194,8 @@ abstract class ZendExt_Db_Dao_Abstract
      * Create a query for the given shards.
      *
      * @param array $shards The shards for which the query will be executed.
-     * @param bool $withFromPart Whether or not to include the from part of
-     *                           the select based on the table
+     * @param bool  $withFromPart Whether or not to include the from part of
+     *                            the select based on the table.
      *
      * @return ZendExt_Db_Dao_Select
      */
@@ -228,8 +230,8 @@ abstract class ZendExt_Db_Dao_Abstract
     /**
      * Executes the given query for all shards.
      *
-     * @param string $sql    The query.
-     * @param array  $bind   An array of data to bind to the placeholders.
+     * @param string $sql  The query.
+     * @param array  $bind An array of data to bind to the placeholders.
      *
      * @return Zend_Db_Statement_Interface The statement for the executed query.
      */
@@ -251,9 +253,9 @@ abstract class ZendExt_Db_Dao_Abstract
      * Executes the given query.
      *
      * @param array  $shardingArgs The values for which the query
-     *                                   will be executed.
-     * @param string $sql    The query.
-     * @param array  $bind   An array of data to bind to the placeholders.
+     *                             will be executed.
+     * @param string $sql          The query.
+     * @param array  $bind         An array of data to bind to the placeholders.
      *
      * @return Zend_Db_Statement_Interface The statement for the executed query.
      */
@@ -282,11 +284,14 @@ abstract class ZendExt_Db_Dao_Abstract
      *
      * @return Zend_Db_Statement_Interface The statement for the executed query.
      */
-    protected function _queryForShards(array $shards, $sql, array $bind = array())
+    protected function _queryForShards(array $shards, $sql, 
+        array $bind = array()
+    )
     {
         // If no config, go to default adapter - no sharding
         if (null === self::$_config) {
-            return $this->_getTableForDefaultAdapter()->getAdapter()->query($sql, $bind);
+            return $this->_getTableForDefaultAdapter()->getAdapter()
+                ->query($sql, $bind);
         }
 
         $adapters = array();

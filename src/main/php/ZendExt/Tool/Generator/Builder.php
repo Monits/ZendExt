@@ -1,10 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
-
 /**
  * Builders code generator.
  *
@@ -17,6 +11,11 @@
  * @since     1.3.0
  */
 
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 /**
  * Builders code generator.
  *
@@ -331,8 +330,7 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
     private function _transformDefaultToPhp($default)
     {
         switch ($default) {
-            case
-            ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_TIMESTAMP:
+            case ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_TIMESTAMP:
                 return 'date(\'c\')';
 
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::CURRENT_DATE:

@@ -1,10 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
-
 /**
  * Launcher script for offline processes.
  *
@@ -16,6 +10,11 @@
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 
 error_reporting(E_ALL);
 define('CONFIG_FILE', 'src/main/resources/config/process.xml');
@@ -26,9 +25,11 @@ $loader->registerNamespace('ZendExt_');
 
 try {
 
-    $opts = new Zend_Console_Getopt(array(
-        'config|c=s' => 'Path to process config file. Optional'
-    ));
+    $opts = new Zend_Console_Getopt(
+        array(
+            'config|c=s' => 'Path to process config file. Optional'
+        )
+    );
 
     $opts->parse();
 } catch (Zend_Console_Getopt_Exception $e) {

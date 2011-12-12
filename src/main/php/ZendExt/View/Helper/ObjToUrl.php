@@ -1,10 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
-
 /**
  * Utily to generate urls from model objects.
  *
@@ -17,6 +11,11 @@
  * @since     1.5.0
  */
 
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 /**
  * Utily to generate urls from model objects.
  *
@@ -40,6 +39,7 @@ class ZendExt_View_Helper_ObjToUrl extends Zend_View_Helper_Abstract
      * @param mixed $obj The model object to use.
      *
      * @return string
+     * @throws Exception
      */
     public function objToUrl($obj)
     {
@@ -47,7 +47,7 @@ class ZendExt_View_Helper_ObjToUrl extends Zend_View_Helper_Abstract
         // a toArray and getType method instead of calling getters
         // and get_class? Benchmark!
 
-        $conf = $this->getTemplates();
+        $conf = $this->_getTemplates();
         $class = get_class($obj);
 
         if (!isset($conf[$class])) {
@@ -73,7 +73,7 @@ class ZendExt_View_Helper_ObjToUrl extends Zend_View_Helper_Abstract
      *
      * @return array
      */
-    private function getTemplates()
+    private function _getTemplates()
     {
         if (null === self::$_templates) {
             throw new Exception(

@@ -1,9 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
 
 /**
  * Service for Apple Push Notifications Service (APNS).
@@ -16,6 +11,11 @@
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 
 /**
  * Service for Apple Push Notifications Service (APNS).
@@ -62,7 +62,8 @@ class ZendExt_Service_APNS
     }
 
     /**
-     * Pushes the given message to all the devices identified by the given tokens.
+     * Pushes the given message to all the devices identified by 
+     * the given tokens.
      * 
      * @param string|array                      $tokens  The tokens to which to
      *                                                   send the notification.
@@ -78,16 +79,28 @@ class ZendExt_Service_APNS
         }
         
         $ctx = stream_context_create();
-        stream_context_set_option($ctx, 'ssl', 'local_cert', $this->_certificatePath);
+        stream_context_set_option(
+            $ctx, 'ssl', 'local_cert', $this->_certificatePath
+        );
         
         // Do we need a passhphrase?
         if (null !== $this->_passphrase) {
-        	stream_context_set_option($ctx, 'ssl', 'passphrase', $this->_passphrase);
+            stream_context_set_option(
+                $ctx, 'ssl', 'passphrase', $this->_passphrase
+            );
         }
         
-        $pushUrl = $this->_sandbox ? self::SANDBOX_PUSH_URL : self::PRODUCTION_PUSH_URL;
+        $pushUrl = $this->_sandbox ? 
+            self::SANDBOX_PUSH_URL : self::PRODUCTION_PUSH_URL;
         
-        $fd = stream_socket_client($pushUrl, $error, $errorString, 100, STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT, $ctx);
+        $fd = stream_socket_client(
+            $pushUrl,
+            $error,
+            $errorString, 
+            100, 
+            STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT, 
+            $ctx
+        );
 
         if (!$fd) {
             throw new ZendExt_Service_APNS_CommunicationException();
@@ -112,19 +125,35 @@ class ZendExt_Service_APNS
      * @return array List of tokens which are no longer valid.
      * @throws ZendExt_Service_APNS_CommunicationException
      */
-    public function checkFeedback() {
+    public function checkFeedback()
+    {
         $ctx = stream_context_create();
-        stream_context_set_option($ctx, 'ssl', 'local_cert', $this->_certificatePath);
+        stream_context_set_option(
+            $ctx, 'ssl', 'local_cert', $this->_certificatePath
+        );
         stream_context_set_option($ctx, 'ssl', 'verify_peer', false);
         
         // Do we need a passhphrase?
         if (null !== $this->_passphrase) {
-        	stream_context_set_option($ctx, 'ssl', 'passphrase', $this->_passphrase);
+            stream_context_set_option(
+                $ctx, 
+                'ssl', 
+                'passphrase', 
+                $this->_passphrase
+            );
         }
         
-        $feedbackUrl = $this->_sandbox ? self::SANDBOX_FEEDBACK_URL : self::PRODUCTION_FEEDBACK_URL;
+        $feedbackUrl = $this->_sandbox ? 
+            self::SANDBOX_FEEDBACK_URL : self::PRODUCTION_FEEDBACK_URL;
         
-        $fd = stream_socket_client($feedbackUrl, $error, $errorString, 100, STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT, $ctx);
+        $fd = stream_socket_client(
+            $feedbackUrl,
+            $error, 
+            $errorString, 
+            100, 
+            STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT, 
+            $ctx
+        );
 
         if (!$fd) {
             throw new ZendExt_Service_APNS_CommunicationException();

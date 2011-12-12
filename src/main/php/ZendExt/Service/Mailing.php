@@ -1,9 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
 
 /**
  * Service to send html mails massively.
@@ -29,6 +24,11 @@
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 class ZendExt_Service_Mailing
 {
     protected $_view;

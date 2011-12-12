@@ -1,10 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
-
 /**
  * CRUD Controller.
  *
@@ -17,6 +11,11 @@
  * @since     1.0.0
  */
 
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 /**
  * CRUD Controller.
  *
@@ -136,7 +135,7 @@ abstract class ZendExt_Controller_CRUDAbstract
 
             $translatedList = array(
                 'modifyTitle' => $this->_listModifyTitle,
-            	'newButton' => $this->_listNewButton,
+            'newButton' => $this->_listNewButton,
                 'deleteButton' => $this->_listDeleteButton,
                 'editButton' => $this->_listEditButton
             );
@@ -541,10 +540,9 @@ abstract class ZendExt_Controller_CRUDAbstract
                             'Label', array('tag' => 'dt'))
                     );
                     $elements[$field]->addDecorators($decorators);
-                    $elements[$field]
-                        ->setLabel(
-                            (isset($this->_viewToColumnMap[$field]) ?
-                                $this->_viewToColumnMap[$field] : $field) . ':'
+                    $elements[$field]->setLabel(
+                        (isset($this->_viewToColumnMap[$field]) ?
+                            $this->_viewToColumnMap[$field] : $field) . ':'
                     );
 
                     $required = true == $nullable ? false : true;
@@ -585,7 +583,8 @@ abstract class ZendExt_Controller_CRUDAbstract
                 $checkValue = 'checked';
                 if (null !== $checks) {
                     $checkValue = $checks[$field] == '0' ? '' : 'checked';
-                } else if (null !== $row) { // We are updating from db, check if null
+                } else if (null !== $row) { 
+                    // We are updating from db, check if null
                     $column = $this->_fieldToColumnMap[$field];
                     $value = $row[$column];
                     $checkValue = $value === null ? '' : 'checked';
@@ -618,14 +617,10 @@ abstract class ZendExt_Controller_CRUDAbstract
         }
 
         $sendButton = 'send';
-        if ($this->_actualForm === 'new'
-        	&& null != $this->_createButton
-        ) {
+        if ($this->_actualForm === 'new' && null != $this->_createButton) {
             $sendButton = $this->_createButton;
-        }
-        elseif ($this->_actualForm === 'update'
-        	&& null != $this->_listEditButton
-        ) {
+        } elseif ($this->_actualForm === 'update' 
+            && null != $this->_listEditButton) {
             $sendButton = $this->_listEditButton;
         }
 

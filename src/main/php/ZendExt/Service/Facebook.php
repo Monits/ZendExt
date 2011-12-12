@@ -1,9 +1,4 @@
 <?php
-/*
-*  Copyright 2011, Monits, S.A.
-*  Released under the Apache 2 and New BSD Licenses.
-*  More information: https://github.com/Monits/ZendExt/
-*/
 
 /**
  * Wrapper for Facebook API library.
@@ -34,6 +29,11 @@ require_once('facebook/facebook.php');
  * @link      http://www.zendext.com/
  * @since     1.0.0
  */
+/*
+*  Copyright 2011, Monits, S.A.
+*  Released under the Apache 2 and New BSD Licenses.
+*  More information: https://github.com/Monits/ZendExt/
+*/
 class ZendExt_Service_Facebook
 {
     const PHOTO_SQUARE = 'square';
@@ -79,11 +79,11 @@ class ZendExt_Service_Facebook
     /**
      * Construct a new FB API service.
      *
-     * @param string  $appId		  The application id.
+     * @param string  $appId          The application id.
      * @param string  $apiKey         The API key given by FB.
      * @param string  $apiSecret      The API secret given by FB.
      * @param boolean $generateSecret Whether session API calls should
-     *                                   generate a new secret.
+     *                                generate a new secret.
      */
     public function __construct($appId, $apiKey, $apiSecret,
         $generateSecret=false)
@@ -140,9 +140,9 @@ class ZendExt_Service_Facebook
     public function getAuthorizedFriends()
     {
         $friends = $this->_fb->api(
-        	array(
-        		'method' => 'friends.getappusers'
-        	)
+            array(
+                'method' => 'friends.getappusers'
+            )
         );
         if (is_array($friends)) {
             return $friends;
@@ -153,6 +153,8 @@ class ZendExt_Service_Facebook
 
     /**
      * Get the uids of the friends of the given user.
+     *
+     * @param string $userId The user's id.
      *
      * @return array
      */
@@ -174,15 +176,17 @@ class ZendExt_Service_Facebook
     /**
      * Performs a FQL query.
      *
+     * @param string $query The query.
+     *
      * @return array
      */
     public function execFql($query)
     {
         $ret = $this->_fb->api(
-        	array(
-        		'method' => 'fql.query',
-        	    'query' => $query
-        	)
+            array(
+                'method' => 'fql.query',
+                'query' => $query
+            )
         );
 
         if (is_array($ret)) {
@@ -195,17 +199,20 @@ class ZendExt_Service_Facebook
     /**
      * Post a message on the given wall (own by default).
      *
-     * @param string  $msg      The message to be posted.
-     * @param integer $userId   The id of the user on whose wall to post.
-     * @param string  $picture  The picture associated with the post.
-     * @param string  $actions  The actions for this post.
-     * @param string  $link     The link associated with the post.
-     * @param string  $linkName The name of the link associated with the post.
+     * @param string  $msg            The message to be posted.
+     * @param integer $userId         The id of the user on whose wall to post.
+     * @param string  $picture        The picture associated with the post.
+     * @param string  $actions        The actions for this post.
+     * @param string  $link           The link associated with the post.
+     * @param string  $linkName       The name of the link associated 
+     *                                with the post.
+     * @param string $linkDescription The description associated of the link.
      *
      * @return void
      */
     public function postFeed($msg, $userId = null, $picture = null,
-        $actions = null, $link = null, $linkName = null, $linkDescription = null)
+        $actions = null, $link = null, 
+        $linkName = null, $linkDescription = null)
     {
         if ($userId === null) {
             $userId = $this->getUserId();
@@ -236,8 +243,8 @@ class ZendExt_Service_Facebook
         }
 
         $this->_fb->api(
-        	'/' . $userId . '/feed',
-        	'POST',
+            '/' . $userId . '/feed',
+            'POST',
             $opts
         );
     }
@@ -277,17 +284,18 @@ class ZendExt_Service_Facebook
      *
      * @return array
      */
-    public function getSignedRequest() {
+    public function getSignedRequest()
+    {
         $request = $this->_request->getParam('signed_request');
 
         if ($request === null) {
             return null;
         }
 
-        list($encoded_sig, $payload) = explode('.', $request, 2);
+        list($encodedSig, $payload) = explode('.', $request, 2);
 
         // decode the data
-        $sig = $this->_base64UrlDecode($encoded_sig);
+        $sig = $this->_base64UrlDecode($encodedSig);
         $data = json_decode($this->_base64UrlDecode($payload), true);
 
         if (strtoupper($data['algorithm']) !== 'HMAC-SHA256') {
@@ -295,8 +303,13 @@ class ZendExt_Service_Facebook
         }
 
         // check sig
-        $expected_sig = hash_hmac('sha256', $payload, $this->_apiSecret, $raw = true);
-        if ($sig !== $expected_sig) {
+        $expectedSig = hash_hmac(
+            'sha256', 
+            $payload, 
+            $this->_apiSecret, 
+            $raw = true
+        );
+        if ($sig !== $expectedSig) {
             return null;
         }
 
@@ -310,7 +323,8 @@ class ZendExt_Service_Facebook
      *
      * @return string
      */
-    protected function _base64UrlDecode($input) {
+    protected function _base64UrlDecode($input)
+    {
         return base64_decode(strtr($input, '-_', '+/'));
     }
   
