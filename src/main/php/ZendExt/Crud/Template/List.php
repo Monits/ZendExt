@@ -162,7 +162,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
     /**
      * Renders the list items.
      * 
-     * @param mixede4  $items          The items
+     * @param mixed  $items          The items
      * @param string $controllerName The controller's name.
      * @param string $moduleUrl      The module's url.
      * @param string $newButton      The text for new's button.

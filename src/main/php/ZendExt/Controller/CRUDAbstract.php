@@ -206,11 +206,9 @@ abstract class ZendExt_Controller_CRUDAbstract
              *        and rerender the empty form with a success message.
              */
             $params = $request->getParams();
-            if (isset($params['submit'])) {
-                $this->_redirectTo('list');
-            } else {
-                $this->_redirectTo('new');                
-            }
+            return (isset($params['submit']) ? 
+                $this->_redirectTo('list') : $this->_redirectTo('new')
+            );
 
         } catch (Exception $e) {
             if ($e instanceof Zend_Db_Exception) {
@@ -654,10 +652,9 @@ abstract class ZendExt_Controller_CRUDAbstract
         $form->addElement($submit);
 
         
-        $anotherButton = ($this->_createAnotherButton === null ? 'Create another' : $this->_createAnotherButton);
-        $submit = new Zend_Form_Element_Submit($anotherButton);
+        $submit = new Zend_Form_Element_Submit($this->_createAnotherButton);
         $submit->setName('submitAnother');
-        $submit->setLabel($anotherButton);
+        $submit->setLabel($this->_createAnotherButton);
         $form->addElement($submit);
         
         return $form;
@@ -666,9 +663,9 @@ abstract class ZendExt_Controller_CRUDAbstract
     /**
      * Adds a checkbox on the given form.
      * 
-     * @param Zend_Form $form       The form.
-     * @param array     $checkbox   The array of checkboxes.
-     * @param string    $field      The field.
+     * @param Zend_Form $form     The form.
+     * @param array     $checkbox The array of checkboxes.
+     * @param string    $field    The field.
      * 
      * @return void
      */
