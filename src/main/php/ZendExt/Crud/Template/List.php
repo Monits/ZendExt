@@ -162,7 +162,7 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
     /**
      * Renders the list items.
      * 
-     * @param array  $items          The items
+     * @param mixede4  $items          The items
      * @param string $controllerName The controller's name.
      * @param string $moduleUrl      The module's url.
      * @param string $newButton      The text for new's button.
@@ -171,13 +171,9 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
      * 
      * @return void
      */
-    private function _renderItems(array $items, $controllerName, $moduleUrl,
+    private function _renderItems($items, $controllerName, $moduleUrl,
         $newButton, $deleteButton, $editButton)
     {
-        if (!is_array($items)) {
-            return;
-        }
-        
         $trColor = 'normColor';
         foreach ($items as $item) {
             $arrCols = $item->toArray();

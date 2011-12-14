@@ -57,6 +57,8 @@ abstract class ZendExt_Controller_CRUDAbstract
     protected $_listDeleteButton = null;
     protected $_listEditButton = null;
     protected $_createButton = null;
+    
+    protected $_createAnotherButton = null;
 
     private $_actualForm = null;
 
@@ -203,8 +205,12 @@ abstract class ZendExt_Controller_CRUDAbstract
              * TODO : Optionally alow the user to "add another"
              *        and rerender the empty form with a success message.
              */
-
-            $this->_redirectTo('list');
+            $params = $request->getParams();
+            if (isset($params['submit'])) {
+                $this->_redirectTo('list');
+            } else {
+                $this->_redirectTo('new');                
+            }
 
         } catch (Exception $e) {
             if ($e instanceof Zend_Db_Exception) {
@@ -462,7 +468,7 @@ abstract class ZendExt_Controller_CRUDAbstract
      *
      * @return array|null
      */
-    private function _getRow(array $pk)
+    private function _getRow($pk)
     {
         if (!is_array($pk)) {
             return null;    
@@ -638,32 +644,38 @@ abstract class ZendExt_Controller_CRUDAbstract
             }
 
             $form->addElement($elements[$field]);
-            $existCheck = array_key_exists($field, $checkbox);
-            $this->_addCheckboxToForm($form, $existCheck, $checkbox[$field]);
+            $this->_addCheckboxToForm($form, $checkbox, $field);
         }
 
         $sendButton = $this->_getButtonValue();
         $submit = new Zend_Form_Element_Submit($sendButton);
-        $submit->setName('send');
+        $submit->setName('submit');
         $submit->setLabel($sendButton);
         $form->addElement($submit);
 
+        
+        $anotherButton = ($this->_createAnotherButton === null ? 'Create another' : $this->_createAnotherButton);
+        $submit = new Zend_Form_Element_Submit($anotherButton);
+        $submit->setName('submitAnother');
+        $submit->setLabel($anotherButton);
+        $form->addElement($submit);
+        
         return $form;
     }
     
     /**
      * Adds a checkbox on the given form.
      * 
-     * @param Zend_Form         $form       The form.
-     * @param boolean           $existCheck True if the checkbox is set.
-     * @param Zend_Form_Element $checkbox   The checkbox.
+     * @param Zend_Form $form       The form.
+     * @param array     $checkbox   The array of checkboxes.
+     * @param string    $field      The field.
      * 
      * @return void
      */
-    private function _addCheckboxToForm(Zend_Form $form, $existCheck, $checkbox)
+    private function _addCheckboxToForm(Zend_Form $form, $checkbox, $field)
     {
-        if ($existCheck) {
-            $form->addElement($checkbox);
+        if (array_key_exists($field, $checkbox)) {
+            $form->addElement($checkbox[$field]);
         }
     }
     
