@@ -33,7 +33,7 @@ class ZendExt_Service_DineroMail_IPN_Buyer extends ZendExt_Model_SimpleXML
     /**
      * Construct a new instance from an XML
      *
-     * @param SimpleXMLElement $xml
+     * @param SimpleXMLElement $xml The xml.
      */
     public function __construct(SimpleXMLElement $xml)
     {

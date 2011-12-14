@@ -91,7 +91,7 @@ class ZendExt_Paginator_Adapter_DbDaoSelect
      *
      * @return Zend_Paginator_Adapter_DbDaoSelect
      *
-     * @throws Zend_Paginator_Exception
+     * @throws Zend_Paginator_Exception 
      */
     public function setRowCount($rowCount)
     {
@@ -106,12 +106,9 @@ class ZendExt_Paginator_Adapter_DbDaoSelect
 
             $rowCountColumn = self::ROW_COUNT_COLUMN;
 
-//          The select query can contain only one column, 
-//          which should be the row count column
+            //The select query can contain only one column, 
+            //which should be the row count column
             if (false === strpos($countColumnPart, $rowCountColumn)) {
-                /**
-                 * @see Zend_Paginator_Exception
-                 */
                 throw new Zend_Paginator_Exception(
                     'Row count column not found'
                 );
@@ -119,13 +116,13 @@ class ZendExt_Paginator_Adapter_DbDaoSelect
 
             $queries = $rowCount->query(Zend_Db::FETCH_ASSOC);
 
-//          Compute the total row count per shard
+            //Compute the total row count per shard
             $this->_rowCountPerShard = array();
             foreach ($queries as $query) {
                 $result = $query->fetch();
 
                 $this->_rowCountPerShard[] = count($result) > 0
-                                                ? $result[$rowCountColumn] : 0;
+                                                 ? $result[$rowCountColumn] : 0;
             }
 
             $this->_rowCount = array_sum($this->_rowCountPerShard);
@@ -145,8 +142,8 @@ class ZendExt_Paginator_Adapter_DbDaoSelect
     /**
      * Returns an array of items for a page.
      *
-     * @param  integer $offset Page offset.
-     * @param  integer $itemCountPerPage Number of items per page.
+     * @param integer $offset           Page offset.
+     * @param integer $itemCountPerPage Number of items per page.
      * 
      * @return array
      */

@@ -48,8 +48,6 @@ class ZendExt_Db_Schema
             $config = $config->toArray();
         }
 
-        // TODO: Throw exception if no adapter was given?
-
         $this->_db = Zend_Db::factory($config['adapter'], $config);
     }
 

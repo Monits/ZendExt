@@ -74,6 +74,8 @@ class ZendExt_Service_DineroMail_IPN_Request
     /**
      * Make the request to the server.
      *
+     *@return void
+     *
      * @throws ZendExt_Service_DineroMail_Exception
      */
     private function _makeRequest()
@@ -143,8 +145,9 @@ class ZendExt_Service_DineroMail_IPN_Request
     /**
      * Parse the response.
      *
-     * @param Zend_Http_Response $response
+     * @param Zend_Http_Response $response The response.
      *
+     * @return void
      * @throws ZendExt_Service_DineroMail_Exception
      */
     private function _parseResponse(Zend_Http_Response $response)

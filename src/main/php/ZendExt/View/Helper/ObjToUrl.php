@@ -43,9 +43,11 @@ class ZendExt_View_Helper_ObjToUrl extends Zend_View_Helper_Abstract
      */
     public function objToUrl($obj)
     {
-        // TODO: Maybe this would be more efficient using and interface with
-        // a toArray and getType method instead of calling getters
-        // and get_class? Benchmark!
+        /*
+         * TODO : Maybe this would be more efficient using and interface with
+         *        a toArray and getType method instead of calling getters 
+         *        and get_class? Benchmark!
+         */
 
         $conf = $this->_getTemplates();
         $class = get_class($obj);
@@ -72,6 +74,8 @@ class ZendExt_View_Helper_ObjToUrl extends Zend_View_Helper_Abstract
      * Retrieves the helper's templates.
      *
      * @return array
+     * 
+     * @throws Exception
      */
     private function _getTemplates()
     {

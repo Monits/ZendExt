@@ -40,7 +40,7 @@ class ZendExt_Service_DineroMail_IPN_Ping
     /**
      * Construct a new instance from the ping XML.
      *
-     * @param $data the string containing the XML passed on.
+     * @param string $data The string containing the XML passed on.
      */
     public function __construct($data)
     {

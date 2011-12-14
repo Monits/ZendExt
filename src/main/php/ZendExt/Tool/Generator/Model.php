@@ -397,4 +397,5 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
                 break;
         }
     }
+    
 }

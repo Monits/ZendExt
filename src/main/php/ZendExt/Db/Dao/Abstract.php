@@ -193,7 +193,8 @@ abstract class ZendExt_Db_Dao_Abstract
     /**
      * Create a query for the given shards.
      *
-     * @param array $shards The shards for which the query will be executed.
+     * @param array $shards       The shards for which the query 
+     *                            will be executed.
      * @param bool  $withFromPart Whether or not to include the from part of
      *                            the select based on the table.
      *
