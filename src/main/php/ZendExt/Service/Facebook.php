@@ -345,4 +345,24 @@ class ZendExt_Service_Facebook
             return null;
         }
     }
+    
+    /**
+     * Retrieves the login url.
+     * 
+     * @param string $redirectUrl The redirect url.
+     * @param array  $perms 	  The perms.
+     * @param string $display     The display mode.
+     * 
+     * @return string
+     */
+    public function getLoginUrl($redirectUrl, array $perms = array(), $display = 'page')
+    {
+        return $this->_fb->getLoginUrl(
+            array(
+                'scope' => implode(',', $perms),
+                'redirect_uri' => $redirectUrl,
+                'display' => $display
+            )
+        );
+    }
 }
