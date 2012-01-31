@@ -83,7 +83,7 @@ class ZendExt_Service_APNS
             $ctx, 'ssl', 'local_cert', $this->_certificatePath
         );
         
-        // Do we need a passhphrase?
+        // Do we need a passphrase?
         if (null !== $this->_passphrase) {
             stream_context_set_option(
                 $ctx, 'ssl', 'passphrase', $this->_passphrase
@@ -133,7 +133,7 @@ class ZendExt_Service_APNS
         );
         stream_context_set_option($ctx, 'ssl', 'verify_peer', false);
         
-        // Do we need a passhphrase?
+        // Do we need a passphrase?
         if (null !== $this->_passphrase) {
             stream_context_set_option(
                 $ctx, 
