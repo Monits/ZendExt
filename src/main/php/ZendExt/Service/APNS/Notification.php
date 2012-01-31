@@ -7,7 +7,7 @@
  * @copyright 2011 Monits
  * @license   Copyright (C) 2011. All rights reserved.
  * @version   Release: 1.0.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.0.0
  */
 
@@ -101,7 +101,7 @@ class ZendExt_Service_APNS_Notification
      * Removes the custom data for this notification associated with
      * the given key.
      * 
-     * @param string $key   The key for the custom key-value pair to remove.
+     * @param string $key The key for the custom key-value pair to remove.
      * 
      * @return void.
      */
@@ -133,7 +133,7 @@ class ZendExt_Service_APNS_Notification
     /**
      * Sets the alert for this notification, using localized strings.
      * 
-     * @param string $lockKey The key of the localized string to be displayed.
+     * @param string $locKey  The key of the localized string to be displayed.
      * @param array  $locArgs The arguments to be used inthe localized string.
      * 
      * @return void

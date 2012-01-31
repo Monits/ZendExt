@@ -135,60 +135,14 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         echo '</thead>';
         echo '<tbody>';
 
-        $trColor = 'normColor';
-
-        foreach ($items as $item) {
-
-            $arrCols = $item->toArray();
-
-            echo '<tr class="'.$trColor.'" >';
-
-            foreach ($arrCols as $col => $c) {
-                echo '<td>';
-                echo '<span class="colValue">';
-                $isPk = in_array($col, $this->_view->pk);
-                if ($isPk) {
-                    echo '<a href="/', $moduleUrl, $controllerName, '/update/';
-                    foreach ($this->_view->pk as $k) {
-                        $field = array_search($k, $this->_view->fieldsMap);
-                        echo $field . '/'. $arrCols[$k] . '/';
-                    }
-                    echo '">';
-                }
-                echo $c . ($isPk ? '</a>' : '') . '</span>';
-                echo '</td>';
-            }
-
-            echo '<td>';
-            echo '<a href="/' . $moduleUrl . $controllerName . '/update/';
-            foreach ($this->_view->pk as $k) {
-                $field = array_search($k, $this->_view->fieldsMap);
-                echo $field . '/'. $arrCols[$k] . '/';
-            }
-            echo '">';
-            echo '<button> '.$editButton.' </button>';
-            echo '</a>';
-            echo '</td>';
-
-            echo '<td>';
-            echo '<form action="/' . $moduleUrl . $controllerName . '/delete"',
-                    ' method="post">',
-                    '<input class="button_delete" type="submit"',
-                    ' name="delete" value="'.$deleteButton.'">';
-
-            foreach ($this->_view->pk as $k) {
-                $field = array_search($k, $this->_view->fieldsMap);
-                echo "<input type=\"hidden\" name=\"{$field}\"',
-                		' value=\"{$arrCols[$k]}\">";
-            }
-            echo '</form>';
-
-            echo '</td>'; // delete
-
-            echo '</tr>';
-
-            $trColor = $trColor == 'altColor' ? 'normColor' : 'altColor';
-        }
+        $this->_renderItems(
+            $items, 
+            $controllerName, 
+            $moduleUrl, 
+            $newButton, 
+            $deleteButton, 
+            $editButton
+        );
 
         echo '</tbody>';
         echo '</table>';
@@ -205,6 +159,75 @@ class ZendExt_Crud_Template_List extends ZendExt_Crud_TemplateAbstract
         echo '</div>';
     }
 
+    /**
+     * Renders the list items.
+     * 
+     * @param mixed  $items          The items
+     * @param string $controllerName The controller's name.
+     * @param string $moduleUrl      The module's url.
+     * @param string $newButton      The text for new's button.
+     * @param string $deleteButton   The text for delete's button.
+     * @param string $editButton     The text for edit's button.
+     * 
+     * @return void
+     */
+    private function _renderItems($items, $controllerName, $moduleUrl,
+        $newButton, $deleteButton, $editButton)
+    {
+        $trColor = 'normColor';
+        foreach ($items as $item) {
+            $arrCols = $item->toArray();
+    
+            echo '<tr class="'.$trColor.'" >';
+    
+            foreach ($arrCols as $col => $c) {
+                echo '<td>';
+                echo '<span class="colValue">';
+                $isPk = in_array($col, $this->_view->pk);
+                if ($isPk) {
+                    echo '<a href="/', $moduleUrl, $controllerName, '/update/';
+                    foreach ($this->_view->pk as $k) {
+                        $field = array_search($k, $this->_view->fieldsMap);
+                        echo $field . '/'. $arrCols[$k] . '/';
+                    }
+                    echo '">';
+                }
+                echo $c . ($isPk ? '</a>' : '') . '</span>';
+                echo '</td>';
+            }
+    
+            echo '<td>';
+            echo '<a href="/' . $moduleUrl . $controllerName . '/update/';
+            foreach ($this->_view->pk as $k) {
+                $field = array_search($k, $this->_view->fieldsMap);
+                echo $field . '/'. $arrCols[$k] . '/';
+            }
+            echo '">';
+            echo '<button> '.$editButton.' </button>';
+            echo '</a>';
+            echo '</td>';
+    
+            echo '<td>';
+            echo '<form action="/' . $moduleUrl . $controllerName . '/delete"',
+                    ' method="post">',
+                    '<input class="button_delete" type="submit"',
+                    ' name="delete" value="'.$deleteButton.'">';
+    
+            foreach ($this->_view->pk as $k) {
+                $field = array_search($k, $this->_view->fieldsMap);
+                echo "<input type=\"hidden\" name=\"{$field}\"',
+                		' value=\"{$arrCols[$k]}\">";
+            }
+            echo '</form>';
+    
+            echo '</td>'; // delete
+    
+            echo '</tr>';
+    
+            $trColor = $trColor == 'altColor' ? 'normColor' : 'altColor';
+        }
+    }
+    
     /**
      * Renders the page bar.
      *

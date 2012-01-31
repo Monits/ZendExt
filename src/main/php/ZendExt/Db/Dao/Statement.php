@@ -8,10 +8,15 @@
  * @copyright 2010 Juan Sotuyo
  * @license   Copyright (C) 2011. All rights reserved.
  * @version   Release: 1.0.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.0.0
  */
 
+/*
+ *  Copyright 2011, Monits, S.A.
+ *  Released under the Apache 2 and New BSD Licenses.
+ *  More information: https://github.com/Monits/ZendExt/
+ */
 /**
  * Wraps several statements as one, allowing to be used in DAOs.
  *
@@ -21,13 +26,8 @@
  * @copyright 2010 Juan Sotuyo
  * @license   Copyright 2011. All rights reserved.
  * @version   Release: 1.0.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.0.0
- */
-/*
- *  Copyright 2011, Monits, S.A.
- *  Released under the Apache 2 and New BSD Licenses.
- *  More information: https://github.com/Monits/ZendExt/
  */
 class ZendExt_Db_Dao_Statement implements Zend_Db_Statement_Interface
 {
@@ -54,7 +54,7 @@ class ZendExt_Db_Dao_Statement implements Zend_Db_Statement_Interface
      *
      * @param string $column Name the column in the result set, either by
      *                       position or by name.
-     * @param mixed  $param  Reference to the PHP variable 
+     * @param mixed  &$param Reference to the PHP variable 
      * 	                     containing the value.
      * @param mixed  $type   OPTIONAL
      * 
@@ -76,7 +76,7 @@ class ZendExt_Db_Dao_Statement implements Zend_Db_Statement_Interface
      * Binds a parameter to the specified variable name.
      *
      * @param mixed $parameter Name the parameter, either integer or string.
-     * @param mixed $variable  Reference to PHP variable containing the value.
+     * @param mixed &$variable Reference to PHP variable containing the value.
      * @param mixed $type      OPTIONAL Datatype of SQL parameter.
      * @param mixed $length    OPTIONAL Length of SQL parameter.
      * @param mixed $options   OPTIONAL Other options.
@@ -185,8 +185,8 @@ class ZendExt_Db_Dao_Statement implements Zend_Db_Statement_Interface
         foreach ($this->_statements as $stmt) {
             $errorInfo = $stmt->errorInfo();
 
-                return $errorInfo;
             if (!empty($errorInfo)) {
+                return $errorInfo;
             }
         }
 

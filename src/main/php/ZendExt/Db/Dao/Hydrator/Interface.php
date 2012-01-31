@@ -7,7 +7,7 @@
  * @copyright 2010 Juan Sotuyo
  * @license   Copyright (C) 2011. All rights reserved.
  * @version   Release: 1.0.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.0.0
  */
 
@@ -25,7 +25,7 @@
  * @copyright 2010 Juan Sotuyo
  * @license   Copyright 2011. All rights reserved.
  * @version   Release: 1.0.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.0.0
  */
 interface ZendExt_Db_Dao_Hydrator_Interface

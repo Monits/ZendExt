@@ -7,7 +7,7 @@
  * @copyright 2011 Monits
  * @license   Copyright (C) 2011. All rights reserved.
  * @version   Release: 1.0.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.5.0
  */
 
@@ -25,7 +25,7 @@
  * @copyright 2011 Monits
  * @license   Copyright 2011. All rights reserved.
  * @version   Release: 1.0.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.5.0
  */
 class ZendExt_Service_DineroMail_IPN_Buyer extends ZendExt_Model_SimpleXML
@@ -33,7 +33,7 @@ class ZendExt_Service_DineroMail_IPN_Buyer extends ZendExt_Model_SimpleXML
     /**
      * Construct a new instance from an XML
      *
-     * @param SimpleXMLElement $xml
+     * @param SimpleXMLElement $xml The xml.
      */
     public function __construct(SimpleXMLElement $xml)
     {

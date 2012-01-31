@@ -7,7 +7,7 @@
  * @copyright 2011 Monits
  * @license   Copyright (C) 2011. All rights reserved.
  * @version   Release: 1.0.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.0.0
  */
 
@@ -25,7 +25,7 @@
  * @copyright 2011 Monits
  * @license   Copyright 2011. All rights reserved.
  * @version   Release: 1.0.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.0.0
  */
 class ZendExt_Controller_Router_Route_Module

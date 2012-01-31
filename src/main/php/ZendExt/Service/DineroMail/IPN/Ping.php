@@ -7,7 +7,7 @@
  * @copyright 2011 Monits
  * @license   Copyright (C) 2011. All rights reserved.
  * @version   Release: 1.0.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.5.0
  */
 
@@ -25,7 +25,7 @@
  * @copyright 2011 Monits
  * @license   Copyright 2011. All rights reserved.
  * @version   Release: 1.0.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.5.0
  */
 class ZendExt_Service_DineroMail_IPN_Ping
@@ -40,7 +40,7 @@ class ZendExt_Service_DineroMail_IPN_Ping
     /**
      * Construct a new instance from the ping XML.
      *
-     * @param $data the string containing the XML passed on.
+     * @param string $data The string containing the XML passed on.
      */
     public function __construct($data)
     {

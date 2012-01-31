@@ -8,7 +8,7 @@
  * @copyright 2011 Monits
  * @license   Copyright (C) 2011. All rights reserved.
  * @version   Release: 1.0.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.0.0
  */
 
@@ -26,7 +26,7 @@ require_once('facebook/facebook.php');
  * @copyright 2011 Monits
  * @license   Copyright 2011. All rights reserved.
  * @version   Release: 1.0.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.0.0
  */
 /*
@@ -199,14 +199,14 @@ class ZendExt_Service_Facebook
     /**
      * Post a message on the given wall (own by default).
      *
-     * @param string  $msg            The message to be posted.
-     * @param integer $userId         The id of the user on whose wall to post.
-     * @param string  $picture        The picture associated with the post.
-     * @param string  $actions        The actions for this post.
-     * @param string  $link           The link associated with the post.
-     * @param string  $linkName       The name of the link associated 
-     *                                with the post.
-     * @param string $linkDescription The description associated of the link.
+     * @param string  $msg             The message to be posted.
+     * @param integer $userId          The id of the user on whose wall to post
+     * @param string  $picture         The picture associated with the post.
+     * @param string  $actions         The actions for this post.
+     * @param string  $link            The link associated with the post.
+     * @param string  $linkName        The name of the link associated 
+     *                                 with the post.
+     * @param string  $linkDescription The description associated of the link.
      *
      * @return void
      */
@@ -344,5 +344,25 @@ class ZendExt_Service_Facebook
         } else {
             return null;
         }
+    }
+    
+    /**
+     * Retrieves the login url.
+     * 
+     * @param string $redirectUrl The redirect url.
+     * @param array  $perms 	  The perms.
+     * @param string $display     The display mode.
+     * 
+     * @return string
+     */
+    public function getLoginUrl($redirectUrl, array $perms = array(), $display = 'page')
+    {
+        return $this->_fb->getLoginUrl(
+            array(
+                'scope' => implode(',', $perms),
+                'redirect_uri' => $redirectUrl,
+                'display' => $display
+            )
+        );
     }
 }

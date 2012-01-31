@@ -8,7 +8,7 @@
  * @copyright 2010 Juan Sotuyo
  * @license   Copyright (C) 2011. All rights reserved.
  * @version   Release: 1.0.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.0.0
  */
 
@@ -21,7 +21,7 @@
  * @copyright 2010 Juan Sotuyo
  * @license   Copyright 2011. All rights reserved.
  * @version   Release: 1.0.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.0.0
  */
 /*
@@ -336,13 +336,13 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
      * * joinRightUsing
      * * joinLeftUsing
      *
-     * @param  null|string               $type   Type of join; inner, left, and
-     *                                           null are currently supported
-     * @param  array|string|Zend_Db_Expr $name   Table name
-     * @param  string                    $cond   The column on which to join
-     * @param  array|string              $cols   The columns to select from the
-     *                                           joined table
-     * @param  string                    $schema The database name to specify,
+     * @param null|string               $type   Type of join; inner, left, and
+     *                                          null are currently supported
+     * @param array|string|Zend_Db_Expr $name   Table name
+     * @param string                    $cond   The column on which to join
+     * @param array|string              $cols   The columns to select from the
+     *                                          joined table
+     * @param string                    $schema The database name to specify,
      *                                           if any.
      *
      * @return ZendExt_Db_Dao_Select This ZendExt_Db_Dao_Select object.

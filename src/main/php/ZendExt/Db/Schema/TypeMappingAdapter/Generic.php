@@ -7,7 +7,7 @@
  * @copyright 2011 Monits
  * @license   Copyright (C) 2011. All rights reserved.
  * @version   Release: 1.3.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.3.0
  */
 
@@ -25,7 +25,7 @@
  * @copyright 2011 Monits
  * @license   Copyright 2011. All rights reserved.
  * @version   Release: 1.3.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.3.0
  */
 class ZendExt_Db_Schema_TypeMappingAdapter_Generic
@@ -65,30 +65,35 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
         switch ($type) {
             case 'bool':
                 return array('name' => self::TYPE_BOOLEAN);
+                
             case 'tinyint':
                 return array(
                     'name' => self::TYPE_INTEGER,
                     'min' => $unsigned ? 0 : -128,
                     'max' => $unsigned ? 255 : 127
                 );
+                
             case 'smallint':
                 return array(
                     'name' => self::TYPE_SMALLINT,
                     'min' => $unsigned ? 0 : -32768,
                     'max' => $unsigned ? 65535 : 32767
                 );
+                
             case 'mediumint':
                 return array(
                     'name' => self::TYPE_INTEGER,
                     'min' => $unsigned ? 0 : -8388608,
                     'max' => $unsigned ? 16777215 : 8388607
                 );
+                
             case 'int':
                 return array(
                     'name' => self::TYPE_INTEGER,
                     'min' => $unsigned ? 0 : -2147483648,
                     'max' => $unsigned ? 4294967295 : 2147483647
                 );
+                
             case 'bigint':
             case 'serial':
                 return array(
@@ -97,16 +102,20 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
                     'max' => $unsigned ? 18446744073709551615
                                             : 9223372036854775807
                 );
+                
             case 'double':
                 return array('name' => self::TYPE_DOUBLE_PRECISION);
+                
             case 'tinyblob':
             case 'mediumblob':
             case 'longblob':
                 return array('name' => self::TYPE_BLOB);
+                
             case 'tinytext':
             case 'mediumtext':
             case 'longtext':
                 return array('name' => self::TYPE_TEXT);
+                
             case 'varbinary':
                 return array('name' => self::TYPE_BINARY_VARYING);
 
@@ -115,6 +124,7 @@ class ZendExt_Db_Schema_TypeMappingAdapter_Generic
                     'name' => self::TYPE_ENUM,
                     'options' => $this->_parseEnum($type)
                 );
+                
             default:
                 // For types that max and min is not necessary.
                 break;

@@ -57,6 +57,8 @@ abstract class ZendExt_Controller_CRUDAbstract
     protected $_listDeleteButton = null;
     protected $_listEditButton = null;
     protected $_createButton = null;
+    
+    protected $_createAnotherButton = null;
 
     private $_actualForm = null;
 
@@ -135,7 +137,7 @@ abstract class ZendExt_Controller_CRUDAbstract
 
             $translatedList = array(
                 'modifyTitle' => $this->_listModifyTitle,
-            'newButton' => $this->_listNewButton,
+                'newButton' => $this->_listNewButton,
                 'deleteButton' => $this->_listDeleteButton,
                 'editButton' => $this->_listEditButton
             );
@@ -203,12 +205,14 @@ abstract class ZendExt_Controller_CRUDAbstract
              * TODO : Optionally alow the user to "add another"
              *        and rerender the empty form with a success message.
              */
-
-            $this->_redirectTo('list');
+            $params = $request->getParams();
+            return (isset($params['submit']) ? 
+                $this->_redirectTo('list') : $this->_redirectTo('new')
+            );
 
         } catch (Exception $e) {
             if ($e instanceof Zend_Db_Exception) {
-                $this->view->errorDb = 'Duplicate entry';
+                $this->view->errorDb = $e->__toString();
             }
             $this->view->failedField = $e->getField();
             $this->view->errors = $e->getErrors();
@@ -460,10 +464,14 @@ abstract class ZendExt_Controller_CRUDAbstract
      *
      * @param array $pk Array for field => value of primary to do the lookup.
      *
-     * @return array
+     * @return array|null
      */
-    private function _getRow(array $pk)
+    private function _getRow($pk)
     {
+        if (!is_array($pk)) {
+            return null;    
+        }
+        
         $select = $this->_dataSource->select();
 
         foreach ($pk as $field => $value) {
@@ -474,6 +482,43 @@ abstract class ZendExt_Controller_CRUDAbstract
         return $this->_dataSource->fetchOne($select);
     }
 
+    /**
+     * Adds an element with the db error.
+     * 
+     * @param Zend_Form $form The form.
+     * 
+     * @return void
+     */
+    private function _addDbErrorElement(Zend_Form $form)
+    {
+        if (null !== $this->view->errorDb) {
+            //FIXME : cambiar esta forma de mostrar el error de la db!!!
+            $hiddenElement = new Zend_Form_Element_Hidden('errorDb');
+            $hiddenElement->addError($this->view->errorDb)
+                          ->removeDecorator('label');
+            $form->addElement($hiddenElement);
+        }
+    }
+    
+    /**
+     * Retrieves the view text for the given field.
+     * 
+     * @param string $field The field
+     * 
+     * @return string
+     */
+    private function _getViewForColumn($field)
+    {
+        if (!$field) {
+            return '';
+        }
+        if (isset($this->_viewToColumnMap[$field])) {
+            return $this->_viewToColumnMap[$field];
+        } else { 
+            return $field . ':';
+        }
+    }
+    
     /**
      * Create a new form.
      *
@@ -488,10 +533,7 @@ abstract class ZendExt_Controller_CRUDAbstract
             array $pk = null, array $dataField = null, array $checks = null)
     {
         $row = null;
-
-        if (null !== $pk) {
-            $row = $this->_getRow($pk);
-        }
+        $row = $this->_getRow($pk);
 
         $builder = new $this->_builderClass();
         $fields = $builder->getFieldsNames();
@@ -503,14 +545,9 @@ abstract class ZendExt_Controller_CRUDAbstract
              ->setMethod('post')
              ->addDecorator('HtmlTag', array('tag' => 'dl','class' => ''));
 
-        if (null !== $this->view->errorDb) {
-            //FIXME : cambiar esta forma de mostrar el error de la db!!!
-            $hiddenElement = new Zend_Form_Element_Hidden('errorDb');
-            $hiddenElement->addError($this->view->errorDb)
-                          ->removeDecorator('label');
-            $form->addElement($hiddenElement);
-        }
+        $this->_addDbErrorElement($form);
 
+        
         $checkbox = array();
         $elements = array();
         foreach ($fields as $field) {
@@ -525,17 +562,14 @@ abstract class ZendExt_Controller_CRUDAbstract
                         'Label', array('tag' => 'dt'))
                 );
                 $elements[$field]->addDecorators($decorators);
-                $elements[$field]->setLabel(
-                    (isset($this->_viewToColumnMap[$field]) ?
-                        $this->_viewToColumnMap[$field] : $field) . ':'
-                );
+                $elements[$field]->setLabel($this->_getViewForColumn($field));
                 $elements[$field]->addMultiOptions($type);
 
             } else {
-                $zendElement = 'Zend_Form_Element_' . $type;
+                $zendElement = 'Zend_Form_Element_' . ucfirst($type);
 
                 $elements[$field] = new $zendElement($field);
-                if ($type !== 'Hidden') {
+                if ($type !== 'hidden') {
                     $decorators = array('Errors', array(
                             'Label', array('tag' => 'dt'))
                     );
@@ -562,7 +596,7 @@ abstract class ZendExt_Controller_CRUDAbstract
                 $elements[$field]->setValue($value);
             }
 
-            if (null !==$dataField && 'Hidden' !== $type) {
+            if (null !== $dataField && 'hidden' !== $type) {
                 $value = $dataField[$field];
                 $elements[$field]->setValue($value);
                 if ($this->view->failedField == $field) {
@@ -591,12 +625,10 @@ abstract class ZendExt_Controller_CRUDAbstract
                 }
                 $textLabel = 'Enable';
 
-                if ('' == $checkValue) {
-                    $elements[$field]->setAttrib('disable', true);
-                } else {
-                    $checkbox[$field]->setAttrib('checked', $checkValue);
-
-                }
+                ('' == $checkValue ? 
+                    $elements[$field]->setAttrib('disable', true) 
+                    : $checkbox[$field]->setAttrib('checked', $checkValue)
+                );
                 $jsFunction = 'checkField(\''.$field.'\')';
 
                 $checkbox[$field]->setAttrib('onClick', $jsFunction);
@@ -610,26 +642,55 @@ abstract class ZendExt_Controller_CRUDAbstract
             }
 
             $form->addElement($elements[$field]);
-            $existCheck = array_key_exists($field, $checkbox);
-            if (true == $existCheck) {
-                $form->addElement($checkbox[$field]);
-            }
+            $this->_addCheckboxToForm($form, $checkbox, $field);
         }
 
-        $sendButton = 'send';
-        if ($this->_actualForm === 'new' && null != $this->_createButton) {
-            $sendButton = $this->_createButton;
-        } elseif ($this->_actualForm === 'update' 
-            && null != $this->_listEditButton) {
-            $sendButton = $this->_listEditButton;
-        }
-
+        $sendButton = $this->_getButtonValue();
         $submit = new Zend_Form_Element_Submit($sendButton);
-        $submit->setName('send');
+        $submit->setName('submit');
         $submit->setLabel($sendButton);
         $form->addElement($submit);
 
+        
+        $submit = new Zend_Form_Element_Submit($this->_createAnotherButton);
+        $submit->setName('submitAnother');
+        $submit->setLabel($this->_createAnotherButton);
+        $form->addElement($submit);
+        
         return $form;
+    }
+    
+    /**
+     * Adds a checkbox on the given form.
+     * 
+     * @param Zend_Form $form     The form.
+     * @param array     $checkbox The array of checkboxes.
+     * @param string    $field    The field.
+     * 
+     * @return void
+     */
+    private function _addCheckboxToForm(Zend_Form $form, $checkbox, $field)
+    {
+        if (array_key_exists($field, $checkbox)) {
+            $form->addElement($checkbox[$field]);
+        }
+    }
+    
+    /**
+     * Retrieves the button's value.
+     * 
+     * @return string
+     */
+    private function _getButtonValue()
+    {
+        $sendButton = 'send';
+        if ($this->_actualForm == 'new' && null != $this->_createButton) {
+            $sendButton = $this->_createButton;
+        } elseif ($this->_actualForm == 'update' 
+            && null != $this->_listEditButton) {
+            $sendButton = $this->_listEditButton;
+        }
+        return $sendButton;
     }
 
     /**
@@ -646,7 +707,7 @@ abstract class ZendExt_Controller_CRUDAbstract
             foreach ((array) $pk as $k) {
                 $pkField = array_search($k, $this->_fieldToColumnMap);
                 if ($pkField == $field) {
-                    return 'Hidden';
+                    return 'hidden';
                 }
             }
         }
@@ -654,7 +715,7 @@ abstract class ZendExt_Controller_CRUDAbstract
         $desc = $this->_dataSource->getFieldType($field);
 
         if ($desc == 'text') {
-            return 'Textarea';
+            return 'textarea';
         }
 
         $enum = strpos($desc, 'enum');
@@ -666,8 +727,7 @@ abstract class ZendExt_Controller_CRUDAbstract
             return $ret;
         }
 
-        // TODO : If there is a better fit than 'text' use that
-        return 'Text';
+        return 'text';
     }
 
     /**

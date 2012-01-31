@@ -13,7 +13,7 @@
  * @copyright 2011 Monits
  * @license   Copyright (C) 2011. All rights reserved.
  * @version   1.0.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.0.0
  */
 
@@ -26,7 +26,7 @@
  * @copyright 2011 Monits
  * @license   Copyright 2011. All rights reserved.
  * @version   Release: 1.0.0
- * @link      http://www.zendext.com/
+ * @link      http://www.monits.com/
  * @since     1.0.0
  */
 class LazyStreamTest extends PHPUnit_Framework_TestCase
@@ -194,13 +194,17 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
      */
     public function testFactoryStream()
     {
-        $cfg = array('log' => array('memory' => array(
-            'writerName'   => "Mock",
-            'writerParams' => array(
-                'stream' => 'php://memory',
-                'mode'   => 'a'
+        $cfg = array(
+            'log' => array(
+                'memory' => array(
+                    'writerName'   => "Mock",
+                    'writerParams' => array(
+                        'stream' => 'php://memory',
+                        'mode'   => 'a'
+                    )
+                )
             )
-        )));
+        );
 
         $logger = Zend_Log::factory($cfg['log']);
         self::assertTrue($logger instanceof Zend_Log);
@@ -213,15 +217,37 @@ class LazyStreamTest extends PHPUnit_Framework_TestCase
      */
     public function testFactoryUrl()
     {
-        $cfg = array('log' => array('memory' => array(
-            'writerName'   => "Mock",
-            'writerParams' => array(
-                'url'  => 'http://localhost',
-                'mode' => 'a'
+        $cfg = array(
+            'log' => array(
+                'memory' => array(
+                    'writerName'   => "Mock",
+                    'writerParams' => array(
+                        'url'  => 'http://localhost',
+                        'mode' => 'a'
+                    )
+                )
             )
-        )));
+        );
 
         $logger = Zend_Log::factory($cfg['log']);
         self::assertTrue($logger instanceof Zend_Log);
     }
+    
+    /**
+     * Test the factory method with a stream.
+     *
+     * @return void
+     */
+    public function testFactoryLazyStream()
+    {
+        $cfg = array(
+            'stream' => array(
+            	'stream' => 'php://memory'
+            )
+        );
+        
+        $logger = ZendExt_Log_Writer_LazyStream::factory($cfg);
+        self::assertTrue($logger instanceof ZendExt_Log_Writer_LazyStream);
+    }
+    
 }
