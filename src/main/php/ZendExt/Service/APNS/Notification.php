@@ -140,8 +140,8 @@ class ZendExt_Service_APNS_Notification
      */
     public function setLocalizedAlert($locKey, array $locArgs)
     {
-        $this->_alertLocArgs = $locKey;
-        $this->_alertLocKey = $locArgs;
+        $this->_alertLocArgs = $locArgs;
+        $this->_alertLocKey = $locKey;
         
         // Reset other values
         $this->_alertMessage = null;
