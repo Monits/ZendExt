@@ -167,7 +167,7 @@ class ZendExt_Service_APNS_Notification
             );
         } else if (null !== $this->_alertLocArgs) {
             $message['aps']['alert'] = array(
-                'lock-key' => $this->_alertLocKey,
+                'loc-key' => $this->_alertLocKey,
                 'loc-args' => $this->_alertLocArgs
             );
         } else {
