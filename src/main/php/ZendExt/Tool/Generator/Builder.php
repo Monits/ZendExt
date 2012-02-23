@@ -187,24 +187,26 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
             )
             . "' => array("
             . PHP_EOL;
-
+            
         if (!$desc['nullable'] && null === $desc['default']) {
             $ret .= str_repeat(self::TAB, 2) . "'required' => true," . PHP_EOL;
         }
 
         $default = null;
-
         if ($desc['default'] === null) {
             if ($desc['nullable']) {
                 $default = 'null';
             }
         } else {
             $default = $desc['default'];
+            if (!is_numeric($default)) {
+                $default = "'" . $default . "'";
+            }
         }
 
         if ($default !== null) {
             $ret .= str_repeat(self::TAB, 2) . "'default' => "
-             . $this->_transformDefaultToPhp($default)
+            . $this->_transformDefaultToPhp($default)
             . ',' . PHP_EOL;
         }
 
