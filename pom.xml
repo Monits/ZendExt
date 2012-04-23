@@ -48,19 +48,19 @@
 	<distributionManagement>
 		<repository>
 			<id>nexus</id>
-			<url>http://nexus.monits.com/content/repositories/releases</url>
+			<url>http://nexus.monits.com/content/repositories/oss-releases</url>
 		</repository>
 		<snapshotRepository>
 			<id>nexus</id>
-			<url>http://nexus.monits.com/content/repositories/snapshots</url>
+            <url>http://nexus.monits.com/content/repositories/oss-snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
 
 	<repositories>
 		<repository>
-			<id>thirdparty</id>
-			<url>http://nexus.monits.com/content/repositories/thirdparty/</url>
-			<name>3rd party</name>
+			<id>monits-external</id>
+			<url>http://nexus.monits.com/content/repositories/external/</url>
+			<name>Monits external</name>
 		</repository>
 	</repositories>
 
