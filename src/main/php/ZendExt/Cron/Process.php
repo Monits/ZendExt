@@ -187,8 +187,9 @@ abstract class ZendExt_Cron_Process
         if ($appConfig) {
 
             try {
+                $env = isset($appConfig->env) ? $this->_config->env : 'cron';
                 $app = new Zend_Application(
-                    'cron',
+                    $env,
                     $appConfig
                 );
 
@@ -366,7 +367,7 @@ abstract class ZendExt_Cron_Process
         if ($this->_pidFile && file_exists($this->_pidFile)) {
             $msg = 'A lock file was found when trying to execute '
                 .get_class($this);
-                
+
             $this->_logger->info($msg);
 
             $pid = intval(file_get_contents($this->_pidFile));
@@ -377,7 +378,7 @@ abstract class ZendExt_Cron_Process
             } else {
                 throw new ZendExt_Cron_LockException($msg);
             }
-            
+
 
         }
     }
@@ -481,5 +482,5 @@ abstract class ZendExt_Cron_Process
     protected function _shutdown()
     {
     }
-    
+
 }
