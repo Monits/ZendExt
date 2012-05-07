@@ -1,178 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>ZendExt</groupId>
-	<artifactId>ZendExt</artifactId>
-	<packaging>php</packaging>
-	<name>ZendExt</name>
-	<version>1.6-SNAPSHOT</version>
-	
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ZendExt</groupId>
+    <artifactId>ZendExt</artifactId>
+    <packaging>php</packaging>
+    <name>ZendExt</name>
+    <version>1.6-SNAPSHOT</version>
+
     <description>An extension library for Zend Framework adding multiple new features.</description>
 
-    <organization>
-      <name>Monits S.A.</name>
-      <url>http://monits.com/</url>
-    </organization>
-
-    <licenses>
-        <license>
-            <name>New BSD</name>
-            <url>http://www.opensource.org/licenses/BSD-3-Clause</url>
-            <distribution>repo</distribution>
-            <comments>A business-friendly OSS license</comments>
-        </license>
-      <license>
-        <name>Apache 2</name>
-        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        <distribution>repo</distribution>
-      </license>
-    </licenses>
+    <parent>
+        <groupId>com.monits</groupId>
+        <artifactId>php-pom</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
 
     <scm>
-      <developerConnection>scm:git@github.com:Monits/ZendExt.git</developerConnection>
-      <url>https://github.com/Monits/ZendExt</url>
-      <connection>scm:git://github.com/Monits/ZendExt.git</connection>
+        <developerConnection>scm:git@github.com:Monits/ZendExt.git</developerConnection>
+        <url>https://github.com/Monits/ZendExt</url>
+        <connection>scm:git://github.com/Monits/ZendExt.git</connection>
     </scm>
     <issueManagement>
-      <system>Mantis BugTracker</system>
-      <url>http://mantis.monits.com/</url>
+        <system>Mantis BugTracker</system>
+        <url>http://mantis.monits.com/</url>
     </issueManagement>
-    <ciManagement>
-      <system>Jenkins</system>
-      <url>http://jenkins.monits.com/</url>
-    </ciManagement>
-	
-	<properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-	<distributionManagement>
-		<repository>
-			<id>nexus</id>
-			<url>http://nexus.monits.com/content/repositories/oss-releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>nexus</id>
-            <url>http://nexus.monits.com/content/repositories/oss-snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
 
-	<repositories>
-		<repository>
-			<id>monits-external</id>
-			<url>http://nexus.monits.com/content/repositories/external/</url>
-			<name>Monits external</name>
-		</repository>
-	</repositories>
+    <repositories>
+        <repository>
+            <id>monits-external</id>
+            <url>http://nexus.monits.com/content/repositories/external/</url>
+            <name>Monits external</name>
+        </repository>
+    </repositories>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.phpmaven</groupId>
-				<artifactId>maven-php-plugin</artifactId>
-				<extensions>true</extensions>
-				<version>1.0</version>
-				<configuration>
-                    <compileArgs> -d auto_prepend_file=maven-autoloader.php</compileArgs>
-                    <ignoreValidate>false</ignoreValidate>
-                </configuration>
-			</plugin>
-			<plugin>
-        		<groupId>org.apache.maven.plugins</groupId>
-        		<artifactId>maven-jar-plugin</artifactId>
-        		<version>2.3</version>
-        		<configuration>
-          			<excludes>
-            			<exclude>maven-autoloader.php</exclude>
-          			</excludes>
-        		</configuration>
-      		</plugin>
-			<plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.1.1</version>
-                <executions>
-                    <execution>
-                        <id>reports-dir</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>mkdir</executable>
-                            <arguments>
-                                <argument>-p</argument>
-                                <argument>${project.build.directory}/reports/coverage</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>codesniffer</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>phpcs</executable>
-                            <arguments>
-                                <argument>--standard=Zend</argument>
-                                <argument>--report=checkstyle</argument>
-                                <!-- Hudson's plugin needs it to be in the target folder... -->
-                                <argument>--report-file=${project.build.directory}/checkstyle-result.xml</argument>
-                                <argument>src/main/</argument>
-                            </arguments>
-                            <successCodes>
-                                <!-- Prevent the build from failing due a coding style error -->
-                                <successCode>0</successCode>
-                                <successCode>1</successCode>
-                            </successCodes>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>phpunit</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>phpunit</executable>
-                            <arguments>
-                                <!-- Since phpunit uses spaces as separators, we need to set these key-value pairs as different arguments -->
-                                <argument>--log-xml</argument>
-                                <argument>${project.build.directory}/reports/phpunit.xml</argument>
-                                
-                                <!-- Hudson's plugin needs it to be in the target folder... -->
-                                <argument>--log-pmd</argument>
-                                <argument>${project.build.directory}/pmd.xml</argument>
-                                
-                                <argument>--coverage-clover</argument>
-                                <argument>${project.build.directory}/reports/clover.xml</argument>
-                                
-                                <argument>--coverage-html</argument>
-                                <argument>${project.build.directory}/reports/coverage/</argument>
-                                
-                                <argument>-dmemory_limit=512M</argument>
-                                
-                                <!-- Properly set include path and autoloader to allow everything to work -->
-                                <argument>--bootstrap</argument>
-                                <argument>maven-autoloader.php</argument>
-                                <argument>-dinclude_path=src/main/php:src/test/php:/usr/share/php:target/phpinc</argument>
-                                
-                                <argument>src/test/php/</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-		</plugins>
-	</build>
-	<dependencies>
-		<dependency>
-			<groupId>org.phpunit</groupId>
-			<artifactId>phpunit5</artifactId>
-			<version>3.3.9</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
+    <dependencies>
+        <dependency>
             <groupId>com.zend</groupId>
             <artifactId>zend-framework-stripped</artifactId>
             <version>1.10.2</version>
@@ -184,45 +46,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-        	<groupId>com.facebook</groupId>
-        	<artifactId>graphapi</artifactId>
-        	<version>3.0.1</version>
+            <groupId>com.facebook</groupId>
+            <artifactId>graphapi</artifactId>
+            <version>3.0.1</version>
         </dependency>
-	</dependencies>
+    </dependencies>
 
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.1</version>
-			</plugin>
-		    <plugin>
-                <groupId>org.phpmaven</groupId>
-                <artifactId>maven-php-plugin</artifactId>
-                <version>1.0</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>doxygen</report>
-                            <!-- The plugin fails to find this on Debian-based machines -->
-<!--                            <report>phpdocumentor</report>-->
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>2.4</version>
-				<reportSets>
-					<reportSet>
-						<reports>
-							<report>report-only</report>
-						</reports>
-					</reportSet>
-				</reportSets>
-			</plugin>
-		</plugins>
-	</reporting>
 </project>
