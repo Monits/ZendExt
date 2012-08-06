@@ -54,6 +54,13 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
     protected $_originalFrom;
 
     /**
+     * The original columns, when deferred calls where first triggered.
+     *
+     * @var array
+     */
+    protected $_originalColumns;
+
+    /**
      * Indicates how many times the deferred calls whre triggered.
      *
      * @var integer
@@ -405,6 +412,7 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
 
         // Store the original from now the call stack is started
         $this->_originalFrom = $this->_parts[self::FROM];
+        $this->_originalColums = $this->_parts[self::COLUMNS];
 
         if (null === $this->_table) {
             if (isset($this->_tables[0])) {
@@ -444,6 +452,7 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
             return;
         }
 
+        $this->_parts[self::COLUMNS] = $this->_originalColumns;
         $this->_parts[self::FROM] = $this->_originalFrom;
         $this->_parts[self::WHERE] = array();
         $this->_parts[self::HAVING] = array();
