@@ -36,19 +36,15 @@ class ZendExt_Db_Schema
     /**
      * Creates a new descriptor.
      *
-     * @param Zend_Config|array $config The database configuration.
-     *                                  Standard config for Zend_Db is required
-     *                                  plus the adapter to use.
+     * @param string            $adapter The adapter to be used.
+     * @param Zend_Config|array $config  The database configuration.
+     *                                   Standard config for Zend_Db is required
      *
      * @return ZendExt_Db_Schema
      */
-    public function __construct($config)
+    public function __construct($adapter, $config)
     {
-        if ($config instanceof Zend_Config) {
-            $config = $config->toArray();
-        }
-
-        $this->_db = Zend_Db::factory($config['adapter'], $config);
+        $this->_db = Zend_Db::factory($adapter, $config);
     }
 
     /**

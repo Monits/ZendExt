@@ -134,13 +134,13 @@ abstract class ZendExt_Tool_Generator_Abstract
             $this->_getLogger()->debug('Schema required, getting it');
 
             $desc = new ZendExt_Db_Schema(
+                $this->_opts->adapter,
                 array(
                     'host' => $this->_opts->host === null ?
                         'localhost' : $this->_opts->host,
                     'dbname' => $this->_opts->dbname,
                     'username' => $this->_opts->username,
-                    'password' => $this->_opts->password,
-                    'adapter' => $this->_opts->adapter
+                    'password' => $this->_opts->password
                 )
             );
 
