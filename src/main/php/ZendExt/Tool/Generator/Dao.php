@@ -83,7 +83,10 @@ class ZendExt_Tool_Generator_Dao extends ZendExt_Tool_Generator_Abstract
      */
     private function _generateDao($table)
     {
-
+        $this->_getLogger()->debug(
+            'Generating DAO class for table "' . $table . '"'
+        );
+    	
         if (!isset($this->_schema[$table])) {
             throw new ZendExt_Tool_Generator_Exception(
                 'The asked table does not exists (' . $table . ')'

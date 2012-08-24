@@ -39,6 +39,10 @@ class ZendExt_Tool_Generator_CRUD extends ZendExt_Tool_Generator_Abstract
      */
     protected function _doGenerate()
     {
+        $this->_getLogger()->debug(
+            'Generating CRUD Controller class for table "' . $table . '"'
+        );
+    	
         $builder = $this->_opts->builder;
 
         $namespace = $this->_opts->namespace;

@@ -82,7 +82,10 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
      */
     private function _generateBuilder($table)
     {
-
+        $this->_getLogger()->debug(
+            'Generating builder class for table "' . $table . '"'
+        );
+        
         if (!isset($this->_schema[$table])) {
             throw new ZendExt_Tool_Generator_Exception(
                 'The asked table does not exists (' . $table . ')'

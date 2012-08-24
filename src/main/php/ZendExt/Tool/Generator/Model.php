@@ -95,7 +95,10 @@ class ZendExt_Tool_Generator_Model extends ZendExt_Tool_Generator_Abstract
      */
     private function _generateModel($table)
     {
-
+        $this->_getLogger()->debug(
+            'Generating model class for table "' . $table . '"'
+        );
+    	
         if (!isset($this->_schema[$table])) {
             throw new ZendExt_Exception(
                 'The table doesn\'t exist'

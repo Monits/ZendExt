@@ -145,6 +145,7 @@ abstract class ZendExt_Tool_Generator_Abstract
             );
 
             foreach ($desc->listTables() as $table) {
+            	$this->_getLogger()->debug('Describing table ' . $table);
                 $this->_schema[$table] = $desc->describeTable($table);
             }
         }
