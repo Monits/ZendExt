@@ -154,7 +154,7 @@ class ZendExt_Tool_Generator_Dao extends ZendExt_Tool_Generator_Abstract
         );
         
         $body = '$hydrator = new ZendExt_Db_Dao_Hydrator_Constructor(' . PHP_EOL
-            . str_repeat(self::TAB, 2) . "'" . $modelClassName . "'" . PHP_EOL
+            . self::TAB . "'" . $modelClassName . "'" . PHP_EOL
             . ');' . PHP_EOL;
         
         $body .= PHP_EOL;
