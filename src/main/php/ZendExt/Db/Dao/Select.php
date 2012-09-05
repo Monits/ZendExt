@@ -412,7 +412,7 @@ class ZendExt_Db_Dao_Select extends Zend_Db_Table_Select
 
         // Store the original from now the call stack is started
         $this->_originalFrom = $this->_parts[self::FROM];
-        $this->_originalColums = $this->_parts[self::COLUMNS];
+        $this->_originalColumns = $this->_parts[self::COLUMNS];
 
         if (null === $this->_table) {
             if (isset($this->_tables[0])) {
