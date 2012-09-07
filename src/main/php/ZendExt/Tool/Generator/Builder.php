@@ -267,7 +267,7 @@ class ZendExt_Tool_Generator_Builder extends ZendExt_Tool_Generator_Abstract
                     . ')';
 
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_BOOLEAN:
-                return 'new Zend_Validate_Boolean()';
+                return 'new ZendExt_Validate_Boolean()';
 
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_DECIMAL:
             case ZendExt_Db_Schema_TypeMappingAdapter_Generic::TYPE_FLOAT:
