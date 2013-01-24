@@ -37,6 +37,8 @@ class ZendExt_Service_Mailing
     protected $_subject;
     protected $_from;
     protected $_fromName;
+    protected $_cc;
+    protected $_bcc;
 
     /**
      * Creates a new mailing service.
@@ -184,8 +186,9 @@ class ZendExt_Service_Mailing
      * @param string|array $to The e-mail addresses where to send the mail.
      *
      * @return void
+     * @throws ZendExt_Service_Mailing_EmptyRecipientException
      */
-    public function send($to)
+    public function send($to = null)
     {
         /**
          * This is rendered first of all so if something
@@ -194,7 +197,22 @@ class ZendExt_Service_Mailing
         $content = $this->_view->render($this->_mail . '.phtml');
         $mail = new Zend_Mail($this->_view->getEncoding());
 
-        $mail->addTo($to);
+        if ($to === null && $this->_cc === null && $this->_bcc === null) {
+            throw new ZendExt_Service_Mailing_EmptyRecipientException();
+        }
+
+        if ($to != null) {
+            $mail->addTo($to);
+        }
+
+        if ($this->_cc != null) {
+            $mail->addCc($ths->_cc);
+        }
+
+        if ($this->_bcc != null) {
+            $mail->addBcc($ths->_bcc);
+        }
+
         $mail->setSubject($this->_subject);
         $mail->setFrom($this->_from, $this->_fromName);
         $mail->setBodyHtml($content);
@@ -215,4 +233,27 @@ class ZendExt_Service_Mailing
         $this->_view->clearVars();
     }
 
+    /**
+     * Adds Cc recipient.
+     *
+     * @param string|array $to The e-mail addresses where to send the mail.
+     *
+     * @return void.
+     */
+    public function addCc($to)
+    {
+        $this->_cc = $to;
+    }
+
+    /**
+     * Adds Bcc recipient.
+     *
+     * @param string|array $to The e-mail addresses where to send the mail.
+     *
+     * @return void.
+     */
+    public function addBcc($to)
+    {
+        $this->_Bcc = $to;
+    }
 }
