@@ -206,11 +206,11 @@ class ZendExt_Service_Mailing
         }
 
         if ($this->_cc != null) {
-            $mail->addCc($ths->_cc);
+            $mail->addCc($this->_cc);
         }
 
         if ($this->_bcc != null) {
-            $mail->addBcc($ths->_bcc);
+            $mail->addBcc($this->_bcc);
         }
 
         $mail->setSubject($this->_subject);
@@ -234,26 +234,26 @@ class ZendExt_Service_Mailing
     }
 
     /**
-     * Adds Cc recipient.
+     * Sets Cc recipient.
      *
      * @param string|array $to The e-mail addresses where to send the mail.
      *
      * @return void.
      */
-    public function addCc($to)
+    public function setCc($to)
     {
         $this->_cc = $to;
     }
 
     /**
-     * Adds Bcc recipient.
+     * Sets Bcc recipient.
      *
      * @param string|array $to The e-mail addresses where to send the mail.
      *
      * @return void.
      */
-    public function addBcc($to)
+    public function setBcc($to)
     {
-        $this->_Bcc = $to;
+        $this->_bcc = $to;
     }
 }
