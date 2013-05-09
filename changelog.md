@@ -34,6 +34,7 @@
  - **(Fix)** Joins in `ZendExt_Db_Dao_Abstract` were not applied unless a call to `from`was also performed.
  - **(Fix)** The generator now honors the output directory argument to output created files.
  - **(Fix)** Let the Table generator respect the table's name casing so it will allways match.
+ - **(Improvement)** Allows the use of underscores in the database column names and camelCased object properties.
 
 ## 1.5
  - **(Change)** `ZendExt_Dao_Abstract` is now `ZendExt_Db_Dao_Abstract` for compatibility with Zend.
