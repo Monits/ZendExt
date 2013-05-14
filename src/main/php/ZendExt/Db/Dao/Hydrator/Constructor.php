@@ -48,12 +48,40 @@ class ZendExt_Db_Dao_Hydrator_Constructor
     /**
      * Hydrate a row as retrieved from the database into a rich object.
      *
+     * The row names are converted to camelCase.
+     *
      * @param array $row The row's data, as retrieved from the database.
      *
      * @return mixed The rich object created from the original row.
      */
     public function hydrate(array $row)
     {
-        return new $this->_class($row);
+        $translated = array();
+        foreach ($row as $key => $value) {
+            if (strpos($key, '_') !== false) {
+                $key = $this->_toCamelCase($key);
+            }
+            $translated[$key] = $value;
+        }
+        return new $this->_class($translated);
+    }
+
+    
+    /**
+     * Translates a string with underscores into camel case
+     *
+     * @param    string   $str                     String in underscore format
+     * @return   string                            $str translated into camel case
+     */
+    private function _toCamelCase($str)
+    {
+        $parts = explode('_', $str);
+        $partCount = count($parts);
+
+        for ($i = 1; $i < $partCount; $i++) {
+            $parts[$i] = ucfirst($parts[$i]);
+        }
+
+        return implode('', $parts);
     }
 }
